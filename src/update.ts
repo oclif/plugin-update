@@ -41,7 +41,9 @@ export class Updater {
   }
 
   get channel(): string {
-    return this.config.scopedEnvVar('CHANNEL') || 'stable'
+    let pjson = this.config.pjson.oclif as any
+    if (pjson.channel) return pjson.channel
+    return 'stable'
   }
 
   get reexecBin(): string | undefined {
