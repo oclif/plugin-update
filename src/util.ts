@@ -27,7 +27,7 @@ export async function ls(dir: string) {
 
 export function wait(ms: number, unref: boolean = false): Promise<void> {
   return new Promise(resolve => {
-    let t: any = setTimeout(resolve, ms)
+    let t: any = setTimeout(() => resolve(), ms)
     if (unref) t.unref()
   })
 }

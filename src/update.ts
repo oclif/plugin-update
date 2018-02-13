@@ -243,7 +243,9 @@ export class Updater {
       }
 
       let fail = (err: Error) => {
-        fs.remove(dir).then(() => reject(err))
+        fs.remove(dir)
+        .then(() => reject(err))
+        .catch(reject)
       }
 
       let hasher = crypto.createHash('sha256')

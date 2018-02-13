@@ -12,6 +12,7 @@
     "cli-ux": "^3.3.19",
     "cross-spawn": "^6.0.4",
     "date-fns": "^1.29.0",
+    "debug": "^3.1.0",
     "filesize": "^3.6.0",
     "fs-extra": "^5.0.0",
     "http-call": "^5.0.2",
