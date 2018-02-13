@@ -78,7 +78,7 @@ export class Updater {
   }
 
   private get s3Host(): string | undefined {
-    return this.config.scopedEnvVar('S3_HOST')
+    return (this.config.pjson.oclif as any).s3Host || this.config.scopedEnvVar('S3_HOST')
   }
 
   s3url(channel: string, p: string): string {
@@ -154,7 +154,7 @@ export class Updater {
         stdio: ['ignore', fd, fd],
         env: this.autoupdateEnv,
       })
-        .on('error', (e: Error) => cli.warn(e))
+        .on('error', (e: Error) => process.emitWarning(e))
         .unref()
     } catch (e) {
       process.emitWarning(e)

@@ -53,6 +53,7 @@
   "license": "MIT",
   "oclif": {
     "bin": "heroku",
+    "s3Host": "cli-assets.heroku.com",
     "commands": "./lib/commands",
     "hooks": {
       "init": "./lib/hooks/init"
