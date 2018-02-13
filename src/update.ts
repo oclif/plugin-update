@@ -6,7 +6,7 @@ import * as dateSubDays from 'date-fns/sub_days'
 import * as dateSubHours from 'date-fns/sub_hours'
 import * as fs from 'fs-extra'
 import HTTP from 'http-call'
-import * as _ from 'lodash'
+import * as Lodash from 'lodash'
 import * as path from 'path'
 
 import {ls, minorVersionGreater, touch} from './util'
@@ -87,8 +87,9 @@ export class Updater {
   }
 
   async fetchManifest(channel: string): Promise<IManifest> {
+    const http: typeof HTTP = require('http-call').HTTP
     try {
-      let {body} = await HTTP.get(this.s3url(channel, `${this.config.platform}-${this.config.arch}`))
+      let {body} = await http.get(this.s3url(channel, `${this.config.platform}-${this.config.arch}`))
       return body
     } catch (err) {
       if (err.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${channel}`)
@@ -97,6 +98,7 @@ export class Updater {
   }
 
   async fetchVersion(download: boolean): Promise<IVersion> {
+    const http: typeof HTTP = require('http-call').HTTP
     let v: IVersion | undefined
     try {
       if (!download) v = await fs.readJSON(this.versionFile)
@@ -105,7 +107,7 @@ export class Updater {
     }
     if (!v) {
       debug('fetching latest %s version', this.channel)
-      let {body} = await HTTP.get(this.s3url(this.channel, 'version'))
+      let {body} = await http.get(this.s3url(this.channel, 'version'))
       v = body
       await this._catch(() => fs.outputJSON(this.versionFile, v))
     }
@@ -160,6 +162,8 @@ export class Updater {
   }
 
   async update(manifest: IManifest) {
+    const _: typeof Lodash = require('lodash')
+    const http: typeof HTTP = require('http-call').HTTP
     const filesize = require('filesize')
     let base = this.base(manifest)
     const output = path.join(this.clientRoot, manifest.version)
@@ -168,7 +172,7 @@ export class Updater {
     if (!this.s3Host) throw new Error('S3 host not defined')
 
     let url = `https://${this.s3Host}/${this.name}/channels/${manifest.channel}/${base}.tar.gz`
-    let {response: stream} = await HTTP.stream(url)
+    let {response: stream} = await http.stream(url)
 
     await fs.emptyDir(tmp)
     let extraction = this.extract(stream, this.clientRoot, manifest.sha256gz)
