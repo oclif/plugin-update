@@ -78,7 +78,8 @@ export class Updater {
   }
 
   private get s3Host(): string | undefined {
-    return (this.config.pjson.oclif as any).s3Host || this.config.scopedEnvVar('S3_HOST')
+    const pjson = this.config.pjson.oclif as any
+    return (pjson.s3 && pjson.s3.host) || this.config.scopedEnvVar('S3_HOST')
   }
 
   s3url(channel: string, p: string): string {
