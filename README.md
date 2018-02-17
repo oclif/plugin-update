@@ -11,3 +11,6 @@
 [![Known Vulnerabilities](https://snyk.io/test/npm/@oclif/plugin-update/badge.svg)](https://snyk.io/test/npm/@oclif/plugin-update)
 [![Downloads/week](https://img.shields.io/npm/dw/@oclif/plugin-update.svg)](https://npmjs.org/package/@oclif/plugin-update)
 [![License](https://img.shields.io/npm/l/@oclif/plugin-update.svg)](https://github.com/jdxcode/plugin-update/blob/master/package.json)
+
+
+This plugin is still a WIP
