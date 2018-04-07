@@ -30,9 +30,15 @@
   dependencies:
     debug "^3.1.0"
 
-"@oclif/dev-cli@^1.7.2":
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/@oclif/dev-cli/-/dev-cli-1.7.2.tgz#45f6ff3dc67c0374f1a43d6ec348dc8910b45a64"
+"@oclif/config@^1.3.67":
+  version "1.3.67"
+  resolved "https://registry.yarnpkg.com/@oclif/config/-/config-1.3.67.tgz#b5f3c3f72af5db369e13cf1ce677a1f7e04cd258"
+  dependencies:
+    debug "^3.1.0"
+
+"@oclif/dev-cli@^1.7.3":
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/@oclif/dev-cli/-/dev-cli-1.7.3.tgz#cc1d7108289b63164ee9a64452b63d7f9b7808c8"
   dependencies:
     "@heroku-cli/color" "^1.1.3"
     "@oclif/command" "^1.4.7"

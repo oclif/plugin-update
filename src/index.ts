@@ -1,44 +1,30 @@
+import color from '@heroku-cli/color'
 import * as Config from '@oclif/config'
 import {cli} from 'cli-ux'
 import * as spawn from 'cross-spawn'
 import * as dateIsAfter from 'date-fns/is_after'
 import * as dateSubDays from 'date-fns/sub_days'
-import * as dateSubHours from 'date-fns/sub_hours'
 import * as fs from 'fs-extra'
 import HTTP from 'http-call'
 import * as Lodash from 'lodash'
 import * as path from 'path'
 
-import {ls, minorVersionGreater, touch} from './util'
+import {ls, touch} from './util'
 
 const debug = require('debug')('cli:updater')
 
-export interface IVersion {
-  version: string
-  channel: string
-  message?: string
-}
-
-export interface IManifest {
-  version: string
-  channel: string
-  sha256gz: string
-  priority?: number
-}
-
-async function mtime(f: string) {
-  const {mtime} = await fs.stat(f)
-  return mtime
-}
-
-function timestamp(msg: string): string {
-  return `[${new Date().toISOString()}] ${msg}`
-}
-
-export class Updater {
-  constructor(public config: Config.IConfig) {
-    this.config = config
+export function fetchUpdater(config: Config.IConfig): Updater {
+  switch (config.pjson.oclif.autoupdate) {
+    case 'github':
+      return new (require('./github').GithubUpdater)(config)
+    case 's3':
+      return new (require('./s3').S3Updater)(config)
   }
+  throw new Error('oclif.autoupdate must be set to "github" or "s3"')
+}
+
+export abstract class Updater {
+  constructor(public config: Config.IConfig) {}
 
   get channel(): string {
     let pjson = this.config.pjson.oclif as any
@@ -50,23 +36,6 @@ export class Updater {
     return this.config.scopedEnvVar('CLI_BINPATH')
   }
 
-  get name(): string {
-    return this.config.name === '@oclif/plugin-update' ? 'heroku-cli' : this.config.name
-  }
-
-  get autoupdatefile(): string {
-    return path.join(this.config.cacheDir, 'autoupdate')
-  }
-  get autoupdatelogfile(): string {
-    return path.join(this.config.cacheDir, 'autoupdate.log')
-  }
-  get versionFile(): string {
-    return path.join(this.config.cacheDir, `${this.channel}.version`)
-  }
-  get lastrunfile(): string {
-    return path.join(this.config.cacheDir, 'lastrun')
-  }
-
   private get clientRoot(): string {
     return path.join(this.config.dataDir, 'client')
   }
@@ -75,110 +44,19 @@ export class Updater {
     return this.config.windows ? `${b}.cmd` : b
   }
 
-  private get binPath(): string {
-    return this.reexecBin || this.config.bin
-  }
-
-  private get s3Host(): string | undefined {
-    const pjson = this.config.pjson.oclif as any
-    return (pjson.s3 && pjson.s3.host) || this.config.scopedEnvVar('S3_HOST')
-  }
-
-  s3url(channel: string, p: string): string {
-    if (!this.s3Host) throw new Error('S3 host not defined')
-    return `https://${this.s3Host}/${this.name}/channels/${channel}/${p}`
-  }
-
-  async fetchManifest(channel: string): Promise<IManifest> {
-    const http: typeof HTTP = require('http-call').HTTP
-    try {
-      let {body} = await http.get(this.s3url(channel, `${this.config.platform}-${this.config.arch}`))
-      return body
-    } catch (err) {
-      if (err.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${channel}`)
-      throw err
-    }
-  }
-
-  async fetchVersion(download: boolean): Promise<IVersion> {
-    const http: typeof HTTP = require('http-call').HTTP
-    let v: IVersion | undefined
-    try {
-      if (!download) v = await fs.readJSON(this.versionFile)
-    } catch (err) {
-      if (err.code !== 'ENOENT') throw err
-    }
-    if (!v) {
-      debug('fetching latest %s version', this.channel)
-      let {body} = await http.get(this.s3url(this.channel, 'version'))
-      v = body
-      await this._catch(() => fs.outputJSON(this.versionFile, v))
-    }
-    return v!
-  }
-
-  public async warnIfUpdateAvailable() {
-    await this._catch(async () => {
-      if (!this.s3Host) return
-      let v = await this.fetchVersion(false)
-      if (minorVersionGreater(this.config.version, v.version)) {
-        cli.warn(`${this.name}: update available from ${this.config.version} to ${v.version}`)
-      }
-      if (v.message) {
-        cli.warn(`${this.name}: ${v.message}`)
-      }
-    })
-  }
-
-  public async autoupdate(force: boolean = false) {
-    try {
-      await touch(this.lastrunfile)
-      const clientDir = path.join(this.clientRoot, this.config.version)
-      if (await fs.pathExists(clientDir)) {
-        await touch(clientDir)
-      }
-      await this.warnIfUpdateAvailable()
-      if (!force && !await this.autoupdateNeeded()) return
-
-      debug('autoupdate running')
-      await fs.outputFile(this.autoupdatefile, '')
-
-      debug(`spawning autoupdate on ${this.binPath}`)
-
-      let fd = await fs.open(this.autoupdatelogfile, 'a')
-      // @ts-ignore
-      fs.write(
-        fd,
-        timestamp(`starting \`${this.binPath} update --autoupdate\` from ${process.argv.slice(1, 3).join(' ')}\n`),
-      )
-
-      spawn(this.binPath, ['update', '--autoupdate'], {
-        detached: !this.config.windows,
-        stdio: ['ignore', fd, fd],
-        env: this.autoupdateEnv,
-      })
-        .on('error', (e: Error) => process.emitWarning(e))
-        .unref()
-    } catch (e) {
-      process.emitWarning(e)
-    }
-  }
-
-  async update(manifest: IManifest) {
+  async update({version, url, sha256, channel}: {url: string, version: string, sha256?: string, channel?: string}) {
+    if (!channel) channel = 'stable'
+    cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.config.version)} to ${color.green(version)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
     const _: typeof Lodash = require('lodash')
     const http: typeof HTTP = require('http-call').HTTP
     const filesize = require('filesize')
-    let base = this.base(manifest)
-    const output = path.join(this.clientRoot, manifest.version)
-    const tmp = path.join(this.clientRoot, base)
+    const output = path.join(this.clientRoot, version)
+    const tmp = path.join(this.clientRoot, this.config.bin)
 
-    if (!this.s3Host) throw new Error('S3 host not defined')
-
-    let url = `https://${this.s3Host}/${this.name}/channels/${manifest.channel}/${base}.tar.gz`
     let {response: stream} = await http.stream(url)
 
     await fs.emptyDir(tmp)
-    let extraction = this.extract(stream, this.clientRoot, manifest.sha256gz)
+    let extraction = this.extract(stream, this.clientRoot, sha256)
 
     // TODO: use cli.action.type
     if ((cli.action as any).frames) {
@@ -207,8 +85,8 @@ export class Updater {
     await fs.rename(tmp, output)
     await touch(output)
 
-    await this._createBin(manifest)
-    await this.reexecUpdate()
+    await this._createBin(version)
+    await this.reexec()
   }
 
   public async tidy() {
@@ -230,7 +108,13 @@ export class Updater {
     }
   }
 
-  private extract(stream: NodeJS.ReadableStream, dir: string, sha: string): Promise<void> {
+  public abstract needsUpdate(channel: string): Promise<boolean>
+
+  protected base(version: string): string {
+    return `${this.config.bin}-v${version}-${this.config.platform}-${this.config.arch}`
+  }
+
+  private extract(stream: NodeJS.ReadableStream, dir: string, sha?: string): Promise<void> {
     const zlib = require('zlib')
     const tar = require('tar-fs')
     const crypto = require('crypto')
@@ -251,10 +135,11 @@ export class Updater {
         .catch(reject)
       }
 
-      let hasher = crypto.createHash('sha256')
-      stream.on('error', fail)
-      stream.on('data', d => hasher.update(d))
-      stream.on('end', () => {
+      if (sha) {
+        let hasher = crypto.createHash('sha256')
+        stream.on('error', fail)
+        stream.on('data', d => hasher.update(d))
+        stream.on('end', () => {
         let shasum = hasher.digest('hex')
         if (sha === shasum) {
           shaValidated = true
@@ -262,13 +147,16 @@ export class Updater {
         } else {
           reject(new Error(`SHA mismatch: expected ${shasum} to be ${sha}`))
         }
-      })
+        })
+      } else {
+        shaValidated = true
+      }
 
       let ignore = (_: any, header: any) => {
         switch (header.type) {
           case 'directory':
           case 'file':
-            if (process.env.CLI_ENGINE_DEBUG_UPDATE_FILES) debug(header.name)
+            if (process.env.OCLIF_DEBUG_UPDATE_FILES) debug(header.name)
             return false
           case 'symlink':
             return true
@@ -290,40 +178,7 @@ export class Updater {
     })
   }
 
-  private base(manifest: IManifest): string {
-    return `${this.name}-v${manifest.version}-${this.config.platform}-${this.config.arch}`
-  }
-
-  private async autoupdateNeeded(): Promise<boolean> {
-    try {
-      const m = await mtime(this.autoupdatefile)
-      return dateIsAfter(m, dateSubHours(new Date(), 5))
-    } catch (err) {
-      if (err.code !== 'ENOENT') cli.error(err.stack)
-      if ((global as any).testing) return false
-      debug('autoupdate ENOENT')
-      return true
-    }
-  }
-
-  get timestampEnvVar(): string {
-    // TODO: use function from @cli-engine/config
-    let bin = this.config.bin.replace('-', '_').toUpperCase()
-    return `${bin}_TIMESTAMPS`
-  }
-
-  get skipAnalyticsEnvVar(): string {
-    let bin = this.config.bin.replace('-', '_').toUpperCase()
-    return `${bin}_SKIP_ANALYTICS`
-  }
-
-  get autoupdateEnv(): { [k: string]: string | undefined } {
-    return {...process.env,
-      [this.timestampEnvVar]: '1',
-      [this.skipAnalyticsEnvVar]: '1'}
-  }
-
-  private async reexecUpdate() {
+  private async reexec() {
     cli.action.stop()
     return new Promise((_, reject) => {
       debug('restarting CLI after update', this.clientBin)
@@ -342,27 +197,35 @@ export class Updater {
     })
   }
 
-  private async _createBin(manifest: IManifest) {
+  private async _createBin(version: string) {
     let dst = this.clientBin
     if (this.config.windows) {
       let body = `@echo off
-"%~dp0\\..\\${manifest.version}\\bin\\${this.config.bin}.cmd" %*
+"%~dp0\\..\\${version}\\bin\\${this.config.bin}.cmd" %*
 `
       await fs.outputFile(dst, body)
-      return
-    }
+    } else {
+      let body = `#!/usr/bin/env bash
+set -e
+get_script_dir () {
+  SOURCE="\${BASH_SOURCE[0]}"
+  # While $SOURCE is a symlink, resolve it
+  while [ -h "$SOURCE" ]; do
+    DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+    SOURCE="$( readlink "$SOURCE" )"
+    # If $SOURCE was a relative symlink (so no "/" as prefix, need to resolve it relative to the symlink base directory
+    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+  done
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  echo "$DIR"
+}
+DIR=$(get_script_dir)
+HEROKU_CLI_REDIRECTED=1 "$DIR/../${version}/bin/${this.config.bin}" "$@"
+`
 
-    let src = path.join('..', manifest.version, 'bin', this.config.bin)
-    await fs.mkdirp(path.dirname(dst))
-    await fs.remove(dst)
-    await fs.symlink(src, dst)
-  }
-
-  private async _catch(fn: () => {}) {
-    try {
-      return await Promise.resolve(fn())
-    } catch (err) {
-      debug(err)
+      await fs.remove(dst)
+      await fs.outputFile(dst, body)
+      await fs.chmod(dst, 0o755)
     }
   }
 }

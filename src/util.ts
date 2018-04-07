@@ -1,15 +1,5 @@
 import * as fs from 'fs-extra'
 import * as path from 'path'
-import * as Semver from 'semver'
-
-export function minorVersionGreater(fromString: string, toString: string): boolean {
-  const semver: typeof Semver = require('semver')
-  const from = semver.parse(fromString)!
-  const to = semver.parse(toString)!
-  if (from.major < to.major) return true
-  if (from.major === to.major && from.minor < to.minor) return true
-  return false
-}
 
 export async function touch(p: string) {
   try {
