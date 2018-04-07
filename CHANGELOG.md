@@ -1,3 +1,16 @@
+<a name="1.1.0"></a>
+# [1.1.0](https://github.com/oclif/plugin-update/compare/v1.0.5...v1.1.0) (2018-04-07)
+
+
+### Bug Fixes
+
+* fixed github check ([7fe3d42](https://github.com/oclif/plugin-update/commit/7fe3d42))
+
+
+### Features
+
+* added github updater ([cbd2a4f](https://github.com/oclif/plugin-update/commit/cbd2a4f))
+
 <a name="1.0.5"></a>
 ## [1.0.5](https://github.com/oclif/plugin-update/compare/v1.0.4...v1.0.5) (2018-04-07)
 
