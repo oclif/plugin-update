@@ -6,7 +6,7 @@ import * as dateIsAfter from 'date-fns/is_after'
 import * as fs from 'fs-extra'
 import * as path from 'path'
 
-import {IManifest, Updater} from '../update'
+import {IManifest, Updater} from '..'
 import {wait} from '../util'
 
 export default class UpdateCommand extends Command {

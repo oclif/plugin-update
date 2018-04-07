@@ -1,7 +1,7 @@
 import * as Config from '@oclif/config'
 import cli from 'cli-ux'
 
-import {Updater} from '../update'
+import {Updater} from '..'
 
 export const init: Config.Hook<'init'> = async function (opts) {
   cli.config.errlog = opts.config.errlog
