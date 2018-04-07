@@ -9,7 +9,7 @@ export class GithubUpdater extends Updater {
     const release = await this.fetchRelease()
     const version = release.tag_name.split('v')[1]
     const base = this.base(version)
-    const asset = release.assets.find((a: any) => true || a.name === `${base}.tar.gz`)
+    const asset = release.assets.find((a: any) => a.name === `${base}.tar.gz`)
     if (!asset) throw new Error('release not found')
     return super.update({url: asset.browser_download_url, version})
   }
