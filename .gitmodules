@@ -1,0 +1,3 @@
+[submodule "examples/github-update-example-cli"]
+	path = examples/github-update-example-cli
+	url = https://github.com/oclif/github-update-example-cli
