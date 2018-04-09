@@ -1,3 +1,11 @@
+<a name="1.1.2"></a>
+## [1.1.2](https://github.com/oclif/plugin-update/compare/v1.1.1...v1.1.2) (2018-04-09)
+
+
+### Bug Fixes
+
+* use version string for channel ([f0095c3](https://github.com/oclif/plugin-update/commit/f0095c3))
+
 <a name="1.1.1"></a>
 ## [1.1.1](https://github.com/oclif/plugin-update/compare/v1.1.0...v1.1.1) (2018-04-09)
 
