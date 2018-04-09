@@ -15,12 +15,12 @@
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@heroku/linewrap/-/linewrap-1.0.0.tgz#a9d4e99f0a3e423a899b775f5f3d6747a1ff15c6"
 
-"@oclif/command@^1.4.10":
-  version "1.4.10"
-  resolved "https://registry.yarnpkg.com/@oclif/command/-/command-1.4.10.tgz#15d229ba975018ca62cf4a94bec6d9796e18b619"
+"@oclif/command@^1.4.13":
+  version "1.4.13"
+  resolved "https://registry.yarnpkg.com/@oclif/command/-/command-1.4.13.tgz#2ed3c42142307d20337ec04eabd1be410dfa2a5e"
   dependencies:
     "@oclif/errors" "^1.0.4"
-    "@oclif/parser" "^3.2.13"
+    "@oclif/parser" "^3.3.2"
     debug "^3.1.0"
     semver "^5.5.0"
 
@@ -39,18 +39,18 @@
   dependencies:
     debug "^3.1.0"
 
-"@oclif/config@^1.4.10":
-  version "1.4.10"
-  resolved "https://registry.yarnpkg.com/@oclif/config/-/config-1.4.10.tgz#79d10455378bf97b0910685659c00a7cca6e2e77"
+"@oclif/config@^1.4.12":
+  version "1.4.12"
+  resolved "https://registry.yarnpkg.com/@oclif/config/-/config-1.4.12.tgz#9ce66ef6fdb4cbc0bed9cb639dd118d8e8bde50d"
   dependencies:
     debug "^3.1.0"
 
-"@oclif/dev-cli@^1.9.15":
-  version "1.9.15"
-  resolved "https://registry.yarnpkg.com/@oclif/dev-cli/-/dev-cli-1.9.15.tgz#5527f0521b72cc2ec9a6fa65553b77f3ab529ac2"
+"@oclif/dev-cli@^1.9.19":
+  version "1.9.19"
+  resolved "https://registry.yarnpkg.com/@oclif/dev-cli/-/dev-cli-1.9.19.tgz#17d764fd3e2a187671176f4697a940ab57534b03"
   dependencies:
-    "@oclif/command" "^1.4.10"
-    "@oclif/config" "^1.4.10"
+    "@oclif/command" "^1.4.13"
+    "@oclif/config" "^1.4.12"
     "@oclif/errors" "^1.0.4"
     "@oclif/plugin-help" "^1.2.3"
     "@oclif/plugin-warn-if-update-available" "^1.3.0"
@@ -87,18 +87,18 @@
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@oclif/linewrap/-/linewrap-1.0.0.tgz#aedcb64b479d4db7be24196384897b5000901d91"
 
-"@oclif/parser@^3.2.13":
-  version "3.2.13"
-  resolved "https://registry.yarnpkg.com/@oclif/parser/-/parser-3.2.13.tgz#4baf2b4ea23165e57adaae1f223861d8d9a33a24"
-  dependencies:
-    "@oclif/linewrap" "^1.0.0"
-    chalk "^2.3.2"
-
 "@oclif/parser@^3.2.9":
   version "3.2.9"
   resolved "https://registry.yarnpkg.com/@oclif/parser/-/parser-3.2.9.tgz#76d01106971e20dfcfec5be276c4e6e9edfee9ec"
   dependencies:
     "@heroku/linewrap" "^1.0.0"
+
+"@oclif/parser@^3.3.2":
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/@oclif/parser/-/parser-3.3.2.tgz#81af56d4f97beae376abb59e461005489abd9e19"
+  dependencies:
+    "@oclif/linewrap" "^1.0.0"
+    chalk "^2.3.2"
 
 "@oclif/plugin-help@^1.2.3":
   version "1.2.3"
