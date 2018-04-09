@@ -11,15 +11,14 @@ describe('update', () => {
     const sha = await qq.x.stdout('git', ['rev-parse', '--short', 'HEAD'])
     const stdout = await qq.x.stdout('npm', ['pack', '--unsafe-perm'])
     const tarball = path.resolve(stdout.split('\n').pop()!)
-    console.dir(tarball)
 
     qq.cd('examples/s3-update-example-cli')
     process.env.EXAMPLE_CLI_DISABLE_AUTOUPDATE = '1'
     process.env.YARN_CACHE_FOLDER = path.resolve('tmp', 'yarn')
     await qq.rm(process.env.YARN_CACHE_FOLDER)
     const pjson = await qq.readJSON('package.json')
-    // pjson.dependencies['@oclif/plugin-update'] = `file:${path.resolve(tarball)}`
-    // await qq.writeJSON('package.json', pjson)
+    delete pjson.dependencies['@oclif/plugin-update']
+    await qq.writeJSON('package.json', pjson)
 
     await qq.rm('yarn.lock')
     await qq.x(`yarn add ${tarball}`)
