@@ -24,39 +24,39 @@ describe('update', () => {
     await qq.x(`yarn add ${tarball}`)
     // await qq.x('yarn')
 
-    const release = async (version: string, channel?: string) => {
+    const release = async (version: string) => {
       const pjson = await qq.readJSON('package.json')
       pjson.version = version
       await qq.writeJSON('package.json', pjson)
-      await qq.x(`./node_modules/.bin/oclif-dev pack${channel ? ` -c${channel}` : ''}`)
-      await qq.x(`./node_modules/.bin/oclif-dev publish${channel ? ` -c${channel}` : ''}`)
+      await qq.x('./node_modules/.bin/oclif-dev pack')
+      await qq.x('./node_modules/.bin/oclif-dev publish')
     }
     const checkVersion = async (version: string, nodeVersion = pjson.oclif.update.node.version) => {
       const stdout = await qq.x.stdout('./tmp/example-cli/bin/example-cli', ['version'])
       expect(stdout).to.equal(`s3-update-example-cli/${version} ${process.platform}-${process.arch} node-v${nodeVersion}`)
     }
-    const resetLocalVersion = async () => {
+    const update = async (channel?: string) => {
       const f = 'tmp/example-cli/package.json'
       const pjson = await qq.readJSON(f)
       pjson.version = '0.0.0'
       await qq.writeJSON(f, pjson)
+      const args = ['update']
+      if (channel) args.push(channel)
+      await qq.x('./tmp/example-cli/bin/example-cli', args)
     }
     await release('1.0.0')
     await checkVersion('1.0.0', process.versions.node)
-    await resetLocalVersion()
-    await qq.x('./tmp/example-cli/bin/example-cli', ['update'])
+    await update()
     await checkVersion('1.0.0')
-
     await release('1.0.1')
     await checkVersion('1.0.0')
-    await qq.x.stdout('./tmp/example-cli/bin/example-cli', ['update'])
+    await update()
     await checkVersion('1.0.1')
-
-    await release('2.0.0', 'beta')
+    await release('2.0.0-beta')
     await checkVersion('1.0.1')
-    await qq.x.stdout('./tmp/example-cli/bin/example-cli', ['update'])
+    await update()
     await checkVersion('1.0.1')
-    await qq.x.stdout('./tmp/example-cli/bin/example-cli', ['update', 'beta'])
+    await update('beta')
     await checkVersion(`2.0.0-beta.${sha}`)
   })
 })

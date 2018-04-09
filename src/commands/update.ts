@@ -5,8 +5,9 @@ import cli from 'cli-ux'
 import * as spawn from 'cross-spawn'
 import * as fs from 'fs-extra'
 import HTTP from 'http-call'
-import * as Lodash from 'lodash'
+import * as _ from 'lodash'
 import * as path from 'path'
+import {URL} from 'url'
 
 import {extract} from '../tar'
 import {ls, wait} from '../util'
@@ -47,16 +48,14 @@ export default class UpdateCommand extends Command {
     cli.action.stop()
   }
 
-  private s3url(p: string): string {
-    if (!this.s3Host) throw new Error('S3 host not defined')
-    // TODO: handle s3Prefix
-    return `${this.s3Host}/${this.config.name}/channels/${this.channel}/${p}`
-  }
-
   private async fetchManifest(): Promise<ITargetManifest> {
+    if (!this.s3Host) throw new Error('S3 host not defined')
     const http: typeof HTTP = require('http-call').HTTP
     try {
-      let {body} = await http.get(this.s3url(`${this.config.platform}-${this.config.arch}`))
+      const key = _.template(this.config.pjson.oclif.update.s3.templates.platformManifest)({...this.config, channel: this.channel})
+      const url = new URL(this.s3Host)
+      url.pathname = path.join(url.pathname, key)
+      let {body} = await http.get(url.toString())
       return body
     } catch (err) {
       if (err.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${this.channel}`)
@@ -67,7 +66,6 @@ export default class UpdateCommand extends Command {
   private async update(manifest: ITargetManifest) {
     const {version, channel} = manifest
     cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.config.version)} to ${color.green(version)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
-    const _: typeof Lodash = require('lodash')
     const http: typeof HTTP = require('http-call').HTTP
     const filesize = require('filesize')
     const output = path.join(this.clientRoot, version)
