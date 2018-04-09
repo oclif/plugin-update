@@ -1,6 +1,6 @@
 {
   "name": "s3-update-example-cli",
-  "version": "0.0.0",
+  "version": "2.0.0",
   "author": "Jeff Dickey @jdxcode",
   "bin": {
     "s3-example": "./bin/run"
@@ -9,13 +9,14 @@
   "dependencies": {
     "@oclif/command": "^1.4.9",
     "@oclif/config": "^1.4.7",
-    "@oclif/plugin-help": "^1.2.3"
+    "@oclif/plugin-help": "^1.2.3",
+    "@oclif/plugin-update": "/Users/jdickey/src/github.com/oclif/plugin-update/oclif-plugin-update-1.1.0.tgz"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "^1.9.5",
+    "@oclif/dev-cli": "^1.9.10",
     "@types/node": "^9.6.2",
+    "aws-sdk": "^2.222.1",
     "globby": "^8.0.1",
-    "pkg": "^4.3.1",
     "ts-node": "5",
     "tslib": "^1.9.0",
     "typescript": "^2.8.1"
@@ -44,8 +45,14 @@
       },
       "node": {
         "version": "8.11.1",
-        "xtargets": [ "darwin-x64", "linux-x64", "win32-x64" ],
-        "targets": [ "darwin-x64" ]
+        "xtargets": [
+          "darwin-x64",
+          "linux-x64",
+          "win32-x64"
+        ],
+        "targets": [
+          "darwin-x64"
+        ]
       }
     },
     "plugins": [

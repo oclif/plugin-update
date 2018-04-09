@@ -71,7 +71,7 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
     }
     const from = path.join(tmp, basename)
     debug('moving %s to %s', from, output)
-    await fs.move(from, output)
+    await fs.rename(from, output)
     await fs.remove(tmp).catch(debug)
     await touch(output)
     debug('done extracting')

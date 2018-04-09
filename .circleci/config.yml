@@ -3,7 +3,7 @@ version: 2
 jobs:
   node-latest: &test
     docker:
-      - image: node:latest
+      - image: oclif/release:0.0.0-9.11.1
     working_directory: ~/cli
     environment:
       NYC: "yarn exec nyc -- --nycrc-path node_modules/@oclif/nyc-config/.nycrc"
@@ -34,7 +34,7 @@ jobs:
       - add_ssh_keys
       - checkout
       - restore_cache: *restore_cache
-      - run: yarn global add @oclif/semantic-release@2 semantic-release@15
+      - run: yarn global add @oclif/semantic-release@3 semantic-release@15
       - run: yarn --frozen-lockfile
       - run: |
           export PATH=/usr/local/share/.config/yarn/global/node_modules/.bin:$PATH
@@ -51,11 +51,11 @@ workflows:
   "@oclif/plugin-update":
     jobs:
       - node-latest
-      - node-8
+      #- node-8
       - release:
           context: org-global
           filters:
             branches: {only: master}
           requires:
             - node-latest
-            - node-8
+            #- node-8

@@ -20,20 +20,15 @@ export default class UpdateCommand extends Command {
 
   private autoupdate!: boolean
   private channel!: string
-  private clientRoot = path.join(this.config.dataDir, 'client')
-  private clientBin = path.join(this.clientRoot, 'bin', this.config.windows ? `${this.config.bin}.cmd` : this.config.bin)
-  private s3Host = this.config.pjson.oclif.update.s3.host
+  private readonly clientRoot = path.join(this.config.dataDir, 'client')
+  private readonly clientBin = path.join(this.clientRoot, 'bin', this.config.windows ? `${this.config.bin}.cmd` : this.config.bin)
+  private readonly s3Host = this.config.pjson.oclif.update.s3.host
 
   async run() {
     const {args, flags} = this.parse(UpdateCommand)
     this.autoupdate = !!flags.autoupdate
 
-    if (this.autoupdate) {
-      await this.debounce()
-    } else {
-      // on manual run, also log to file
-      cli.config.errlog = path.join(this.config.cacheDir, 'autoupdate')
-    }
+    if (this.autoupdate) await this.debounce()
 
     cli.action.start(`${this.config.name}: Updating CLI`)
     this.channel = args.channel || this.config.channel || 'stable'
@@ -67,10 +62,6 @@ export default class UpdateCommand extends Command {
       if (err.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${this.channel}`)
       throw err
     }
-  }
-
-  private base(version: string): string {
-    return `${this.config.bin}-v${version}-${this.config.platform}-${this.config.arch}`
   }
 
   private async update(manifest: ITargetManifest) {
@@ -110,6 +101,7 @@ export default class UpdateCommand extends Command {
   }
 
   private async needsUpdate() {
+    if (this.autoupdate && this.config.scopedEnvVar('DISABLE_AUTOUPDATE') === '1') return
     if (this.channel !== this.config.channel) return true
     let manifest = await this.fetchManifest()
     return this.config.version !== manifest.version
@@ -177,7 +169,7 @@ export default class UpdateCommand extends Command {
         .on('error', reject)
         .on('close', (status: number) => {
           try {
-            cli.exit(status)
+            this.exit(status)
           } catch (err) {
             reject(err)
           }
