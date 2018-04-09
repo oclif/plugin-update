@@ -1,3 +1,14 @@
+<a name="1.1.1"></a>
+## [1.1.1](https://github.com/oclif/plugin-update/compare/v1.1.0...v1.1.1) (2018-04-09)
+
+
+### Bug Fixes
+
+* add targets ([68f6fa8](https://github.com/oclif/plugin-update/commit/68f6fa8))
+* npm pack on circle ([9ca2c9c](https://github.com/oclif/plugin-update/commit/9ca2c9c))
+* updater fixes ([c65c556](https://github.com/oclif/plugin-update/commit/c65c556))
+* updater seems to be working ([9b3e33b](https://github.com/oclif/plugin-update/commit/9b3e33b))
+
 <a name="1.1.0"></a>
 # [1.1.0](https://github.com/oclif/plugin-update/compare/v1.0.5...v1.1.0) (2018-04-07)
 
