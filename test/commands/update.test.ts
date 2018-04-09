@@ -9,7 +9,7 @@ describe('update', () => {
     await qq.rm([process.env.HOME!, '.local', 'share', 'oclif-example-s3-cli'])
     await qq.x('aws s3 rm --recursive s3://oclif-staging/s3-update-example-cli')
     const sha = await qq.x.stdout('git', ['rev-parse', '--short', 'HEAD'])
-    const stdout = await qq.x.stdout('npm', ['pack'])
+    const stdout = await qq.x.stdout('npm', ['pack', '--unsafe-perm'])
     const tarball = path.resolve(stdout.split('\n').pop()!)
 
     qq.cd('examples/s3-update-example-cli')
