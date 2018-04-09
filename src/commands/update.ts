@@ -34,13 +34,9 @@ export default class UpdateCommand extends Command {
     cli.action.start(`${this.config.name}: Updating CLI`)
     this.channel = args.channel || this.config.channel || 'stable'
     const manifest = await this.fetchManifest()
-    if (!await this.needsUpdate()) {
-      if (!this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE')) {
-        cli.action.stop(`already on latest version: ${this.config.version}`)
-      }
-    } else {
-      await this.update(manifest)
-    }
+    let reason = await this.skipUpdate()
+    if (reason) cli.action.stop(reason || 'done')
+    else await this.update(manifest)
     this.debug('tidy')
     await this.tidy()
     await this.config.runHook('update', {channel: this.channel})
@@ -98,11 +94,15 @@ export default class UpdateCommand extends Command {
     await this.reexec()
   }
 
-  private async needsUpdate() {
-    if (this.autoupdate && this.config.scopedEnvVar('DISABLE_AUTOUPDATE') === '1') return
-    if (this.channel !== this.config.channel) return true
-    let manifest = await this.fetchManifest()
-    return this.config.version !== manifest.version
+  private async skipUpdate(): Promise<string | false> {
+    if (!this.config.binPath) return 'not updatable'
+    if (this.autoupdate && this.config.scopedEnvVar('DISABLE_AUTOUPDATE') === '1') return 'autoupdates disabled'
+    const manifest = await this.fetchManifest()
+    if (this.config.version === manifest.version) {
+      if (this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE')) return 'done'
+      return `already on latest version: ${this.config.version}`
+    }
+    return false
   }
 
   private async logChop() {
