@@ -11,6 +11,7 @@ describe('update', () => {
     const sha = await qq.x.stdout('git', ['rev-parse', '--short', 'HEAD'])
     const stdout = await qq.x.stdout('npm', ['pack', '--unsafe-perm'])
     const tarball = path.resolve(stdout.split('\n').pop()!)
+    console.dir(tarball)
 
     qq.cd('examples/s3-update-example-cli')
     process.env.EXAMPLE_CLI_DISABLE_AUTOUPDATE = '1'
