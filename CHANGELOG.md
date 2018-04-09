@@ -1,3 +1,11 @@
+<a name="1.1.4"></a>
+## [1.1.4](https://github.com/oclif/plugin-update/compare/v1.1.3...v1.1.4) (2018-04-09)
+
+
+### Bug Fixes
+
+* do not allow updates when binPath is not set ([939a321](https://github.com/oclif/plugin-update/commit/939a321))
+
 <a name="1.1.3"></a>
 ## [1.1.3](https://github.com/oclif/plugin-update/compare/v1.1.2...v1.1.3) (2018-04-09)
 
