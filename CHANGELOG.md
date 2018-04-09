@@ -1,3 +1,11 @@
+<a name="1.1.5"></a>
+## [1.1.5](https://github.com/oclif/plugin-update/compare/v1.1.4...v1.1.5) (2018-04-09)
+
+
+### Bug Fixes
+
+* updated deps ([652c354](https://github.com/oclif/plugin-update/commit/652c354))
+
 <a name="1.1.4"></a>
 ## [1.1.4](https://github.com/oclif/plugin-update/compare/v1.1.3...v1.1.4) (2018-04-09)
 
