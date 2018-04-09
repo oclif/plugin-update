@@ -72,7 +72,7 @@ export default class UpdateCommand extends Command {
 
     const {response: stream} = await http.stream(manifest.gz)
 
-    let extraction = extract(stream, this.config.bin, output, manifest.sha256gz)
+    let extraction = extract(stream, manifest.baseDir, output, manifest.sha256gz)
 
     // TODO: use cli.action.type
     if ((cli.action as any).frames) {
