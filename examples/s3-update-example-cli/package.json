@@ -1,25 +1,21 @@
 {
-  "private": true,
   "name": "s3-update-example-cli",
   "version": "0.0.0",
   "author": "Jeff Dickey @jdxcode",
   "bin": {
-    "s3-update-example-cli": "./bin/run"
+    "s3-example": "./bin/run"
   },
   "bugs": "https://github.com/jdxcode/s3-update-example-cli/issues",
   "dependencies": {
     "@oclif/command": "^1.4.9",
-    "@oclif/config": "^1.4.3",
+    "@oclif/config": "^1.4.7",
     "@oclif/plugin-help": "^1.2.3"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "^1.9.1",
-    "@oclif/test": "^1.0.4",
-    "@oclif/tslint": "^1.1.0",
-    "@types/chai": "^4.1.2",
-    "@types/mocha": "^5.0.0",
+    "@oclif/dev-cli": "^1.9.5",
     "@types/node": "^9.6.2",
     "globby": "^8.0.1",
+    "pkg": "^4.3.1",
     "ts-node": "5",
     "tslib": "^1.9.0",
     "typescript": "^2.8.1"
@@ -40,11 +36,27 @@
   "main": "lib/index.js",
   "oclif": {
     "commands": "./lib/commands",
-    "bin": "s3-update-example-cli",
+    "bin": "example-cli",
+    "dirname": "oclif-example-s3-cli",
+    "update": {
+      "s3": {
+        "bucket": "oclif-staging"
+      },
+      "node": {
+        "version": "8.11.1",
+        "xtargets": [ "darwin-x64", "linux-x64", "win32-x64" ],
+        "targets": [ "darwin-x64" ]
+      }
+    },
     "plugins": [
+      "@oclif/plugin-update",
       "@oclif/plugin-help"
     ]
   },
+  "pkg": {
+    "scripts": "./lib/**/*.js"
+  },
+  "private": true,
   "repository": "jdxcode/s3-update-example-cli",
   "scripts": {
     "postpack": "rm -f .oclif.manifest.json",

@@ -1,8 +1,6 @@
 import * as Config from '@oclif/config'
 import cli from 'cli-ux'
 import * as spawn from 'cross-spawn'
-import * as dateIsAfter from 'date-fns/is_after'
-import * as dateSubHours from 'date-fns/sub_hours'
 import * as fs from 'fs-extra'
 import * as path from 'path'
 
@@ -22,7 +20,8 @@ async function mtime(f: string) {
 export const init: Config.Hook<'init'> = async function (opts) {
   if (opts.id === 'update') return
   cli.config.errlog = opts.config.errlog
-  const binPath = this.config.scopedEnvVar('CLI_BINPATH') || this.config.bin
+  const binPath = this.config.binPath
+  if (!binPath) return this.debug('no binpath set')
   const lastrunfile = path.join(this.config.cacheDir, 'lastrun')
   const autoupdatefile = path.join(this.config.cacheDir, 'autoupdate')
   const autoupdatelogfile = path.join(this.config.cacheDir, 'autoupdate.log')
@@ -37,7 +36,8 @@ export const init: Config.Hook<'init'> = async function (opts) {
   async function autoupdateNeeded(): Promise<boolean> {
     try {
       const m = await mtime(autoupdatefile)
-      return dateIsAfter(m, dateSubHours(new Date(), 5))
+      m.setHours(m.getHours() + 5)
+      return m < new Date()
     } catch (err) {
       if (err.code !== 'ENOENT') cli.error(err.stack)
       if ((global as any).testing) return false
@@ -48,9 +48,7 @@ export const init: Config.Hook<'init'> = async function (opts) {
 
   await touch(lastrunfile)
   const clientDir = path.join(clientRoot, this.config.version)
-  if (await fs.pathExists(clientDir)) {
-    await touch(clientDir)
-  }
+  if (await fs.pathExists(clientDir)) await touch(clientDir)
   if (!await autoupdateNeeded()) return
 
   debug('autoupdate running')
