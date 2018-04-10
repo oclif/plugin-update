@@ -22,7 +22,6 @@ export default class UpdateCommand extends Command {
   private channel!: string
   private readonly clientRoot = path.join(this.config.dataDir, 'client')
   private readonly clientBin = path.join(this.clientRoot, 'bin', this.config.windows ? `${this.config.bin}.cmd` : this.config.bin)
-  private readonly s3Host = this.config.pjson.oclif.update.s3.host
 
   async run() {
     const {args, flags} = this.parse(UpdateCommand)
@@ -46,7 +45,11 @@ export default class UpdateCommand extends Command {
   private async fetchManifest(): Promise<IManifest> {
     const http: typeof HTTP = require('http-call').HTTP
     try {
-      const url = this.config.s3Url(this.config.s3Key('manifest'))
+      const url = this.config.s3Url(this.config.s3Key('manifest', {
+        channel: this.channel,
+        platform: this.config.platform,
+        arch: this.config.arch
+      }))
       let {body} = await http.get(url)
       return body
     } catch (err) {
