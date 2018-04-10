@@ -47,7 +47,7 @@ describe('update', () => {
     await release('1.0.0')
     await checkVersion('1.0.0', process.versions.node)
     await release('2.0.0-beta')
-    await checkVersion(`2.0.0-beta.${sha}`)
+    await checkVersion(`2.0.0-beta.${sha}`, process.versions.node)
     await update()
     await checkVersion('1.0.0')
     await release('1.0.1')
