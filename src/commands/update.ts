@@ -1,6 +1,6 @@
 import color from '@heroku-cli/color'
 import Command, {flags} from '@oclif/command'
-import {ITargetManifest} from '@oclif/dev-cli'
+import {IManifest} from '@oclif/dev-cli'
 import cli from 'cli-ux'
 import * as spawn from 'cross-spawn'
 import * as fs from 'fs-extra'
@@ -44,11 +44,11 @@ export default class UpdateCommand extends Command {
     cli.action.stop()
   }
 
-  private async fetchManifest(): Promise<ITargetManifest> {
+  private async fetchManifest(): Promise<IManifest> {
     if (!this.s3Host) throw new Error('S3 host not defined')
     const http: typeof HTTP = require('http-call').HTTP
     try {
-      const key = _.template(this.config.pjson.oclif.update.s3.templates.platformManifest)({...this.config, channel: this.channel})
+      const key = _.template(this.config.pjson.oclif.update.s3.templates.target.versioned)({...this.config, channel: this.channel})
       const url = new URL(this.s3Host)
       url.pathname = path.join(url.pathname, key)
       let {body} = await http.get(url.toString())
@@ -59,7 +59,7 @@ export default class UpdateCommand extends Command {
     }
   }
 
-  private async update(manifest: ITargetManifest) {
+  private async update(manifest: IManifest) {
     const {version, channel} = manifest
     cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.config.version)} to ${color.green(version)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
     const http: typeof HTTP = require('http-call').HTTP
