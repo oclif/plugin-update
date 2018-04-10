@@ -1,3 +1,13 @@
+<a name="1.1.6"></a>
+## [1.1.6](https://github.com/oclif/plugin-update/compare/v1.1.5...v1.1.6) (2018-04-10)
+
+
+### Bug Fixes
+
+* updated dev-cli ([06b455d](https://github.com/oclif/plugin-update/commit/06b455d))
+* updated dev-cli ([0fd606b](https://github.com/oclif/plugin-update/commit/0fd606b))
+* use target tarball ([701e8c7](https://github.com/oclif/plugin-update/commit/701e8c7))
+
 <a name="1.1.5"></a>
 ## [1.1.5](https://github.com/oclif/plugin-update/compare/v1.1.4...v1.1.5) (2018-04-09)
 
