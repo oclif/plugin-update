@@ -3,7 +3,7 @@ version: 2
 jobs:
   test: &test
     docker:
-      - image: oclif/release:0.0.0-9.11.1
+      - image: oclif/release:0.0.0-8.11.1
     working_directory: ~/cli
     steps:
       - checkout
