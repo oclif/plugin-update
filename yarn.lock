@@ -43,18 +43,18 @@
     debug "^3.1.0"
     semver "^5.5.0"
 
-"@oclif/config@^1.4.0", "@oclif/config@^1.4.13", "@oclif/config@^1.4.14":
-  version "1.4.14"
-  resolved "https://registry.yarnpkg.com/@oclif/config/-/config-1.4.14.tgz#ef792b5f4b4d44540f3cebc577eca5a77d17f96a"
+"@oclif/config@^1.4.0", "@oclif/config@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@oclif/config/-/config-1.6.0.tgz#0d9a034a3364d0ff24368e039599f89e4c00f775"
   dependencies:
     debug "^3.1.0"
 
-"@oclif/dev-cli@^1.10.0":
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/@oclif/dev-cli/-/dev-cli-1.10.0.tgz#2ca8b30caeaf6959a84fd791195b0e5c99a322bf"
+"@oclif/dev-cli@^1.10.1":
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/@oclif/dev-cli/-/dev-cli-1.10.1.tgz#58546150b50c68176729581b817eb29a70106e24"
   dependencies:
     "@oclif/command" "^1.4.13"
-    "@oclif/config" "^1.4.13"
+    "@oclif/config" "^1.6.0"
     "@oclif/errors" "^1.0.4"
     "@oclif/plugin-help" "^1.2.3"
     "@oclif/plugin-warn-if-update-available" "^1.3.0"
