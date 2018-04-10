@@ -45,8 +45,9 @@ describe('update', () => {
       await qq.x('./tmp/example-cli/bin/example-cli', args)
     }
     await release('1.0.0')
-    await release('2.0.0-beta')
     await checkVersion('1.0.0', process.versions.node)
+    await release('2.0.0-beta')
+    await checkVersion(`2.0.0-beta.${sha}`)
     await update()
     await checkVersion('1.0.0')
     await release('1.0.1')
