@@ -1,3 +1,11 @@
+<a name="1.1.8"></a>
+## [1.1.8](https://github.com/oclif/plugin-update/compare/v1.1.7...v1.1.8) (2018-04-10)
+
+
+### Bug Fixes
+
+* bump circle cache to fix postpack step ([5bd3194](https://github.com/oclif/plugin-update/commit/5bd3194))
+
 <a name="1.1.7"></a>
 ## [1.1.7](https://github.com/oclif/plugin-update/compare/v1.1.6...v1.1.7) (2018-04-10)
 
