@@ -8,7 +8,7 @@ const debug = require('debug')('oclif-update')
 export async function extract(stream: NodeJS.ReadableStream, basename: string, output: string, sha?: string) {
   const getTmp = () => `${output}.partial.${Math.random().toString().split('.')[1].slice(0, 5)}`
   let tmp = getTmp()
-  if (await fs.pathExists(tmp)) tmp = getTmp()
+  if (fs.pathExistsSync(tmp)) tmp = getTmp()
   debug(`extracting to ${tmp}`)
   try {
     await new Promise((resolve, reject) => {
