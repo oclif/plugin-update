@@ -1,3 +1,11 @@
+<a name="1.1.10"></a>
+## [1.1.10](https://github.com/oclif/plugin-update/compare/v1.1.9...v1.1.10) (2018-04-19)
+
+
+### Bug Fixes
+
+* use unix output format ([2b8c765](https://github.com/oclif/plugin-update/commit/2b8c765))
+
 <a name="1.1.9"></a>
 ## [1.1.9](https://github.com/oclif/plugin-update/compare/v1.1.8...v1.1.9) (2018-04-19)
 
