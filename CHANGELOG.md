@@ -1,3 +1,12 @@
+<a name="1.1.11"></a>
+## [1.1.11](https://github.com/oclif/plugin-update/compare/v1.1.10...v1.1.11) (2018-04-19)
+
+
+### Bug Fixes
+
+* pause/resume stream ([b937c61](https://github.com/oclif/plugin-update/commit/b937c61))
+* synchronously check for path exists ([357ea6f](https://github.com/oclif/plugin-update/commit/357ea6f))
+
 <a name="1.1.10"></a>
 ## [1.1.10](https://github.com/oclif/plugin-update/compare/v1.1.9...v1.1.10) (2018-04-19)
 
