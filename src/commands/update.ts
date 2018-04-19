@@ -66,6 +66,7 @@ export default class UpdateCommand extends Command {
     const output = path.join(this.clientRoot, version)
 
     const {response: stream} = await http.stream(manifest.gz)
+    stream.pause()
 
     let extraction = extract(stream, manifest.baseDir, output, manifest.sha256gz)
 
@@ -87,6 +88,7 @@ export default class UpdateCommand extends Command {
       })
     }
 
+    stream.resume()
     await extraction
 
     await this.createBin(version)
