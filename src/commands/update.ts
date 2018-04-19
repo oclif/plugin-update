@@ -62,7 +62,7 @@ export default class UpdateCommand extends Command {
     const {version, channel} = manifest
     cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.config.version)} to ${color.green(version)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
     const http: typeof HTTP = require('http-call').HTTP
-    const filesize = require('filesize')
+    const filesize = require('filesize').partial({unix: true})
     const output = path.join(this.clientRoot, version)
 
     const {response: stream} = await http.stream(manifest.gz)
