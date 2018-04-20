@@ -1,3 +1,11 @@
+<a name="1.1.14"></a>
+## [1.1.14](https://github.com/oclif/plugin-update/compare/v1.1.13...v1.1.14) (2018-04-20)
+
+
+### Bug Fixes
+
+* debounce fix ([241646d](https://github.com/oclif/plugin-update/commit/241646d))
+
 <a name="1.1.13"></a>
 ## [1.1.13](https://github.com/oclif/plugin-update/compare/v1.1.12...v1.1.13) (2018-04-20)
 
