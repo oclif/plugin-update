@@ -137,8 +137,6 @@ export default class UpdateCommand extends Command {
   // removes any unused CLIs
   private async tidy() {
     try {
-      if (!this.config.binPath) return
-      if (!this.config.binPath.includes(this.config.version)) return
       let root = this.clientRoot
       if (!await fs.pathExists(root)) return
       let files = await ls(root)
