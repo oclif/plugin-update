@@ -1,3 +1,11 @@
+<a name="1.1.15"></a>
+## [1.1.15](https://github.com/oclif/plugin-update/compare/v1.1.14...v1.1.15) (2018-04-20)
+
+
+### Bug Fixes
+
+* enable tidy script ([08eb1b0](https://github.com/oclif/plugin-update/commit/08eb1b0))
+
 <a name="1.1.14"></a>
 ## [1.1.14](https://github.com/oclif/plugin-update/compare/v1.1.13...v1.1.14) (2018-04-20)
 
