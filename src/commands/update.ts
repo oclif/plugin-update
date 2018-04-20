@@ -177,10 +177,15 @@ export default class UpdateCommand extends Command {
   }
 
   private async createBin(version: string) {
-    let dst = this.clientBin
+    const dst = this.clientBin
+    const {bin} = this.config
+    const binPathEnvVar = this.config.scopedEnvVarKey('BINPATH')
+    const redirectedEnvVar = this.config.scopedEnvVarKey('REDIRECTED')
     if (this.config.windows) {
       let body = `@echo off
-"%~dp0\\..\\${version}\\bin\\${this.config.bin}.cmd" %*
+set ${redirectedEnvVar}="1"
+set ${binPathEnvVar}="%~dp0${bin}"
+"%~dp0..\\${version}\\bin\\${bin}.cmd" %*
 `
       await fs.outputFile(dst, body)
     } else {
@@ -199,7 +204,7 @@ get_script_dir () {
   echo "$DIR"
 }
 DIR=$(get_script_dir)
-HEROKU_CLI_REDIRECTED=1 "$DIR/../${version}/bin/${this.config.bin}" "$@"
+${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${bin}" "$@"
 `
 
       await fs.remove(dst)

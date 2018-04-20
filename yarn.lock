@@ -49,6 +49,12 @@
   dependencies:
     debug "^3.1.0"
 
+"@oclif/config@^1.6.6":
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/@oclif/config/-/config-1.6.6.tgz#8a5aed05018b6294ce4a46cba75aacebb1a3bf16"
+  dependencies:
+    debug "^3.1.0"
+
 "@oclif/dev-cli@^1.13.1":
   version "1.13.1"
   resolved "https://registry.yarnpkg.com/@oclif/dev-cli/-/dev-cli-1.13.1.tgz#3a40b2c5890c86413ef3a2fcf232178cff7e897c"
@@ -115,9 +121,9 @@
   dependencies:
     tslint-xo "^0.7.0"
 
-"@types/chai@^4.1.2":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.1.2.tgz#f1af664769cfb50af805431c407425ed619daa21"
+"@types/chai@^4.1.3":
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.1.3.tgz#b8a74352977a23b604c01aa784f5b793443fb7dc"
 
 "@types/cross-spawn@^6.0.0":
   version "6.0.0"
@@ -157,19 +163,17 @@
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.3.tgz#3dca0e3f33b200fc7d1139c0cd96c1268cadfd9d"
 
-"@types/mocha@^5.1.0":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-5.1.0.tgz#591f158012ec30de978b00065239a84fb1ce4380"
-  dependencies:
-    "@types/node" "*"
+"@types/mocha@^5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-5.2.0.tgz#b3c8e69f038835db1a7fdc0b3d879fc50506e29e"
 
 "@types/node@*":
   version "7.0.60"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.60.tgz#5406c35961e4f9e2d5a1b9482daa14501754ecda"
 
-"@types/node@^9.6.5":
-  version "9.6.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.5.tgz#ee700810fdf49ac1c399fc5980b7559b3e5a381d"
+"@types/node@^9.6.6":
+  version "9.6.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.6.tgz#439b91f9caf3983cad2eef1e11f6bedcbf9431d2"
 
 "@types/semver@^5.5.0":
   version "5.5.0"
@@ -1749,9 +1753,9 @@ type-detect@^4.0.0:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-4.0.8.tgz#7646fb5f18871cfbb7749e69bd39a6388eb7450c"
 
-typescript@^2.8.1:
-  version "2.8.1"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.8.1.tgz#6160e4f8f195d5ba81d4876f9c0cc1fbc0820624"
+typescript@^2.8.3:
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.8.3.tgz#5d817f9b6f31bb871835f4edf0089f21abe6c170"
 
 union-value@^1.0.0:
   version "1.0.0"
