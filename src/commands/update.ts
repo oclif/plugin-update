@@ -126,7 +126,7 @@ export default class UpdateCommand extends Command {
     const lastrunfile = path.join(this.config.cacheDir, 'lastrun')
     const m = await this.mtime(lastrunfile)
     m.setHours(m.getHours() + 1)
-    if (m < new Date()) {
+    if (m > new Date()) {
       await cli.log(`waiting until ${m.toISOString()} to update`)
       await wait(60 * 1000) // wait 1 minute
       return this.debounce()
