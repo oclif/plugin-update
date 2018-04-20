@@ -1,3 +1,12 @@
+<a name="1.1.13"></a>
+## [1.1.13](https://github.com/oclif/plugin-update/compare/v1.1.12...v1.1.13) (2018-04-20)
+
+
+### Bug Fixes
+
+* setlocal ([d17e2b4](https://github.com/oclif/plugin-update/commit/d17e2b4))
+* setlocal ([665dda9](https://github.com/oclif/plugin-update/commit/665dda9))
+
 <a name="1.1.12"></a>
 ## [1.1.12](https://github.com/oclif/plugin-update/compare/v1.1.11...v1.1.12) (2018-04-20)
 
