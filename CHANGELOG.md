@@ -1,3 +1,11 @@
+<a name="1.1.12"></a>
+## [1.1.12](https://github.com/oclif/plugin-update/compare/v1.1.11...v1.1.12) (2018-04-20)
+
+
+### Bug Fixes
+
+* set binpath ([371bc32](https://github.com/oclif/plugin-update/commit/371bc32))
+
 <a name="1.1.11"></a>
 ## [1.1.11](https://github.com/oclif/plugin-update/compare/v1.1.10...v1.1.11) (2018-04-19)
 
