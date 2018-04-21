@@ -1,3 +1,11 @@
+<a name="1.1.17"></a>
+## [1.1.17](https://github.com/oclif/plugin-update/compare/v1.1.16...v1.1.17) (2018-04-21)
+
+
+### Bug Fixes
+
+* only show waiting message once ([5c75700](https://github.com/oclif/plugin-update/commit/5c75700))
+
 <a name="1.1.16"></a>
 ## [1.1.16](https://github.com/oclif/plugin-update/compare/v1.1.15...v1.1.16) (2018-04-21)
 
