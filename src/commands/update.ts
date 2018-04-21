@@ -126,11 +126,18 @@ export default class UpdateCommand extends Command {
 
   // when autoupdating, wait until the CLI isn't active
   private async debounce(): Promise<void> {
+    let output = false
     const lastrunfile = path.join(this.config.cacheDir, 'lastrun')
     const m = await this.mtime(lastrunfile)
     m.setHours(m.getHours() + 1)
     if (m > new Date()) {
-      await cli.log(`waiting until ${m.toISOString()} to update`)
+      const msg = `waiting until ${m.toISOString()} to update`
+      if (output) {
+        this.debug(msg)
+      } else {
+        await cli.log(msg)
+        output = true
+      }
       await wait(60 * 1000) // wait 1 minute
       return this.debounce()
     }
