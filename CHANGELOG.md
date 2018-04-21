@@ -1,3 +1,11 @@
+<a name="1.1.16"></a>
+## [1.1.16](https://github.com/oclif/plugin-update/compare/v1.1.15...v1.1.16) (2018-04-21)
+
+
+### Bug Fixes
+
+* improve filesize output ([966756e](https://github.com/oclif/plugin-update/commit/966756e))
+
 <a name="1.1.15"></a>
 ## [1.1.15](https://github.com/oclif/plugin-update/compare/v1.1.14...v1.1.15) (2018-04-20)
 
