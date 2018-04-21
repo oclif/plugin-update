@@ -62,7 +62,10 @@ export default class UpdateCommand extends Command {
     const {version, channel} = manifest
     cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.config.version)} to ${color.green(version)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
     const http: typeof HTTP = require('http-call').HTTP
-    const filesize = require('filesize').partial({unix: true})
+    const filesize = (n: number): string => {
+      const [num, suffix] = require('filesize')(n, {output: 'array'})
+      return num.toFixed(1) + ` ${suffix}`
+    }
     const output = path.join(this.clientRoot, version)
 
     const {response: stream} = await http.stream(manifest.gz)
@@ -73,7 +76,7 @@ export default class UpdateCommand extends Command {
     // TODO: use cli.action.type
     if ((cli.action as any).frames) {
       // if spinner action
-      let total = stream.headers['content-length']
+      let total = parseInt(stream.headers['content-length']!, 10)
       let current = 0
       const updateStatus = _.throttle(
         (newStatus: string) => {
