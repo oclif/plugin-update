@@ -153,7 +153,7 @@ export default class UpdateCommand extends Command {
       let promises = files.map(async f => {
         if (['bin', this.config.version].includes(path.basename(f.path))) return
         const mtime = f.stat.mtime
-        mtime.setHours(mtime.getHours() + 7 * 24)
+        mtime.setHours(mtime.getHours() + 14 * 24)
         if (mtime < new Date()) {
           await fs.remove(f.path)
         }

@@ -35,7 +35,7 @@ export const init: Config.Hook<'init'> = async function (opts) {
   async function autoupdateNeeded(): Promise<boolean> {
     try {
       const m = await mtime(autoupdatefile)
-      m.setHours(m.getHours() + 5)
+      m.setHours(m.getHours() + 24 * 7)
       return m < new Date()
     } catch (err) {
       if (err.code !== 'ENOENT') cli.error(err.stack)
