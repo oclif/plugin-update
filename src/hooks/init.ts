@@ -20,8 +20,7 @@ async function mtime(f: string) {
 export const init: Config.Hook<'init'> = async function (opts) {
   if (opts.id === 'update') return
   cli.config.errlog = opts.config.errlog
-  const binPath = this.config.binPath
-  if (!binPath) return this.debug('no binpath set')
+  const binPath = this.config.binPath || this.config.bin
   const lastrunfile = path.join(this.config.cacheDir, 'lastrun')
   const autoupdatefile = path.join(this.config.cacheDir, 'autoupdate')
   const autoupdatelogfile = path.join(this.config.cacheDir, 'autoupdate.log')
