@@ -1,3 +1,11 @@
+<a name="1.1.18"></a>
+## [1.1.18](https://github.com/oclif/plugin-update/compare/v1.1.17...v1.1.18) (2018-04-24)
+
+
+### Bug Fixes
+
+* default to config.bin if no binPath ([914e0e1](https://github.com/oclif/plugin-update/commit/914e0e1))
+
 <a name="1.1.17"></a>
 ## [1.1.17](https://github.com/oclif/plugin-update/compare/v1.1.16...v1.1.17) (2018-04-21)
 
