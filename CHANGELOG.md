@@ -1,3 +1,11 @@
+<a name="1.1.19"></a>
+## [1.1.19](https://github.com/oclif/plugin-update/compare/v1.1.18...v1.1.19) (2018-04-25)
+
+
+### Bug Fixes
+
+* increase update check time ([49c4b1f](https://github.com/oclif/plugin-update/commit/49c4b1f))
+
 <a name="1.1.18"></a>
 ## [1.1.18](https://github.com/oclif/plugin-update/compare/v1.1.17...v1.1.18) (2018-04-24)
 
