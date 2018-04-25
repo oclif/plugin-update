@@ -192,8 +192,8 @@ export default class UpdateCommand extends Command {
     if (this.config.windows) {
       let body = `@echo off
 setlocal enableextensions
-set ${redirectedEnvVar}="1"
-set ${binPathEnvVar}="%~dp0${bin}"
+set ${redirectedEnvVar}=1
+set ${binPathEnvVar}=%~dp0${bin}
 "%~dp0..\\${version}\\bin\\${bin}.cmd" %*
 `
       await fs.outputFile(dst, body)
