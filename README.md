@@ -21,7 +21,7 @@ $ npm install -g @oclif/plugin-update
 $ oclif-example COMMAND
 running command...
 $ oclif-example (-v|--version|version)
-@oclif/plugin-update/1.1.19 linux-x64 node-v8.11.1
+@oclif/plugin-update/1.1.20 linux-x64 node-v8.11.1
 $ oclif-example --help [COMMAND]
 USAGE
   $ oclif-example COMMAND
@@ -41,5 +41,5 @@ USAGE
   $ oclif-example update [CHANNEL]
 ```
 
-_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v1.1.19/src/commands/update.ts)_
+_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v1.1.20/src/commands/update.ts)_
 <!-- commandsstop -->
