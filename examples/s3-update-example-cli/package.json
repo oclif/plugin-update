@@ -7,9 +7,9 @@
   },
   "bugs": "https://github.com/jdxcode/s3-update-example-cli/issues",
   "dependencies": {
-    "@oclif/command": "^1.4.19",
+    "@oclif/command": "^1.4.20",
     "@oclif/config": "^1.6.17",
-    "@oclif/plugin-help": "^1.2.8",
+    "@oclif/plugin-help": "^1.2.9",
     "@oclif/plugin-update": "^1.1.20"
   },
   "devDependencies": {
