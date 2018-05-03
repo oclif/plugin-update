@@ -7,25 +7,25 @@
   },
   "bugs": "https://github.com/jdxcode/s3-update-example-cli/issues",
   "dependencies": {
-    "@oclif/command": "^1.4.9",
-    "@oclif/config": "^1.4.9",
-    "@oclif/plugin-help": "^1.2.3",
-    "@oclif/plugin-update": "^1.1.1"
+    "@oclif/command": "^1.4.19",
+    "@oclif/config": "^1.6.17",
+    "@oclif/plugin-help": "^1.2.8",
+    "@oclif/plugin-update": "^1.1.20"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "^1.9.14",
-    "@types/node": "^9.6.2",
-    "aws-sdk": "^2.222.1",
+    "@oclif/dev-cli": "^1.13.14",
+    "@types/node": "^10.0.3",
+    "aws-sdk": "^2.231.1",
     "globby": "^8.0.1",
-    "ts-node": "5",
+    "ts-node": "6.0.2",
     "tslib": "^1.9.0",
-    "typescript": "^2.8.1"
+    "typescript": "^2.8.3"
   },
   "engines": {
     "node": ">=8.0.0"
   },
   "files": [
-    ".oclif.manifest.json",
+    "oclif.manifest.json",
     "/bin",
     "/lib"
   ],
@@ -63,7 +63,7 @@
   "private": true,
   "repository": "jdxcode/s3-update-example-cli",
   "scripts": {
-    "postpack": "rm -f .oclif.manifest.json",
+    "postpack": "rm -f oclif.manifest.json",
     "posttest": "tsc -p test --noEmit && tslint -p test -t stylish",
     "prepack": "rm -rf lib && tsc && oclif-dev manifest",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
