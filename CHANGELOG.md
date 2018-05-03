@@ -1,3 +1,14 @@
+<a name="1.1.21"></a>
+## [1.1.21](https://github.com/oclif/plugin-update/compare/v1.1.20...v1.1.21) (2018-05-03)
+
+
+### Bug Fixes
+
+* manifest ([d0d55b9](https://github.com/oclif/plugin-update/commit/d0d55b9))
+* manifest ([def2bbf](https://github.com/oclif/plugin-update/commit/def2bbf))
+* updated deps ([b7f8076](https://github.com/oclif/plugin-update/commit/b7f8076))
+* updated deps ([52a4094](https://github.com/oclif/plugin-update/commit/52a4094))
+
 <a name="1.1.20"></a>
 ## [1.1.20](https://github.com/oclif/plugin-update/compare/v1.1.19...v1.1.20) (2018-05-01)
 
