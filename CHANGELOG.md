@@ -1,3 +1,11 @@
+<a name="1.2.0"></a>
+# [1.2.0](https://github.com/oclif/plugin-update/compare/v1.1.21...v1.2.0) (2018-05-04)
+
+
+### Features
+
+* add current directory for debugging ([9776dcc](https://github.com/oclif/plugin-update/commit/9776dcc))
+
 <a name="1.1.21"></a>
 ## [1.1.21](https://github.com/oclif/plugin-update/compare/v1.1.20...v1.1.21) (2018-05-03)
 
