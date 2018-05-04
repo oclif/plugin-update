@@ -79,10 +79,8 @@ export default class UpdateCommand extends Command {
       let total = parseInt(stream.headers['content-length']!, 10)
       let current = 0
       const updateStatus = _.throttle(
-        (newStatus: string) => {
-          cli.action.status = newStatus
-        },
-        500,
+        (newStatus: string) => { cli.action.status = newStatus },
+        250,
         {leading: true, trailing: false},
       )
       stream.on('data', data => {
@@ -151,7 +149,7 @@ export default class UpdateCommand extends Command {
       if (!await fs.pathExists(root)) return
       let files = await ls(root)
       let promises = files.map(async f => {
-        if (['bin', this.config.version].includes(path.basename(f.path))) return
+        if (['bin', 'current', this.config.version].includes(path.basename(f.path))) return
         const mtime = f.stat.mtime
         mtime.setHours(mtime.getHours() + 14 * 24)
         if (mtime < new Date()) {
@@ -219,6 +217,8 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
       await fs.remove(dst)
       await fs.outputFile(dst, body)
       await fs.chmod(dst, 0o755)
+      await fs.remove(path.join(this.clientRoot, 'current'))
+      await fs.symlink(`./${version}`, path.join(this.clientRoot, 'current'))
     }
   }
 }
