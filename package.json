@@ -21,7 +21,7 @@
     "tar-fs": "^1.16.2"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "^1.13.14",
+    "@oclif/dev-cli": "^1.13.15",
     "@oclif/plugin-help": "^1.2.10",
     "@oclif/test": "^1.0.6",
     "@oclif/tslint": "^1.1.0",
@@ -41,7 +41,7 @@
     "qqjs": "^0.3.8",
     "ts-node": "6.0.2",
     "tslib": "^1.9.0",
-    "tslint": "^5.9.1",
+    "tslint": "^5.10.0",
     "typescript": "^2.8.3"
   },
   "engines": {
