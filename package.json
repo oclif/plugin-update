@@ -9,7 +9,7 @@
     "@oclif/config": "^1.6.17",
     "@oclif/errors": "^1.0.8",
     "@types/semver": "^5.5.0",
-    "cli-ux": "^3.4.1",
+    "cli-ux": "^4.0.0",
     "cross-spawn": "^6.0.5",
     "debug": "^3.1.0",
     "filesize": "^3.6.1",
