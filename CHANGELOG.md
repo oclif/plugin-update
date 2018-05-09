@@ -1,3 +1,11 @@
+<a name="1.2.2"></a>
+## [1.2.2](https://github.com/oclif/plugin-update/compare/v1.2.1...v1.2.2) (2018-05-09)
+
+
+### Bug Fixes
+
+* disable autoupdates entirely when env var is set ([8328b4f](https://github.com/oclif/plugin-update/commit/8328b4f))
+
 <a name="1.2.1"></a>
 ## [1.2.1](https://github.com/oclif/plugin-update/compare/v1.2.0...v1.2.1) (2018-05-04)
 
