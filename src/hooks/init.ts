@@ -20,7 +20,6 @@ async function mtime(f: string) {
 export const init: Config.Hook<'init'> = async function (opts) {
   if (opts.id === 'update') return
   if (opts.config.scopedEnvVarTrue('DISABLE_AUTOUPDATE')) return
-  cli.config.errlog = opts.config.errlog
   const binPath = this.config.binPath || this.config.bin
   const lastrunfile = path.join(this.config.cacheDir, 'lastrun')
   const autoupdatefile = path.join(this.config.cacheDir, 'autoupdate')
