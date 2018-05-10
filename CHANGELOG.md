@@ -1,3 +1,11 @@
+<a name="1.2.3"></a>
+## [1.2.3](https://github.com/oclif/plugin-update/compare/v1.2.2...v1.2.3) (2018-05-10)
+
+
+### Bug Fixes
+
+* updated cli-ux ([4b3d500](https://github.com/oclif/plugin-update/commit/4b3d500))
+
 <a name="1.2.2"></a>
 ## [1.2.2](https://github.com/oclif/plugin-update/compare/v1.2.1...v1.2.2) (2018-05-09)
 
