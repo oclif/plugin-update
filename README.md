@@ -14,19 +14,8 @@
 * [Commands](#commands)
 <!-- tocstop -->
 # Usage
-<!-- usage -->
-```sh-session
-$ npm install -g @oclif/plugin-update
-$ oclif-example COMMAND
-running command...
-$ oclif-example (-v|--version|version)
-@oclif/plugin-update/1.2.3 linux-x64 node-v8.11.1
-$ oclif-example --help [COMMAND]
-USAGE
-  $ oclif-example COMMAND
-...
-```
-<!-- usagestop -->
+See https://oclif.io/docs/releasing.html#autoupdater
+
 # Commands
 <!-- commands -->
 * [`oclif-example update [CHANNEL]`](#oclif-example-update-channel)
