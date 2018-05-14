@@ -1,6 +1,8 @@
 @oclif/plugin-update
 ====================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/oclif/plugin-update.svg)](https://greenkeeper.io/)
+
 
 
 [![Version](https://img.shields.io/npm/v/@oclif/plugin-update.svg)](https://npmjs.org/package/@oclif/plugin-update)
