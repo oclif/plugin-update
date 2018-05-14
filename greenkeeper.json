@@ -1,0 +1,10 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "examples/s3-update-example-cli/package.json",
+        "package.json"
+      ]
+    }
+  }
+}
