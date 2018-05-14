@@ -17,7 +17,7 @@
     "@types/node": "^10.0.3",
     "aws-sdk": "^2.231.1",
     "globby": "^8.0.1",
-    "ts-node": "6.0.2",
+    "ts-node": "6.0.3",
     "tslib": "^1.9.0",
     "typescript": "^2.8.3"
   },
