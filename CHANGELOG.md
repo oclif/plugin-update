@@ -1,3 +1,11 @@
+<a name="1.2.6"></a>
+## [1.2.6](https://github.com/oclif/plugin-update/compare/v1.2.5...v1.2.6) (2018-05-24)
+
+
+### Bug Fixes
+
+* ensure client directory is not a file ([665c6e0](https://github.com/oclif/plugin-update/commit/665c6e0))
+
 <a name="1.2.5"></a>
 ## [1.2.5](https://github.com/oclif/plugin-update/compare/v1.2.4...v1.2.5) (2018-05-24)
 
