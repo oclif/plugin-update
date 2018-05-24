@@ -66,6 +66,7 @@ export default class UpdateCommand extends Command {
       const [num, suffix] = require('filesize')(n, {output: 'array'})
       return num.toFixed(1) + ` ${suffix}`
     }
+    await this.ensureClientDir()
     const output = path.join(this.clientRoot, version)
 
     const {response: stream} = await http.stream(manifest.gz)
@@ -218,6 +219,19 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
       await fs.chmod(dst, 0o755)
       await fs.remove(path.join(this.clientRoot, 'current'))
       await fs.symlink(`./${version}`, path.join(this.clientRoot, 'current'))
+    }
+  }
+
+  private async ensureClientDir() {
+    try {
+      await fs.mkdirp(this.clientRoot)
+    } catch (err) {
+      if (err.code === 'EEXIST') {
+        // for some reason the client directory is sometimes a file
+        // if so, this happens. Delete it and recreate
+        await fs.remove(this.clientRoot)
+        await fs.mkdirp(this.clientRoot)
+      } else { throw err }
     }
   }
 }
