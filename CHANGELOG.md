@@ -1,3 +1,11 @@
+<a name="1.2.7"></a>
+## [1.2.7](https://github.com/oclif/plugin-update/compare/v1.2.6...v1.2.7) (2018-05-29)
+
+
+### Bug Fixes
+
+* update beta daily and stable bi-weekly ([66aa6f2](https://github.com/oclif/plugin-update/commit/66aa6f2))
+
 <a name="1.2.6"></a>
 ## [1.2.6](https://github.com/oclif/plugin-update/compare/v1.2.5...v1.2.6) (2018-05-24)
 
