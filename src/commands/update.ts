@@ -50,7 +50,7 @@ export default class UpdateCommand extends Command {
         platform: this.config.platform,
         arch: this.config.arch
       }))
-      let {body} = await http.get(url)
+      let {body} = await http.get<IManifest>(url)
       return body
     } catch (err) {
       if (err.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${this.channel}`)
