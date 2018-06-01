@@ -1,3 +1,11 @@
+<a name="1.2.8"></a>
+## [1.2.8](https://github.com/oclif/plugin-update/compare/v1.2.7...v1.2.8) (2018-06-01)
+
+
+### Bug Fixes
+
+* typescript 2.9 ([dfac3c3](https://github.com/oclif/plugin-update/commit/dfac3c3))
+
 <a name="1.2.7"></a>
 ## [1.2.7](https://github.com/oclif/plugin-update/compare/v1.2.6...v1.2.7) (2018-05-29)
 
