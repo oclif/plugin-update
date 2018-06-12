@@ -17,6 +17,7 @@ describe('update', () => {
     process.env.YARN_CACHE_FOLDER = path.resolve('tmp', 'yarn')
     await qq.rm(process.env.YARN_CACHE_FOLDER)
     const pjson = await qq.readJSON('package.json')
+    pjson.oclif.bin = pjson.name = `s3-update-example-cli-${Math.floor(Math.random() * 100000)}`
     delete pjson.dependencies['@oclif/plugin-update']
     await qq.writeJSON('package.json', pjson)
 
@@ -32,17 +33,17 @@ describe('update', () => {
       await qq.x('./node_modules/.bin/oclif-dev publish')
     }
     const checkVersion = async (version: string, nodeVersion = pjson.oclif.update.node.version) => {
-      const stdout = await qq.x.stdout('./tmp/example-cli/bin/example-cli', ['version'])
-      expect(stdout).to.equal(`s3-update-example-cli/${version} ${process.platform}-${process.arch} node-v${nodeVersion}`)
+      const stdout = await qq.x.stdout(`./tmp/${pjson.oclif.bin}/bin/${pjson.oclif.bin}`, ['version'])
+      expect(stdout).to.equal(`${pjson.oclif.bin}/${version} ${process.platform}-${process.arch} node-v${nodeVersion}`)
     }
     const update = async (channel?: string) => {
-      const f = 'tmp/example-cli/package.json'
-      const pjson = await qq.readJSON(f)
-      pjson.version = '0.0.0'
-      await qq.writeJSON(f, pjson)
+      const f = `tmp/${pjson.oclif.bin}/package.json`
+      const pj = await qq.readJSON(f)
+      pj.version = '0.0.0'
+      await qq.writeJSON(f, pj)
       const args = ['update']
       if (channel) args.push(channel)
-      await qq.x('./tmp/example-cli/bin/example-cli', args)
+      await qq.x(`./tmp/${pjson.oclif.bin}/bin/${pjson.oclif.bin}`, args)
     }
     await release('1.0.0')
     await checkVersion('1.0.0', process.versions.node)
