@@ -1,3 +1,10 @@
+## [1.2.11](https://github.com/oclif/plugin-update/compare/v1.2.10...v1.2.11) (2018-06-12)
+
+
+### Bug Fixes
+
+* touch update before tidying ([df4d75f](https://github.com/oclif/plugin-update/commit/df4d75f))
+
 ## [1.2.10](https://github.com/oclif/plugin-update/compare/v1.2.9...v1.2.10) (2018-06-12)
 
 
