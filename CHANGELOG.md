@@ -1,3 +1,10 @@
+## [1.2.9](https://github.com/oclif/plugin-update/compare/v1.2.8...v1.2.9) (2018-06-12)
+
+
+### Bug Fixes
+
+* updated deps ([11a059f](https://github.com/oclif/plugin-update/commit/11a059f))
+
 <a name="1.2.8"></a>
 ## [1.2.8](https://github.com/oclif/plugin-update/compare/v1.2.7...v1.2.8) (2018-06-01)
 
