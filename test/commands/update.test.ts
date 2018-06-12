@@ -17,7 +17,7 @@ describe('update', () => {
     process.env.YARN_CACHE_FOLDER = path.resolve('tmp', 'yarn')
     await qq.rm(process.env.YARN_CACHE_FOLDER)
     const pjson = await qq.readJSON('package.json')
-    pjson.oclif.bin = `s3-update-example-cli-${Math.floor(Math.random() * 100000)}`
+    pjson.oclif.bin = pjson.name = `s3-update-example-cli-${Math.floor(Math.random() * 100000)}`
     delete pjson.dependencies['@oclif/plugin-update']
     await qq.writeJSON('package.json', pjson)
 
@@ -33,7 +33,7 @@ describe('update', () => {
       await qq.x('./node_modules/.bin/oclif-dev publish')
     }
     const checkVersion = async (version: string, nodeVersion = pjson.oclif.update.node.version) => {
-      const stdout = await qq.x.stdout('./tmp/example-cli/bin/example-cli', ['version'])
+      const stdout = await qq.x.stdout(`./tmp/${pjson.oclif.bin}/bin/${pjson.oclif.bin}`, ['version'])
       expect(stdout).to.equal(`${pjson.oclif.bin}/${version} ${process.platform}-${process.arch} node-v${nodeVersion}`)
     }
     const update = async (channel?: string) => {
