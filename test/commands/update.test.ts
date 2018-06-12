@@ -43,7 +43,7 @@ describe('update', () => {
       await qq.writeJSON(f, pj)
       const args = ['update']
       if (channel) args.push(channel)
-      await qq.x('./tmp/example-cli/bin/example-cli', args)
+      await qq.x(`./tmp/${pjson.oclif.bin}/bin/${pjson.oclif.bin}`, args)
     }
     await release('1.0.0')
     await checkVersion('1.0.0', process.versions.node)
