@@ -94,6 +94,7 @@ export default class UpdateCommand extends Command {
     await extraction
 
     await this.createBin(version)
+    await this.touch()
     await this.reexec()
   }
 
@@ -160,6 +161,18 @@ export default class UpdateCommand extends Command {
       await this.logChop()
     } catch (err) {
       cli.warn(err)
+    }
+  }
+
+  private async touch() {
+    // touch the client so it won't be tidied up right away
+    try {
+      const p = path.join(this.clientRoot, this.config.version)
+      this.debug('touching client at', p)
+      if (!await fs.pathExists(p)) return
+      await fs.utimes(p, new Date(), new Date())
+    } catch (err) {
+      this.warn(err)
     }
   }
 
