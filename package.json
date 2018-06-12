@@ -21,7 +21,7 @@
     "tar-fs": "^1.16.2"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "^1.13.30",
+    "@oclif/dev-cli": "^1.13.31",
     "@oclif/plugin-help": "^2.0.5",
     "@oclif/test": "^1.0.9",
     "@oclif/tslint": "^1.1.2",
