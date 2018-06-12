@@ -59,6 +59,13 @@
     debug "^3.1.0"
     tslib "^1.9.2"
 
+"@oclif/config@^1.6.28":
+  version "1.6.28"
+  resolved "https://registry.yarnpkg.com/@oclif/config/-/config-1.6.28.tgz#bfda0718ba5dfbdeb364350990ed79540f9c3d0b"
+  dependencies:
+    debug "^3.1.0"
+    tslib "^1.9.2"
+
 "@oclif/dev-cli@^1.13.31":
   version "1.13.31"
   resolved "https://registry.yarnpkg.com/@oclif/dev-cli/-/dev-cli-1.13.31.tgz#ddcca19e1346de3656b63210305c87acdc98fd44"
