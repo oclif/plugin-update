@@ -37,10 +37,10 @@ describe('update', () => {
       expect(stdout).to.equal(`${pjson.oclif.bin}/${version} ${process.platform}-${process.arch} node-v${nodeVersion}`)
     }
     const update = async (channel?: string) => {
-      const f = 'tmp/example-cli/package.json'
-      const pjson = await qq.readJSON(f)
-      pjson.version = '0.0.0'
-      await qq.writeJSON(f, pjson)
+      const f = `tmp/${pjson.oclif.bin}/package.json`
+      const pj = await qq.readJSON(f)
+      pj.version = '0.0.0'
+      await qq.writeJSON(f, pj)
       const args = ['update']
       if (channel) args.push(channel)
       await qq.x('./tmp/example-cli/bin/example-cli', args)
