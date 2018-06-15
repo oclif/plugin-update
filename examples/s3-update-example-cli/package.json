@@ -8,7 +8,7 @@
   "bugs": "https://github.com/jdxcode/s3-update-example-cli/issues",
   "dependencies": {
     "@oclif/command": "^1.4.33",
-    "@oclif/config": "^1.6.28",
+    "@oclif/config": "^1.6.30",
     "@oclif/plugin-help": "^2.0.5",
     "@oclif/plugin-update": "^1.2.11"
   },
@@ -41,7 +41,19 @@
     "dirname": "oclif-example-s3-cli",
     "update": {
       "s3": {
-        "bucket": "oclif-staging"
+        "bucket": "oclif-staging",
+        "templates": {
+          "target": {
+            "unversioned": "tarballs/<%- bin %>/<%- channel === 'stable' ? '' : 'channels/' + channel + '/' %><%- bin %>-<%- platform %>-<%- arch %><%- ext %>",
+            "versioned": "tarballs/<%- bin %>/<%- channel === 'stable' ? '' : 'channels/' + channel + '/' %><%- bin %>-v<%- version %>/<%- bin %>-v<%- version %>-<%- platform %>-<%- arch %><%- ext %>",
+            "manifest": "tarballs/<%- bin %>/<%- channel === 'stable' ? '' : 'channels/' + channel + '/' %><%- platform %>-<%- arch %>"
+          },
+          "vanilla": {
+            "unversioned": "tarballs/<%- bin %>/<%- channel === 'stable' ? '' : 'channels/' + channel + '/' %><%- bin %><%- ext %>",
+            "versioned": "tarballs/<%- bin %>/<%- channel === 'stable' ? '' : 'channels/' + channel + '/' %><%- bin %>-v<%- version %>/<%- bin %>-v<%- version %><%- ext %>",
+            "manifest": "tarballs/<%- bin %>/<%- channel === 'stable' ? '' : 'channels/' + channel + '/' %>version"
+          }
+        }
       },
       "node": {
         "version": "10.4.0",
