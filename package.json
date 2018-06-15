@@ -6,7 +6,7 @@
   "dependencies": {
     "@heroku-cli/color": "^1.1.5",
     "@oclif/command": "^1.4.33",
-    "@oclif/config": "^1.6.28",
+    "@oclif/config": "^1.6.30",
     "@oclif/errors": "^1.1.2",
     "@types/semver": "^5.5.0",
     "cli-ux": "^4.6.3",
@@ -23,7 +23,7 @@
   "devDependencies": {
     "@oclif/dev-cli": "^1.13.31",
     "@oclif/plugin-help": "^2.0.5",
-    "@oclif/test": "^1.0.9",
+    "@oclif/test": "^1.1.0",
     "@oclif/tslint": "^1.1.2",
     "@types/chai": "^4.1.4",
     "@types/cross-spawn": "^6.0.0",
