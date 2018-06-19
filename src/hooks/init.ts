@@ -24,7 +24,7 @@ export const init: Config.Hook<'init'> = async function (opts) {
   const lastrunfile = path.join(this.config.cacheDir, 'lastrun')
   const autoupdatefile = path.join(this.config.cacheDir, 'autoupdate')
   const autoupdatelogfile = path.join(this.config.cacheDir, 'autoupdate.log')
-  const clientRoot = path.join(this.config.dataDir, 'client')
+  const clientRoot = this.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.config.dataDir, 'client')
 
   const autoupdateEnv = {
     ...process.env,
