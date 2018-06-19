@@ -1,3 +1,10 @@
+## [1.2.12](https://github.com/oclif/plugin-update/compare/v1.2.11...v1.2.12) (2018-06-19)
+
+
+### Bug Fixes
+
+* use OCLIF_CLIENT_HOME if exists ([#25](https://github.com/oclif/plugin-update/issues/25)) ([8b761b6](https://github.com/oclif/plugin-update/commit/8b761b6))
+
 ## [1.2.11](https://github.com/oclif/plugin-update/compare/v1.2.10...v1.2.11) (2018-06-12)
 
 
