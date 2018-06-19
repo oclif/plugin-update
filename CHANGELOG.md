@@ -1,3 +1,10 @@
+## [1.2.13](https://github.com/oclif/plugin-update/compare/v1.2.12...v1.2.13) (2018-06-19)
+
+
+### Bug Fixes
+
+* updated dev-cli ([17efe31](https://github.com/oclif/plugin-update/commit/17efe31))
+
 ## [1.2.12](https://github.com/oclif/plugin-update/compare/v1.2.11...v1.2.12) (2018-06-19)
 
 
