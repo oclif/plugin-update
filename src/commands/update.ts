@@ -1,4 +1,4 @@
-import color from '@heroku-cli/color'
+import color from '@oclif/color'
 import Command, {flags} from '@oclif/command'
 import {IManifest} from '@oclif/dev-cli'
 import cli from 'cli-ux'
