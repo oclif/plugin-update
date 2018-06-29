@@ -1,3 +1,10 @@
+## [1.2.14](https://github.com/oclif/plugin-update/compare/v1.2.13...v1.2.14) (2018-06-29)
+
+
+### Bug Fixes
+
+* switch to [@oclif](https://github.com/oclif)/color ([7d103d3](https://github.com/oclif/plugin-update/commit/7d103d3))
+
 ## [1.2.13](https://github.com/oclif/plugin-update/compare/v1.2.12...v1.2.13) (2018-06-19)
 
 
