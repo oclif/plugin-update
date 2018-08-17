@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/oclif/plugin-update/compare/v1.2.14...v1.3.0) (2018-08-17)
+
+
+### Bug Fixes
+
+* lint issue ([3ed8ed1](https://github.com/oclif/plugin-update/commit/3ed8ed1))
+
+
+### Features
+
+* typescript 3.0 ([5af67f5](https://github.com/oclif/plugin-update/commit/5af67f5))
+
 ## [1.2.14](https://github.com/oclif/plugin-update/compare/v1.2.13...v1.2.14) (2018-06-29)
 
 
