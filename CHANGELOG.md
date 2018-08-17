@@ -1,3 +1,11 @@
+## [1.3.1](https://github.com/oclif/plugin-update/compare/v1.3.0...v1.3.1) (2018-08-17)
+
+
+### Bug Fixes
+
+* updated semver ([0ed2213](https://github.com/oclif/plugin-update/commit/0ed2213))
+* use greenkeeper-lockfile@2 ([c945949](https://github.com/oclif/plugin-update/commit/c945949))
+
 # [1.3.0](https://github.com/oclif/plugin-update/compare/v1.2.14...v1.3.0) (2018-08-17)
 
 

@@ -29,5 +29,5 @@ USAGE
   $ oclif-example update [CHANNEL]
 ```
 
-_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v1.3.0/src/commands/update.ts)_
+_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v1.3.1/src/commands/update.ts)_
 <!-- commandsstop -->
