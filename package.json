@@ -17,7 +17,7 @@
     "http-call": "^5.2.0",
     "lodash": "^4.17.10",
     "log-chopper": "^1.0.2",
-    "semver": "^5.5.0",
+    "semver": "^5.5.1",
     "tar-fs": "^1.16.3"
   },
   "devDependencies": {
