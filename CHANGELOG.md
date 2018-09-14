@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/oclif/plugin-update/compare/v1.3.1...v1.3.2) (2018-09-14)
+
+
+### Bug Fixes
+
+* updated deps ([c4ec1eb](https://github.com/oclif/plugin-update/commit/c4ec1eb))
+
 ## [1.3.1](https://github.com/oclif/plugin-update/compare/v1.3.0...v1.3.1) (2018-08-17)
 
 
