@@ -36,14 +36,14 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
 
       let ignore = (_: any, header: any) => {
         switch (header.type) {
-          case 'directory':
-          case 'file':
-            if (process.env.OCLIF_DEBUG_UPDATE_FILES) debug(header.name)
-            return false
-          case 'symlink':
-            return true
-          default:
-            throw new Error(header.type)
+        case 'directory':
+        case 'file':
+          if (process.env.OCLIF_DEBUG_UPDATE_FILES) debug(header.name)
+          return false
+        case 'symlink':
+          return true
+        default:
+          throw new Error(header.type)
         }
       }
       let extract = tar.extract(tmp, {ignore})
