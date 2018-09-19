@@ -115,7 +115,11 @@ export default class UpdateCommand extends Command {
   }
 
   private async skipUpdate(): Promise<string | false> {
-    if (!this.config.binPath) return this.config.scopedEnvVar('UPDATE_INSTRUCTIONS') || 'not updatable'
+    if (!this.config.binPath) {
+      const instructions = this.config.scopedEnvVar('UPDATE_INSTRUCTIONS')
+      if (instructions) this.warn(instructions)
+      return 'not updatable'
+    }
     const manifest = await this.fetchManifest()
     if (this.config.version === manifest.version) {
       if (this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE')) return 'done'
