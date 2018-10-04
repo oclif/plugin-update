@@ -31,6 +31,7 @@ export default class UpdateCommand extends Command {
 
     cli.action.start(`${this.config.name}: Updating CLI`)
     this.channel = args.channel || this.config.channel || 'stable'
+    await this.config.runHook('preupdate', {channel: this.channel})
     const manifest = await this.fetchManifest()
     let reason = await this.skipUpdate()
     if (reason) cli.action.stop(reason || 'done')
