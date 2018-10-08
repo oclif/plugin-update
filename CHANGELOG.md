@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/oclif/plugin-update/compare/v1.3.2...v1.3.3) (2018-10-08)
+
+
+### Bug Fixes
+
+* Add preupdate hook ([#45](https://github.com/oclif/plugin-update/issues/45)) ([a0eb4dd](https://github.com/oclif/plugin-update/commit/a0eb4dd))
+
 ## [1.3.2](https://github.com/oclif/plugin-update/compare/v1.3.1...v1.3.2) (2018-09-14)
 
 
