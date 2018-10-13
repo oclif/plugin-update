@@ -7,7 +7,6 @@
 [![Codecov](https://codecov.io/gh/oclif/plugin-update/branch/master/graph/badge.svg)](https://codecov.io/gh/oclif/plugin-update)
 [![Downloads/week](https://img.shields.io/npm/dw/@oclif/plugin-update.svg)](https://npmjs.org/package/@oclif/plugin-update)
 [![License](https://img.shields.io/npm/l/@oclif/plugin-update.svg)](https://github.com/oclif/plugin-update/blob/master/package.json)
-[![Greenkeeper badge](https://badges.greenkeeper.io/oclif/plugin-update.svg)](https://greenkeeper.io/)
 
 <!-- toc -->
 * [Usage](#usage)
