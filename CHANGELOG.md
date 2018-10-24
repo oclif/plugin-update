@@ -1,3 +1,10 @@
+## [1.3.5](https://github.com/oclif/plugin-update/compare/v1.3.4...v1.3.5) (2018-10-24)
+
+
+### Bug Fixes
+
+* Fallback to templates for s3 gz url and baseDir ([#46](https://github.com/oclif/plugin-update/issues/46)) ([bd7ab36](https://github.com/oclif/plugin-update/commit/bd7ab36))
+
 ## [1.3.4](https://github.com/oclif/plugin-update/compare/v1.3.3...v1.3.4) (2018-10-13)
 
 
