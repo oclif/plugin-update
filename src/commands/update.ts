@@ -70,10 +70,21 @@ export default class UpdateCommand extends Command {
     await this.ensureClientDir()
     const output = path.join(this.clientRoot, version)
 
-    const {response: stream} = await http.stream(manifest.gz)
+    const gzUrl = manifest.gz || this.config.s3Url(this.config.s3Key('versioned', {
+      version,
+      channel,
+      bin: this.config.bin,
+      platform: this.config.platform,
+      arch: this.config.arch,
+      ext: 'gz'
+    }))
+    const {response: stream} = await http.stream(gzUrl)
     stream.pause()
 
-    let extraction = extract(stream, manifest.baseDir, output, manifest.sha256gz)
+    const baseDir = manifest.baseDir || this.config.s3Key('baseDir', {
+      bin: this.config.bin
+    })
+    let extraction = extract(stream, baseDir, output, manifest.sha256gz)
 
     // TODO: use cli.action.type
     if ((cli.action as any).frames) {
