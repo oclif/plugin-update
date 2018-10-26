@@ -82,7 +82,11 @@ export default class UpdateCommand extends Command {
     stream.pause()
 
     const baseDir = manifest.baseDir || this.config.s3Key('baseDir', {
-      bin: this.config.bin
+      version,
+      channel,
+      bin: this.config.bin,
+      platform: this.config.platform,
+      arch: this.config.arch,
     })
     let extraction = extract(stream, baseDir, output, manifest.sha256gz)
 
