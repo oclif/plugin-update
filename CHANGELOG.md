@@ -1,3 +1,10 @@
+## [1.3.6](https://github.com/oclif/plugin-update/compare/v1.3.5...v1.3.6) (2018-10-26)
+
+
+### Bug Fixes
+
+* add basedir template vars ([f11ab5a](https://github.com/oclif/plugin-update/commit/f11ab5a))
+
 ## [1.3.5](https://github.com/oclif/plugin-update/compare/v1.3.4...v1.3.5) (2018-10-24)
 
 
