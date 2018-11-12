@@ -1,3 +1,10 @@
+## [1.3.7](https://github.com/oclif/plugin-update/compare/v1.3.6...v1.3.7) (2018-11-12)
+
+
+### Bug Fixes
+
+* warn if not updatable ([#44](https://github.com/oclif/plugin-update/issues/44)) ([947d454](https://github.com/oclif/plugin-update/commit/947d454))
+
 ## [1.3.6](https://github.com/oclif/plugin-update/compare/v1.3.5...v1.3.6) (2018-10-26)
 
 
