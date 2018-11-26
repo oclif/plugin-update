@@ -53,8 +53,8 @@ export default class UpdateCommand extends Command {
       }))
       let {body} = await http.get<IManifest | string>(url)
 
-      // Some non-S3 hosts do not automatically use the right content
-      // type, so we could get a raw JSON string here
+      // in case the content-type is not set, parse as a string
+      // this will happen if uploading without `oclif-dev publish`
       if (typeof body === 'string') {
         return JSON.parse(body)
       } else {
