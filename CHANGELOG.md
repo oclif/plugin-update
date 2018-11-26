@@ -1,3 +1,10 @@
+## [1.3.8](https://github.com/oclif/plugin-update/compare/v1.3.7...v1.3.8) (2018-11-26)
+
+
+### Bug Fixes
+
+* Parse update manifests if the response is a string ([#48](https://github.com/oclif/plugin-update/issues/48)) ([757b5a5](https://github.com/oclif/plugin-update/commit/757b5a5))
+
 ## [1.3.7](https://github.com/oclif/plugin-update/compare/v1.3.6...v1.3.7) (2018-11-12)
 
 
