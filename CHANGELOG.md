@@ -1,3 +1,10 @@
+## [1.3.9](https://github.com/oclif/plugin-update/compare/v1.3.8...v1.3.9) (2018-11-26)
+
+
+### Bug Fixes
+
+* clarify ([e19392f](https://github.com/oclif/plugin-update/commit/e19392f))
+
 ## [1.3.8](https://github.com/oclif/plugin-update/compare/v1.3.7...v1.3.8) (2018-11-26)
 
 
