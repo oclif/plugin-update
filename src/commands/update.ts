@@ -51,8 +51,15 @@ export default class UpdateCommand extends Command {
         platform: this.config.platform,
         arch: this.config.arch
       }))
-      let {body} = await http.get<IManifest>(url)
-      return body
+      let {body} = await http.get<IManifest | string>(url)
+
+      // Some non-S3 hosts do not automatically use the right content
+      // type, so we could get a raw JSON string here
+      if (typeof body === 'string') {
+        return JSON.parse(body)
+      } else {
+        return body
+      }
     } catch (err) {
       if (err.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${this.channel}`)
       throw err
