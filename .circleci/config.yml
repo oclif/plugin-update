@@ -1,7 +1,9 @@
 ---
 version: 2
 jobs:
-  test: &test
+  # This plugin requires a custom image to test releases.
+  # Currently it's using Node v10.
+  node-10: &test
     docker:
       - image: oclif/release:10.9.0
     working_directory: ~/cli
@@ -35,10 +37,10 @@ workflows:
   version: 2
   "@oclif/plugin-update":
     jobs:
-      - test
+      - node-10
       - release:
           context: org-global
           filters:
             branches: {only: master}
           requires:
-            - test
+            - node-10
