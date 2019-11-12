@@ -64,8 +64,8 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
         const tmp = getTmp()
         await fs.move(output, tmp)
         await fs.remove(tmp).catch(debug)
-      } catch (err) {
-        debug(err)
+      } catch (error) {
+        debug(error)
         await fs.remove(output)
       }
     }
@@ -75,8 +75,8 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
     await fs.remove(tmp).catch(debug)
     await touch(output)
     debug('done extracting')
-  } catch (err) {
+  } catch (error) {
     await fs.remove(tmp).catch(process.emitWarning)
-    throw err
+    throw error
   }
 }

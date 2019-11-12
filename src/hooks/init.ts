@@ -37,10 +37,10 @@ export const init: Config.Hook<'init'> = async function (opts) {
       const m = await mtime(autoupdatefile)
       let days = 1
       if (opts.config.channel === 'stable') days = 14
-      m.setHours(m.getHours() + days * 24)
+      m.setHours(m.getHours() + (days * 24))
       return m < new Date()
-    } catch (err) {
-      if (err.code !== 'ENOENT') cli.error(err.stack)
+    } catch (error) {
+      if (error.code !== 'ENOENT') cli.error(error.stack)
       if ((global as any).testing) return false
       debug('autoupdate ENOENT')
       return true
@@ -57,11 +57,12 @@ export const init: Config.Hook<'init'> = async function (opts) {
 
   debug(`spawning autoupdate on ${binPath}`)
 
+  const offset = 0
   const fd = await fs.open(autoupdatelogfile, 'a')
-  // @ts-ignore
   fs.write(
     fd,
     timestamp(`starting \`${binPath} update --autoupdate\` from ${process.argv.slice(1, 3).join(' ')}\n`),
+    offset,
   )
 
   spawn(binPath, ['update', '--autoupdate'], {

@@ -13,11 +13,14 @@ describe('update', () => {
     const tarball = path.resolve(stdout.split('\n').pop()!)
 
     qq.cd('examples/s3-update-example-cli')
+    /* eslint-disable require-atomic-updates */
     process.env.EXAMPLE_CLI_DISABLE_AUTOUPDATE = '1'
     process.env.YARN_CACHE_FOLDER = path.resolve('tmp', 'yarn')
+    /* eslint-enable require-atomic-updates */
     await qq.rm(process.env.YARN_CACHE_FOLDER)
     const pjson = await qq.readJSON('package.json')
-    pjson.oclif.bin = pjson.name = `s3-update-example-cli-${Math.floor(Math.random() * 100000)}`
+    pjson.name = `s3-update-example-cli-${Math.floor(Math.random() * 100000)}`
+    pjson.oclif.bin = pjson.name
     delete pjson.dependencies['@oclif/plugin-update']
     await qq.writeJSON('package.json', pjson)
 

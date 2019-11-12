@@ -64,9 +64,9 @@ export default class UpdateCommand extends Command {
         return JSON.parse(body)
       }
       return body
-    } catch (err) {
-      if (err.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${this.channel}`)
-      throw err
+    } catch (error) {
+      if (error.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${this.channel}`)
+      throw error
     }
   }
 
@@ -146,8 +146,8 @@ export default class UpdateCommand extends Command {
       this.debug('log chop')
       const logChopper = require('log-chopper').default
       await logChopper.chop(this.config.errlog)
-    } catch (e) {
-      this.debug(e.message)
+    } catch (error) {
+      this.debug(error.message)
     }
   }
 
@@ -185,15 +185,15 @@ export default class UpdateCommand extends Command {
       const promises = files.map(async f => {
         if (['bin', 'current', this.config.version].includes(path.basename(f.path))) return
         const mtime = f.stat.mtime
-        mtime.setHours(mtime.getHours() + 14 * 24)
+        mtime.setHours(mtime.getHours() + (14 * 24))
         if (mtime < new Date()) {
           await fs.remove(f.path)
         }
       })
-      for (const p of promises) await p
+      for (const p of promises) await p // eslint-disable-line no-await-in-loop
       await this.logChop()
-    } catch (err) {
-      cli.warn(err)
+    } catch (error) {
+      cli.warn(error)
     }
   }
 
@@ -204,8 +204,8 @@ export default class UpdateCommand extends Command {
       this.debug('touching client at', p)
       if (!await fs.pathExists(p)) return
       await fs.utimes(p, new Date(), new Date())
-    } catch (err) {
-      this.warn(err)
+    } catch (error) {
+      this.warn(error)
     }
   }
 
@@ -221,8 +221,8 @@ export default class UpdateCommand extends Command {
       .on('close', (status: number) => {
         try {
           this.exit(status)
-        } catch (err) {
-          reject(err)
+        } catch (error) {
+          reject(error)
         }
       })
     })
@@ -271,14 +271,14 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
   private async ensureClientDir() {
     try {
       await fs.mkdirp(this.clientRoot)
-    } catch (err) {
-      if (err.code === 'EEXIST') {
+    } catch (error) {
+      if (error.code === 'EEXIST') {
         // for some reason the client directory is sometimes a file
         // if so, this happens. Delete it and recreate
         await fs.remove(this.clientRoot)
         await fs.mkdirp(this.clientRoot)
       } else {
-        throw err
+        throw error
       }
     }
   }

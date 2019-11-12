@@ -75,10 +75,9 @@
   "private": true,
   "repository": "jdxcode/s3-update-example-cli",
   "scripts": {
-    "postpack": "rm -f oclif.manifest.json",
-    "posttest": "tsc -p test --noEmit && tslint -p test -t stylish",
-    "prepack": "rm -rf lib && tsc && oclif-dev manifest",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
+    "prepack": "rm -rf lib && tsc && oclif-dev manifest",
+    "postpack": "rm -f oclif.manifest.json",
     "version": "oclif-dev readme && git add README.md"
   },
   "types": "lib/index.d.ts"
