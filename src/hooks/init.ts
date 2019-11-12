@@ -57,7 +57,7 @@ export const init: Config.Hook<'init'> = async function (opts) {
 
   debug(`spawning autoupdate on ${binPath}`)
 
-  let fd = await fs.open(autoupdatelogfile, 'a')
+  const fd = await fs.open(autoupdatelogfile, 'a')
   // @ts-ignore
   fs.write(
     fd,
@@ -69,6 +69,6 @@ export const init: Config.Hook<'init'> = async function (opts) {
     stdio: ['ignore', fd, fd],
     env: autoupdateEnv,
   })
-    .on('error', (e: Error) => process.emitWarning(e))
-    .unref()
+  .on('error', (e: Error) => process.emitWarning(e))
+  .unref()
 }
