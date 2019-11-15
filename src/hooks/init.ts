@@ -57,12 +57,10 @@ export const init: Config.Hook<'init'> = async function (opts) {
 
   debug(`spawning autoupdate on ${binPath}`)
 
-  const offset = 0
   const fd = await fs.open(autoupdatelogfile, 'a')
   fs.write(
     fd,
     timestamp(`starting \`${binPath} update --autoupdate\` from ${process.argv.slice(1, 3).join(' ')}\n`),
-    offset,
   )
 
   spawn(binPath, ['update', '--autoupdate'], {
