@@ -5,7 +5,7 @@ jobs:
   # Currently it's using Node v10.
   node-10: &test
     docker:
-      - image: oclif/release:10.9.0
+      - image: rasphilco/release:10.17.0
     working_directory: ~/cli
     steps:
       - checkout
