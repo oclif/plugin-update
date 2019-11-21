@@ -13,19 +13,24 @@ import {ls, wait} from '../util'
 
 export default class UpdateCommand extends Command {
   static description = 'update the <%= config.bin %> CLI'
+
   static args = [{name: 'channel', optional: true}]
+
   static flags = {
     autoupdate: flags.boolean({hidden: true}),
   }
 
   private autoupdate!: boolean
+
   private channel!: string
+
   private readonly clientRoot = this.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.config.dataDir, 'client')
+
   private readonly clientBin = path.join(this.clientRoot, 'bin', this.config.windows ? `${this.config.bin}.cmd` : this.config.bin)
 
   async run() {
     const {args, flags} = this.parse(UpdateCommand)
-    this.autoupdate = !!flags.autoupdate
+    this.autoupdate = Boolean(flags.autoupdate)
 
     if (this.autoupdate) await this.debounce()
 
@@ -33,7 +38,7 @@ export default class UpdateCommand extends Command {
     this.channel = args.channel || this.config.channel || 'stable'
     await this.config.runHook('preupdate', {channel: this.channel})
     const manifest = await this.fetchManifest()
-    let reason = await this.skipUpdate()
+    const reason = await this.skipUpdate()
     if (reason) cli.action.stop(reason || 'done')
     else await this.update(manifest)
     this.debug('tidy')
@@ -49,20 +54,19 @@ export default class UpdateCommand extends Command {
       const url = this.config.s3Url(this.config.s3Key('manifest', {
         channel: this.channel,
         platform: this.config.platform,
-        arch: this.config.arch
+        arch: this.config.arch,
       }))
-      let {body} = await http.get<IManifest | string>(url)
+      const {body} = await http.get<IManifest | string>(url)
 
       // in case the content-type is not set, parse as a string
       // this will happen if uploading without `oclif-dev publish`
       if (typeof body === 'string') {
         return JSON.parse(body)
-      } else {
-        return body
       }
-    } catch (err) {
-      if (err.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${this.channel}`)
-      throw err
+      return body
+    } catch (error) {
+      if (error.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${this.channel}`)
+      throw error
     }
   }
 
@@ -83,7 +87,7 @@ export default class UpdateCommand extends Command {
       bin: this.config.bin,
       platform: this.config.platform,
       arch: this.config.arch,
-      ext: 'gz'
+      ext: 'gz',
     }))
     const {response: stream} = await http.stream(gzUrl)
     stream.pause()
@@ -95,15 +99,17 @@ export default class UpdateCommand extends Command {
       platform: this.config.platform,
       arch: this.config.arch,
     })
-    let extraction = extract(stream, baseDir, output, manifest.sha256gz)
+    const extraction = extract(stream, baseDir, output, manifest.sha256gz)
 
-    // TODO: use cli.action.type
+    // to-do: use cli.action.type
     if ((cli.action as any).frames) {
       // if spinner action
-      let total = parseInt(stream.headers['content-length']!, 10)
+      const total = parseInt(stream.headers['content-length']!, 10)
       let current = 0
       const updateStatus = _.throttle(
-        (newStatus: string) => { cli.action.status = newStatus },
+        (newStatus: string) => {
+          cli.action.status = newStatus
+        },
         250,
         {leading: true, trailing: false},
       )
@@ -140,8 +146,8 @@ export default class UpdateCommand extends Command {
       this.debug('log chop')
       const logChopper = require('log-chopper').default
       await logChopper.chop(this.config.errlog)
-    } catch (e) {
-      this.debug(e.message)
+    } catch (error) {
+      this.debug(error.message)
     }
   }
 
@@ -173,21 +179,21 @@ export default class UpdateCommand extends Command {
   // removes any unused CLIs
   private async tidy() {
     try {
-      let root = this.clientRoot
+      const root = this.clientRoot
       if (!await fs.pathExists(root)) return
-      let files = await ls(root)
-      let promises = files.map(async f => {
+      const files = await ls(root)
+      const promises = files.map(async f => {
         if (['bin', 'current', this.config.version].includes(path.basename(f.path))) return
         const mtime = f.stat.mtime
-        mtime.setHours(mtime.getHours() + 14 * 24)
+        mtime.setHours(mtime.getHours() + (14 * 24))
         if (mtime < new Date()) {
           await fs.remove(f.path)
         }
       })
-      for (let p of promises) await p
+      for (const p of promises) await p // eslint-disable-line no-await-in-loop
       await this.logChop()
-    } catch (err) {
-      cli.warn(err)
+    } catch (error) {
+      cli.warn(error)
     }
   }
 
@@ -198,8 +204,8 @@ export default class UpdateCommand extends Command {
       this.debug('touching client at', p)
       if (!await fs.pathExists(p)) return
       await fs.utimes(p, new Date(), new Date())
-    } catch (err) {
-      this.warn(err)
+    } catch (error) {
+      this.warn(error)
     }
   }
 
@@ -211,14 +217,14 @@ export default class UpdateCommand extends Command {
         stdio: 'inherit',
         env: {...process.env, [this.config.scopedEnvVarKey('HIDE_UPDATED_MESSAGE')]: '1'},
       })
-        .on('error', reject)
-        .on('close', (status: number) => {
-          try {
-            this.exit(status)
-          } catch (err) {
-            reject(err)
-          }
-        })
+      .on('error', reject)
+      .on('close', (status: number) => {
+        try {
+          this.exit(status)
+        } catch (error) {
+          reject(error)
+        }
+      })
     })
   }
 
@@ -228,7 +234,7 @@ export default class UpdateCommand extends Command {
     const binPathEnvVar = this.config.scopedEnvVarKey('BINPATH')
     const redirectedEnvVar = this.config.scopedEnvVarKey('REDIRECTED')
     if (this.config.windows) {
-      let body = `@echo off
+      const body = `@echo off
 setlocal enableextensions
 set ${redirectedEnvVar}=1
 set ${binPathEnvVar}=%~dp0${bin}
@@ -236,7 +242,8 @@ set ${binPathEnvVar}=%~dp0${bin}
 `
       await fs.outputFile(dst, body)
     } else {
-      let body = `#!/usr/bin/env bash
+      /* eslint-disable no-useless-escape */
+      const body = `#!/usr/bin/env bash
 set -e
 get_script_dir () {
   SOURCE="\${BASH_SOURCE[0]}"
@@ -253,6 +260,7 @@ get_script_dir () {
 DIR=$(get_script_dir)
 ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${bin}" "$@"
 `
+      /* eslint-enable no-useless-escape */
 
       await fs.remove(dst)
       await fs.outputFile(dst, body)
@@ -265,13 +273,15 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
   private async ensureClientDir() {
     try {
       await fs.mkdirp(this.clientRoot)
-    } catch (err) {
-      if (err.code === 'EEXIST') {
+    } catch (error) {
+      if (error.code === 'EEXIST') {
         // for some reason the client directory is sometimes a file
         // if so, this happens. Delete it and recreate
         await fs.remove(this.clientRoot)
         await fs.mkdirp(this.clientRoot)
-      } else { throw err }
+      } else {
+        throw error
+      }
     }
   }
 }

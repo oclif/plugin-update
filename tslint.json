@@ -1,6 +1,0 @@
-{
-  "extends": "@oclif/tslint",
-  "rules": {
-    "no-useless-files": false
-  }
-}

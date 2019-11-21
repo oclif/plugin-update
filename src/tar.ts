@@ -20,11 +20,11 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
       const check = () => shaValidated && extracted && resolve()
 
       if (sha) {
-        let hasher = crypto.createHash('sha256')
+        const hasher = crypto.createHash('sha256')
         stream.on('error', reject)
         stream.on('data', d => hasher.update(d))
         stream.on('end', () => {
-          let shasum = hasher.digest('hex')
+          const shasum = hasher.digest('hex')
           if (sha === shasum) {
             shaValidated = true
             check()
@@ -34,7 +34,7 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
         })
       } else shaValidated = true
 
-      let ignore = (_: any, header: any) => {
+      const ignore = (_: any, header: any) => {
         switch (header.type) {
         case 'directory':
         case 'file':
@@ -46,14 +46,14 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
           throw new Error(header.type)
         }
       }
-      let extract = tar.extract(tmp, {ignore})
+      const extract = tar.extract(tmp, {ignore})
       extract.on('error', reject)
       extract.on('finish', () => {
         extracted = true
         check()
       })
 
-      let gunzip = zlib.createGunzip()
+      const gunzip = zlib.createGunzip()
       gunzip.on('error', reject)
 
       stream.pipe(gunzip).pipe(extract)
@@ -64,8 +64,8 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
         const tmp = getTmp()
         await fs.move(output, tmp)
         await fs.remove(tmp).catch(debug)
-      } catch (err) {
-        debug(err)
+      } catch (error) {
+        debug(error)
         await fs.remove(output)
       }
     }
@@ -75,8 +75,8 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
     await fs.remove(tmp).catch(debug)
     await touch(output)
     debug('done extracting')
-  } catch (err) {
+  } catch (error) {
     await fs.remove(tmp).catch(process.emitWarning)
-    throw err
+    throw error
   }
 }
