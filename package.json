@@ -15,7 +15,7 @@
     "filesize": "^3.6.1",
     "fs-extra": "^7.0.1",
     "http-call": "^5.2.2",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "log-chopper": "^1.0.2",
     "semver": "^5.6.0",
     "tar-fs": "^1.16.3"
