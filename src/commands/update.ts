@@ -101,7 +101,7 @@ export default class UpdateCommand extends Command {
     })
     const extraction = extract(stream, baseDir, output, manifest.sha256gz)
 
-    // TODO: use cli.action.type
+    // to-do: use cli.action.type
     if ((cli.action as any).frames) {
       // if spinner action
       const total = parseInt(stream.headers['content-length']!, 10)
@@ -242,6 +242,7 @@ set ${binPathEnvVar}=%~dp0${bin}
 `
       await fs.outputFile(dst, body)
     } else {
+      /* eslint-disable no-useless-escape */
       const body = `#!/usr/bin/env bash
 set -e
 get_script_dir () {
@@ -259,6 +260,7 @@ get_script_dir () {
 DIR=$(get_script_dir)
 ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${bin}" "$@"
 `
+      /* eslint-enable no-useless-escape */
 
       await fs.remove(dst)
       await fs.outputFile(dst, body)
