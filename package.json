@@ -43,7 +43,7 @@
     "qqjs": "^0.3.10",
     "ts-node": "^7.0.1",
     "tslib": "^1.9.3",
-    "typescript": "^3.1.6"
+    "typescript": "3.8.3"
   },
   "engines": {
     "node": ">=8.0.0"
