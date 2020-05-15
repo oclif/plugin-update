@@ -16,7 +16,7 @@ export default class UpdateCommand extends Command {
 
   static args = [{name: 'channel', optional: true}]
 
-  static flags = {
+  static flags: flags.Input<any> = {
     autoupdate: flags.boolean({hidden: true}),
   }
 
