@@ -71,11 +71,12 @@
   "repository": "oclif/plugin-update",
   "scripts": {
     "lint": "eslint . --ext .ts --config .eslintrc",
-    "pretest": "tsc -p test --noEmit",
+    "pretest": "yarn build --noEmit",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
     "posttest": "yarn lint",
     "prepack": "rm -rf lib && tsc && oclif-dev manifest",
     "postpack": "rm -f oclif.manifest.json",
-    "version": "oclif-dev readme && git add README.md"
+    "version": "oclif-dev readme && git add README.md",
+    "build": "rm -rf lib && tsc"
   }
 }
