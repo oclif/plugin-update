@@ -12,7 +12,7 @@
     "cli-ux": "^4.9.3",
     "cross-spawn": "^6.0.5",
     "debug": "^4.1.0",
-    "filesize": "^3.6.1",
+    "filesize": "^6.1.0",
     "fs-extra": "^7.0.1",
     "http-call": "^5.2.2",
     "lodash": "^4.17.13",
