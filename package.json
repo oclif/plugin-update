@@ -10,7 +10,7 @@
     "@oclif/errors": "^1.2.2",
     "@types/semver": "^5.5.0",
     "cli-ux": "^4.9.3",
-    "cross-spawn": "^6.0.5",
+    "cross-spawn": "^7.0.3",
     "debug": "^4.1.0",
     "filesize": "^6.1.0",
     "fs-extra": "^7.0.1",
