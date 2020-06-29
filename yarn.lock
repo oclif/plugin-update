@@ -341,10 +341,12 @@
   resolved "https://registry.yarnpkg.com/@types/supports-color/-/supports-color-5.3.0.tgz#eb6a52e9531fb3ebcd401cec774d1bdfb571f793"
   integrity sha512-WxwTXnHTIsk7srax1icjLgX+6w1MUAJbhyCpRP/45paEElsPDQUJZDgr1UpKuL2S3Tb+ZyX9MjWwmcSD4bUoOQ==
 
-"@types/write-json-file@^2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@types/write-json-file/-/write-json-file-2.2.1.tgz#74155aaccbb0d532be21f9d66bebc4ea875a5a62"
-  integrity sha512-JdO/UpPm9RrtQBNVcZdt3M7j3mHO/kXaea9LBGx3UgWJd1f9BkIWP7jObLBG6ZtRyqp7KzLFEsaPhWcidVittA==
+"@types/write-json-file@^3.2.1":
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/@types/write-json-file/-/write-json-file-3.2.1.tgz#50b3d8f09b74e5abd18a0be5580e03ef40d8d8ec"
+  integrity sha512-3vX7/kpNX3+FbGfV8wbONVsT6A1czgUjUjRCvbQyMu3TyjkHoCDH3caJz6JTHRziqQdy6M5+F7YRi14FV8eRSw==
+  dependencies:
+    write-json-file "*"
 
 "@typescript-eslint/eslint-plugin@^2.6.1":
   version "2.8.0"
@@ -3201,7 +3203,7 @@ write-file-atomic@^3.0.0:
     signal-exit "^3.0.2"
     typedarray-to-buffer "^3.1.5"
 
-write-json-file@^4.1.1:
+write-json-file@*, write-json-file@^4.1.1:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/write-json-file/-/write-json-file-4.3.0.tgz#908493d6fd23225344af324016e4ca8f702dd12d"
   integrity sha512-PxiShnxf0IlnQuMYOPPhPkhExoCQuTUNPOa/2JWCYTmBquU9njyyDuwRKN26IZBlp4yn1nt+Agh2HOOBl+55HQ==
