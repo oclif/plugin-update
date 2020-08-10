@@ -6,7 +6,7 @@
   "dependencies": {
     "@oclif/color": "^0.1.0",
     "@oclif/command": "^1.7.0",
-    "@oclif/config": "^1.16.0",
+    "@oclif/config": "^1.17.0",
     "@oclif/errors": "^1.2.2",
     "@types/semver": "^7.3.1",
     "cli-ux": "^5.4.7",
