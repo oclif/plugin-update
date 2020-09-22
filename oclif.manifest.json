@@ -1,0 +1,1 @@
+{"version":"1.3.10","commands":{"update":{"id":"update","description":"update the <%= config.bin %> CLI","pluginName":"@oclif/plugin-update","pluginType":"core","aliases":[],"flags":{"autoupdate":{"name":"autoupdate","type":"boolean","hidden":true,"allowNo":false}},"args":[{"name":"channel"}]}}}

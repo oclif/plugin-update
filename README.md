@@ -1,12 +1,8 @@
-@oclif/plugin-update
+@vtex/cli-plugin-autoupdate
 ====================
 
-[![Version](https://img.shields.io/npm/v/@oclif/plugin-update.svg)](https://npmjs.org/package/@oclif/plugin-update)
-[![CircleCI](https://circleci.com/gh/oclif/plugin-update/tree/master.svg?style=shield)](https://circleci.com/gh/oclif/plugin-update/tree/master)
-[![Appveyor CI](https://ci.appveyor.com/api/projects/status/github/oclif/plugin-update?branch=master&svg=true)](https://ci.appveyor.com/project/oclif/plugin-update/branch/master)
-[![Codecov](https://codecov.io/gh/oclif/plugin-update/branch/master/graph/badge.svg)](https://codecov.io/gh/oclif/plugin-update)
-[![Downloads/week](https://img.shields.io/npm/dw/@oclif/plugin-update.svg)](https://npmjs.org/package/@oclif/plugin-update)
-[![License](https://img.shields.io/npm/l/@oclif/plugin-update.svg)](https://github.com/oclif/plugin-update/blob/master/package.json)
+[![Version](https://img.shields.io/npm/v/@vtex/cli-plugin-autoupdate.svg)](https://npmjs.org/package/@vtex/cli-plugin-autoupdate)
+[![License](https://img.shields.io/npm/l/@vtex/cli-plugin-autoupdate.svg)](https://github.com/vtex/cli-plugin-autoupdate/blob/master/package.json)
 
 <!-- toc -->
 * [Usage](#usage)
