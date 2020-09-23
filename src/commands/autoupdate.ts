@@ -213,7 +213,7 @@ export default class UpdateCommand extends Command {
     cli.action.stop()
     return new Promise((_, reject) => {
       this.debug('restarting CLI after update', this.clientBin)
-      spawn(this.clientBin, ['update'], {
+      spawn(this.clientBin, ['autoupdate'], {
         stdio: 'inherit',
         env: {...process.env, [this.config.scopedEnvVarKey('HIDE_UPDATED_MESSAGE')]: '1'},
       })
