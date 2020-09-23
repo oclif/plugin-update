@@ -13,16 +13,16 @@ See https://oclif.io/docs/releasing.html#autoupdater
 
 # Commands
 <!-- commands -->
-* [`oclif-example update [CHANNEL]`](#oclif-example-update-channel)
+* [`oclif-example autoupdate [CHANNEL]`](#oclif-example-autoupdate-channel)
 
-## `oclif-example update [CHANNEL]`
+## `oclif-example autoupdate [CHANNEL]`
 
 update the oclif-example CLI
 
 ```
 USAGE
-  $ oclif-example update [CHANNEL]
+  $ oclif-example autoupdate [CHANNEL]
 ```
 
-_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v1.3.10/src/commands/update.ts)_
+_See code: [src/commands/autoupdate.ts](https://github.com/vtex/cli-plugin-autoupdate/blob/v0.0.0/src/commands/autoupdate.ts)_
 <!-- commandsstop -->
