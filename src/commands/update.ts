@@ -267,6 +267,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
       await fs.chmod(dst, 0o755)
       await fs.remove(path.join(this.clientRoot, 'current'))
       await fs.symlink(`./${version}`, path.join(this.clientRoot, 'current'))
+      await fs.symlink(path.join(this.clientRoot, 'current'), path.join(this.clientRoot, 'current/node_modules/vtex'))
     }
   }
 
