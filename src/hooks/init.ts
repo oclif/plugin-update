@@ -60,10 +60,10 @@ export const init: Config.Hook<'init'> = async function (opts) {
   const fd = await fs.open(autoupdatelogfile, 'a')
   fs.write(
     fd,
-    timestamp(`starting \`${binPath} update --autoupdate\` from ${process.argv.slice(1, 3).join(' ')}\n`),
+    timestamp(`starting \`${binPath} autoupdate --autoupdate\` from ${process.argv.slice(1, 3).join(' ')}\n`),
   )
 
-  spawn(binPath, ['update', '--autoupdate'], {
+  spawn(binPath, ['autoupdate', '--autoupdate'], {
     detached: !this.config.windows,
     stdio: ['ignore', fd, fd],
     env: autoupdateEnv,

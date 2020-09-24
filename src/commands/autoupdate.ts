@@ -213,7 +213,7 @@ export default class UpdateCommand extends Command {
     cli.action.stop()
     return new Promise((_, reject) => {
       this.debug('restarting CLI after update', this.clientBin)
-      spawn(this.clientBin, ['update'], {
+      spawn(this.clientBin, ['autoupdate'], {
         stdio: 'inherit',
         env: {...process.env, [this.config.scopedEnvVarKey('HIDE_UPDATED_MESSAGE')]: '1'},
       })
@@ -267,6 +267,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
       await fs.chmod(dst, 0o755)
       await fs.remove(path.join(this.clientRoot, 'current'))
       await fs.symlink(`./${version}`, path.join(this.clientRoot, 'current'))
+      await fs.symlink(path.join(this.clientRoot, 'current'), path.join(this.clientRoot, 'current/node_modules/vtex'))
     }
   }
 
