@@ -1,6 +1,6 @@
 {
   "name": "@vtex/cli-plugin-autoupdate",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "bugs": "https://github.com/vtex/cli-plugin-autoupdate/issues",
   "dependencies": {
     "@oclif/color": "^0.1.0",
