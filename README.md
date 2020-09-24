@@ -24,5 +24,5 @@ USAGE
   $ oclif-example autoupdate [CHANNEL]
 ```
 
-_See code: [src/commands/autoupdate.ts](https://github.com/vtex/cli-plugin-autoupdate/blob/v1.0.0-beta/src/commands/autoupdate.ts)_
+_See code: [src/commands/autoupdate.ts](https://github.com/vtex/cli-plugin-autoupdate/blob/v0.0.0/src/commands/autoupdate.ts)_
 <!-- commandsstop -->
