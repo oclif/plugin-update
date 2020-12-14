@@ -18,7 +18,7 @@
     "lodash": "^4.17.20",
     "log-chopper": "^1.0.2",
     "semver": "^7.3.4",
-    "tar-fs": "^2.1.0"
+    "tar-fs": "^2.1.1"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.25.1",
