@@ -57,9 +57,10 @@ export default class UpdateCommand extends Command {
     return this.config.channel || 'stable'
   }
 
-  private s3ChannelManifestKey(platform: string, arch: string): string {
-    const key = `channels/${this.channel}/${platform}-${arch}-buildmanifest`
-    return this.config.s3Url(key)
+  private s3ChannelManifestKey(bin: string, platform: string, arch: string, folder: string | undefined): string {    // if (folder) folder = `${folder}/`
+    let s3SubDir = folder || ''
+    if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
+    return path.join(s3SubDir, 'channels', this.channel, `${bin}-${platform}-${arch}-buildmanifest`)
   }
 
   private async fetchManifest(): Promise<IManifest> {
@@ -72,8 +73,10 @@ export default class UpdateCommand extends Command {
       }))
       const newManifestUrl = this.config.s3Url(
         this.s3ChannelManifestKey(
+          this.config.bin,
           this.config.platform,
           this.config.arch,
+          (this.config.pjson.oclif.update.s3 as any).folder,
         ),
       )
 
@@ -105,8 +108,9 @@ export default class UpdateCommand extends Command {
     fs.writeFile(channelPath, this.channel, 'utf8')
   }
 
-  private async update(manifest: IManifest) {
-    const {version, channel} = manifest
+  private async update(manifest: IManifest, channel = 'stable') {
+    const {version, channel: manifestChannel} = manifest
+    if (manifestChannel) channel = manifestChannel
     cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.config.version)} to ${color.green(version)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
     const http: typeof HTTP = require('http-call').HTTP
     const filesize = (n: number): string => {
