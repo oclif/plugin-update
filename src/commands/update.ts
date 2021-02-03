@@ -172,7 +172,7 @@ export default class UpdateCommand extends Command {
     return this.config.channel || 'stable'
   }
 
-  private s3ChannelManifestKey(bin: string, platform: string, arch: string, folder: string | undefined): string {    // if (folder) folder = `${folder}/`
+  private s3ChannelManifestKey(bin: string, platform: string, arch: string, folder?: string): string {
     let s3SubDir = folder || ''
     if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
     return path.join(s3SubDir, 'channels', this.channel, `${bin}-${platform}-${arch}-buildmanifest`)
