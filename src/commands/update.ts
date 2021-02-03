@@ -38,7 +38,7 @@ export default class UpdateCommand extends Command {
     this.channel = args.channel || await this.determineChannel()
     await this.config.runHook('preupdate', {channel: this.channel})
     const manifest = await this.fetchManifest()
-    const reason = await this.skipUpdate()
+    const reason = await this.skipUpdate(manifest)
     if (reason) cli.action.stop(reason || 'done')
     else await this.update(manifest)
     this.debug('tidy')
@@ -64,43 +64,47 @@ export default class UpdateCommand extends Command {
   }
 
   private async fetchManifest(): Promise<IManifest> {
-    const fetch = async () => {
-      const http: typeof HTTP = require('http-call').HTTP
-      const legacyManifestUrl = this.config.s3Url(this.config.s3Key('manifest', {
+    const http: typeof HTTP = require('http-call').HTTP
+
+    // try new channel scheme first
+    if (this.config.scopedEnvVarTrue('USE_NEW_UPDATE_CHANNEL')) {
+      try {
+        const newManifestUrl = this.config.s3Url(
+          this.s3ChannelManifestKey(
+            this.config.bin,
+            this.config.platform,
+            this.config.arch,
+            (this.config.pjson.oclif.update.s3 as any).folder,
+          ),
+        )
+        const {body} = await http.get<IManifest | string>(newManifestUrl)
+        if (typeof body === 'string') {
+          return JSON.parse(body)
+        }
+        return body
+      } catch (error) {
+        this.debug(error.message)
+      }
+    }
+
+    try {
+      const url = this.config.s3Url(this.config.s3Key('manifest', {
         channel: this.channel,
         platform: this.config.platform,
         arch: this.config.arch,
       }))
-      const newManifestUrl = this.config.s3Url(
-        this.s3ChannelManifestKey(
-          this.config.bin,
-          this.config.platform,
-          this.config.arch,
-          (this.config.pjson.oclif.update.s3 as any).folder,
-        ),
-      )
+      const {body} = await http.get<IManifest | string>(url)
 
-      for (const retry of [1, 0]) {
-        try {
-          const url = retry ? legacyManifestUrl : newManifestUrl
-          // eslint-disable-next-line no-await-in-loop
-          const {body} = await http.get<IManifest | string>(url)
-          return body
-        } catch (error) {
-          if (retry) continue
-          if (error.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${this.channel}`)
-          throw error
-        }
+      // in case the content-type is not set, parse as a string
+      // this will happen if uploading without `oclif-dev publish`
+      if (typeof body === 'string') {
+        return JSON.parse(body)
       }
+      return body
+    } catch (error) {
+      if (error.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${this.channel}`)
+      throw error
     }
-
-    const body = await fetch()
-    // in case the content-type is not set, parse as a string
-    // this will happen if uploading without `oclif-dev publish`
-    if (typeof body === 'string') {
-      return JSON.parse(body)
-    }
-    return body!
   }
 
   private async setChannel() {
@@ -167,13 +171,12 @@ export default class UpdateCommand extends Command {
     await this.reexec()
   }
 
-  private async skipUpdate(): Promise<string | false> {
+  private async skipUpdate(manifest: IManifest): Promise<string | false> {
     if (!this.config.binPath) {
       const instructions = this.config.scopedEnvVar('UPDATE_INSTRUCTIONS')
       if (instructions) this.warn(instructions)
       return 'not updatable'
     }
-    const manifest = await this.fetchManifest()
     if (this.config.version === manifest.version) {
       if (this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE')) return 'done'
       return `already on latest version: ${this.config.version}`
