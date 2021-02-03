@@ -51,8 +51,7 @@ export default class UpdateCommand extends Command {
   private async fetchManifest(): Promise<IManifest> {
     const http: typeof HTTP = require('http-call').HTTP
 
-    // try new channel scheme first
-    if (this.config.scopedEnvVarTrue('USE_NEW_UPDATE_CHANNEL')) {
+    if (!this.config.scopedEnvVarTrue('USE_LEGACY_UPDATE')) {
       try {
         const newManifestUrl = this.config.s3Url(
           this.s3ChannelManifestKey(
