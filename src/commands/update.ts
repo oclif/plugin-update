@@ -48,21 +48,6 @@ export default class UpdateCommand extends Command {
     cli.action.stop()
   }
 
-  private async determineChannel(): Promise<string> {
-    const channelPath = path.join(this.config.dataDir, 'channel')
-    if (fs.existsSync(channelPath)) {
-      const channel = await fs.readFile(channelPath, 'utf8')
-      return String(channel).trim()
-    }
-    return this.config.channel || 'stable'
-  }
-
-  private s3ChannelManifestKey(bin: string, platform: string, arch: string, folder: string | undefined): string {    // if (folder) folder = `${folder}/`
-    let s3SubDir = folder || ''
-    if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
-    return path.join(s3SubDir, 'channels', this.channel, `${bin}-${platform}-${arch}-buildmanifest`)
-  }
-
   private async fetchManifest(): Promise<IManifest> {
     const http: typeof HTTP = require('http-call').HTTP
 
@@ -105,11 +90,6 @@ export default class UpdateCommand extends Command {
       if (error.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${this.channel}`)
       throw error
     }
-  }
-
-  private async setChannel() {
-    const channelPath = path.join(this.config.dataDir, 'channel')
-    fs.writeFile(channelPath, this.channel, 'utf8')
   }
 
   private async update(manifest: IManifest, channel = 'stable') {
@@ -182,6 +162,26 @@ export default class UpdateCommand extends Command {
       return `already on latest version: ${this.config.version}`
     }
     return false
+  }
+
+  private async determineChannel(): Promise<string> {
+    const channelPath = path.join(this.config.dataDir, 'channel')
+    if (fs.existsSync(channelPath)) {
+      const channel = await fs.readFile(channelPath, 'utf8')
+      return String(channel).trim()
+    }
+    return this.config.channel || 'stable'
+  }
+
+  private s3ChannelManifestKey(bin: string, platform: string, arch: string, folder: string | undefined): string {    // if (folder) folder = `${folder}/`
+    let s3SubDir = folder || ''
+    if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
+    return path.join(s3SubDir, 'channels', this.channel, `${bin}-${platform}-${arch}-buildmanifest`)
+  }
+
+  private async setChannel() {
+    const channelPath = path.join(this.config.dataDir, 'channel')
+    fs.writeFile(channelPath, this.channel, 'utf8')
   }
 
   private async logChop() {
