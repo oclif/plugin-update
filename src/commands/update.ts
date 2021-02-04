@@ -35,10 +35,10 @@ export default class UpdateCommand extends Command {
     if (this.autoupdate) await this.debounce()
 
     cli.action.start(`${this.config.name}: Updating CLI`)
-    this.channel = args.channel || this.config.channel || 'stable'
+    this.channel = args.channel || await this.determineChannel()
     await this.config.runHook('preupdate', {channel: this.channel})
     const manifest = await this.fetchManifest()
-    const reason = await this.skipUpdate()
+    const reason = await this.skipUpdate(manifest)
     if (reason) cli.action.stop(reason || 'done')
     else await this.update(manifest)
     this.debug('tidy')
@@ -50,6 +50,27 @@ export default class UpdateCommand extends Command {
 
   private async fetchManifest(): Promise<IManifest> {
     const http: typeof HTTP = require('http-call').HTTP
+
+    if (!this.config.scopedEnvVarTrue('USE_LEGACY_UPDATE')) {
+      try {
+        const newManifestUrl = this.config.s3Url(
+          this.s3ChannelManifestKey(
+            this.config.bin,
+            this.config.platform,
+            this.config.arch,
+            (this.config.pjson.oclif.update.s3 as any).folder,
+          ),
+        )
+        const {body} = await http.get<IManifest | string>(newManifestUrl)
+        if (typeof body === 'string') {
+          return JSON.parse(body)
+        }
+        return body
+      } catch (error) {
+        this.debug(error.message)
+      }
+    }
+
     try {
       const url = this.config.s3Url(this.config.s3Key('manifest', {
         channel: this.channel,
@@ -70,8 +91,9 @@ export default class UpdateCommand extends Command {
     }
   }
 
-  private async update(manifest: IManifest) {
-    const {version, channel} = manifest
+  private async update(manifest: IManifest, channel = 'stable') {
+    const {version, channel: manifestChannel} = manifest
+    if (manifestChannel) channel = manifestChannel
     cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.config.version)} to ${color.green(version)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
     const http: typeof HTTP = require('http-call').HTTP
     const filesize = (n: number): string => {
@@ -122,23 +144,43 @@ export default class UpdateCommand extends Command {
     stream.resume()
     await extraction
 
+    await this.setChannel()
     await this.createBin(version)
     await this.touch()
     await this.reexec()
   }
 
-  private async skipUpdate(): Promise<string | false> {
+  private async skipUpdate(manifest: IManifest): Promise<string | false> {
     if (!this.config.binPath) {
       const instructions = this.config.scopedEnvVar('UPDATE_INSTRUCTIONS')
       if (instructions) this.warn(instructions)
       return 'not updatable'
     }
-    const manifest = await this.fetchManifest()
     if (this.config.version === manifest.version) {
       if (this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE')) return 'done'
       return `already on latest version: ${this.config.version}`
     }
     return false
+  }
+
+  private async determineChannel(): Promise<string> {
+    const channelPath = path.join(this.config.dataDir, 'channel')
+    if (fs.existsSync(channelPath)) {
+      const channel = await fs.readFile(channelPath, 'utf8')
+      return String(channel).trim()
+    }
+    return this.config.channel || 'stable'
+  }
+
+  private s3ChannelManifestKey(bin: string, platform: string, arch: string, folder?: string): string {
+    let s3SubDir = folder || ''
+    if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
+    return path.join(s3SubDir, 'channels', this.channel, `${bin}-${platform}-${arch}-buildmanifest`)
+  }
+
+  private async setChannel() {
+    const channelPath = path.join(this.config.dataDir, 'channel')
+    fs.writeFile(channelPath, this.channel, 'utf8')
   }
 
   private async logChop() {
