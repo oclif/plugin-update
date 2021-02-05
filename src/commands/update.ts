@@ -179,9 +179,14 @@ export default class UpdateCommand extends Command {
   }
 
   private async determineCurrentVersion(): Promise<string|undefined> {
-    const currentVersion = await fs.readlink(path.join(this.clientRoot, 'current'))
-    const matches = currentVersion.match(/\.\.[/|\\](.+)[/|\\]bin/)
-    return matches ? matches[1] : undefined
+    try {
+      const currentVersion = await fs.readlink(path.join(this.clientRoot, 'current'))
+      const matches = currentVersion.match(/\.\.[/|\\](.+)[/|\\]bin/)
+      return matches ? matches[1] : this.config.version
+    } catch (error) {
+      this.debug(error)
+    }
+    return this.config.version
   }
 
   private s3ChannelManifestKey(bin: string, platform: string, arch: string, folder?: string): string {
