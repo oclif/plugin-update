@@ -24,7 +24,9 @@ export default class UpdateCommand extends Command {
 
   private channel!: string
 
-  private updateSha!: string
+  private currentVersion?: string
+
+  private updatedVersion!: string
 
   private readonly clientRoot = this.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.config.dataDir, 'client')
 
@@ -40,8 +42,9 @@ export default class UpdateCommand extends Command {
     this.channel = args.channel || await this.determineChannel()
     await this.config.runHook('preupdate', {channel: this.channel})
     const manifest = await this.fetchManifest()
-    this.updateSha = (manifest as any).sha || '0000000'
-    const reason = await this.skipUpdate(manifest)
+    this.currentVersion = await this.determineCurrentVersion()
+    this.updatedVersion = (manifest as any).sha ? `${manifest.version}-${(manifest as any).sha}` : manifest.version
+    const reason = await this.skipUpdate()
     if (reason) cli.action.stop(reason || 'done')
     else await this.update(manifest)
     this.debug('tidy')
@@ -97,15 +100,14 @@ export default class UpdateCommand extends Command {
   private async update(manifest: IManifest, channel = 'stable') {
     const {version, channel: manifestChannel} = manifest
     if (manifestChannel) channel = manifestChannel
-    const localSha = await this.determineSha()
-    cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.config.version, '-', localSha)}- to ${color.green(version, '-', this.updateSha)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
+    cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.currentVersion)} to ${color.green(this.updatedVersion)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
     const http: typeof HTTP = require('http-call').HTTP
     const filesize = (n: number): string => {
       const [num, suffix] = require('filesize')(n, {output: 'array'})
       return num.toFixed(1) + ` ${suffix}`
     }
     await this.ensureClientDir()
-    const output = path.join(this.clientRoot, version, this.updateSha)
+    const output = path.join(this.clientRoot, this.updatedVersion)
 
     const gzUrl = manifest.gz || this.config.s3Url(this.config.s3Key('versioned', {
       version,
@@ -149,22 +151,20 @@ export default class UpdateCommand extends Command {
     await extraction
 
     await this.setChannel()
-    await this.setSha()
-    await this.createBin(version, this.updateSha)
+    await this.createBin(this.updatedVersion)
     await this.touch()
     await this.reexec()
   }
 
-  private async skipUpdate(manifest: IManifest): Promise<string | false> {
+  private async skipUpdate(): Promise<string | false> {
     if (!this.config.binPath) {
       const instructions = this.config.scopedEnvVar('UPDATE_INSTRUCTIONS')
       if (instructions) this.warn(instructions)
       return 'not updatable'
     }
-    const localSha = await this.determineSha()
-    if (this.config.version === manifest.version && this.updateSha === localSha) {
+    if (this.currentVersion === this.updatedVersion) {
       if (this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE')) return 'done'
-      return `already on latest version: ${this.config.version}`
+      return `already on latest version: ${this.currentVersion}`
     }
     return false
   }
@@ -178,12 +178,10 @@ export default class UpdateCommand extends Command {
     return this.config.channel || 'stable'
   }
 
-  private async determineSha(): Promise<string|undefined> {
-    const channelPath = path.join(this.config.dataDir, 'sha')
-    if (fs.existsSync(channelPath)) {
-      const channel = await fs.readFile(channelPath, 'utf8')
-      return String(channel).trim()
-    }
+  private async determineCurrentVersion(): Promise<string|undefined> {
+    const currentVersion = await fs.readlink(path.join(this.clientRoot, 'current'))
+    const matches = currentVersion.match(/\.\.[/|\\](.+)[/|\\]bin/)
+    return matches ? matches[1] : undefined
   }
 
   private s3ChannelManifestKey(bin: string, platform: string, arch: string, folder?: string): string {
@@ -195,11 +193,6 @@ export default class UpdateCommand extends Command {
   private async setChannel() {
     const channelPath = path.join(this.config.dataDir, 'channel')
     fs.writeFile(channelPath, this.channel, 'utf8')
-  }
-
-  private async setSha() {
-    const shaPath = path.join(this.config.dataDir, 'sha')
-    fs.writeFile(shaPath, this.updateSha, 'utf8')
   }
 
   private async logChop() {
@@ -261,7 +254,7 @@ export default class UpdateCommand extends Command {
   private async touch() {
     // touch the client so it won't be tidied up right away
     try {
-      const p = path.join(this.clientRoot, this.config.version, this.updateSha)
+      const p = path.join(this.clientRoot, this.config.version)
       this.debug('touching client at', p)
       if (!await fs.pathExists(p)) return
       await fs.utimes(p, new Date(), new Date())
@@ -289,7 +282,7 @@ export default class UpdateCommand extends Command {
     })
   }
 
-  private async createBin(version: string, sha: string) {
+  private async createBin(version: string) {
     const dst = this.clientBin
     const {bin} = this.config
     const binPathEnvVar = this.config.scopedEnvVarKey('BINPATH')
@@ -299,7 +292,7 @@ export default class UpdateCommand extends Command {
 setlocal enableextensions
 set ${redirectedEnvVar}=1
 set ${binPathEnvVar}=%~dp0${bin}
-"%~dp0..\\${version}\\${sha}\\bin\\${bin}.cmd" %*
+"%~dp0..\\${version}\\bin\\${bin}.cmd" %*
 `
       await fs.outputFile(dst, body)
     } else {
@@ -319,7 +312,7 @@ get_script_dir () {
   echo "$DIR"
 }
 DIR=$(get_script_dir)
-${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/${sha}/bin/${bin}" "$@"
+${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${bin}" "$@"
 `
       /* eslint-enable no-useless-escape */
 
@@ -327,7 +320,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/${sha}
       await fs.outputFile(dst, body)
       await fs.chmod(dst, 0o755)
       await fs.remove(path.join(this.clientRoot, 'current'))
-      await fs.symlink(`./${version}/${sha}`, path.join(this.clientRoot, 'current'))
+      await fs.symlink(`./${version}`, path.join(this.clientRoot, 'current'))
     }
   }
 
