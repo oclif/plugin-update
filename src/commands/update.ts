@@ -24,6 +24,8 @@ export default class UpdateCommand extends Command {
 
   private channel!: string
 
+  private updateSha!: string
+
   private readonly clientRoot = this.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.config.dataDir, 'client')
 
   private readonly clientBin = path.join(this.clientRoot, 'bin', this.config.windows ? `${this.config.bin}.cmd` : this.config.bin)
@@ -38,6 +40,7 @@ export default class UpdateCommand extends Command {
     this.channel = args.channel || await this.determineChannel()
     await this.config.runHook('preupdate', {channel: this.channel})
     const manifest = await this.fetchManifest()
+    this.updateSha = (manifest as any).sha || '0000000'
     const reason = await this.skipUpdate(manifest)
     if (reason) cli.action.stop(reason || 'done')
     else await this.update(manifest)
@@ -94,14 +97,15 @@ export default class UpdateCommand extends Command {
   private async update(manifest: IManifest, channel = 'stable') {
     const {version, channel: manifestChannel} = manifest
     if (manifestChannel) channel = manifestChannel
-    cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.config.version)} to ${color.green(version)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
+    const localSha = await this.determineSha()
+    cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.config.version, '-', localSha)}- to ${color.green(version, '-', this.updateSha)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
     const http: typeof HTTP = require('http-call').HTTP
     const filesize = (n: number): string => {
       const [num, suffix] = require('filesize')(n, {output: 'array'})
       return num.toFixed(1) + ` ${suffix}`
     }
     await this.ensureClientDir()
-    const output = path.join(this.clientRoot, version)
+    const output = path.join(this.clientRoot, version, this.updateSha)
 
     const gzUrl = manifest.gz || this.config.s3Url(this.config.s3Key('versioned', {
       version,
@@ -145,7 +149,8 @@ export default class UpdateCommand extends Command {
     await extraction
 
     await this.setChannel()
-    await this.createBin(version)
+    await this.setSha()
+    await this.createBin(version, this.updateSha)
     await this.touch()
     await this.reexec()
   }
@@ -156,7 +161,8 @@ export default class UpdateCommand extends Command {
       if (instructions) this.warn(instructions)
       return 'not updatable'
     }
-    if (this.config.version === manifest.version) {
+    const localSha = await this.determineSha()
+    if (this.config.version === manifest.version && this.updateSha === localSha) {
       if (this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE')) return 'done'
       return `already on latest version: ${this.config.version}`
     }
@@ -172,6 +178,14 @@ export default class UpdateCommand extends Command {
     return this.config.channel || 'stable'
   }
 
+  private async determineSha(): Promise<string|undefined> {
+    const channelPath = path.join(this.config.dataDir, 'sha')
+    if (fs.existsSync(channelPath)) {
+      const channel = await fs.readFile(channelPath, 'utf8')
+      return String(channel).trim()
+    }
+  }
+
   private s3ChannelManifestKey(bin: string, platform: string, arch: string, folder?: string): string {
     let s3SubDir = folder || ''
     if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
@@ -181,6 +195,11 @@ export default class UpdateCommand extends Command {
   private async setChannel() {
     const channelPath = path.join(this.config.dataDir, 'channel')
     fs.writeFile(channelPath, this.channel, 'utf8')
+  }
+
+  private async setSha() {
+    const shaPath = path.join(this.config.dataDir, 'sha')
+    fs.writeFile(shaPath, this.updateSha, 'utf8')
   }
 
   private async logChop() {
@@ -242,7 +261,7 @@ export default class UpdateCommand extends Command {
   private async touch() {
     // touch the client so it won't be tidied up right away
     try {
-      const p = path.join(this.clientRoot, this.config.version)
+      const p = path.join(this.clientRoot, this.config.version, this.updateSha)
       this.debug('touching client at', p)
       if (!await fs.pathExists(p)) return
       await fs.utimes(p, new Date(), new Date())
@@ -270,7 +289,7 @@ export default class UpdateCommand extends Command {
     })
   }
 
-  private async createBin(version: string) {
+  private async createBin(version: string, sha: string) {
     const dst = this.clientBin
     const {bin} = this.config
     const binPathEnvVar = this.config.scopedEnvVarKey('BINPATH')
@@ -280,7 +299,7 @@ export default class UpdateCommand extends Command {
 setlocal enableextensions
 set ${redirectedEnvVar}=1
 set ${binPathEnvVar}=%~dp0${bin}
-"%~dp0..\\${version}\\bin\\${bin}.cmd" %*
+"%~dp0..\\${version}\\${sha}\\bin\\${bin}.cmd" %*
 `
       await fs.outputFile(dst, body)
     } else {
@@ -300,7 +319,7 @@ get_script_dir () {
   echo "$DIR"
 }
 DIR=$(get_script_dir)
-${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${bin}" "$@"
+${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/${sha}/bin/${bin}" "$@"
 `
       /* eslint-enable no-useless-escape */
 
@@ -308,7 +327,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
       await fs.outputFile(dst, body)
       await fs.chmod(dst, 0o755)
       await fs.remove(path.join(this.clientRoot, 'current'))
-      await fs.symlink(`./${version}`, path.join(this.clientRoot, 'current'))
+      await fs.symlink(`./${version}/${sha}`, path.join(this.clientRoot, 'current'))
     }
   }
 
