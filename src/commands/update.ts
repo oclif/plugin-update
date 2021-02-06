@@ -24,6 +24,10 @@ export default class UpdateCommand extends Command {
 
   private channel!: string
 
+  private currentVersion?: string
+
+  private updatedVersion!: string
+
   private readonly clientRoot = this.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.config.dataDir, 'client')
 
   private readonly clientBin = path.join(this.clientRoot, 'bin', this.config.windows ? `${this.config.bin}.cmd` : this.config.bin)
@@ -38,7 +42,9 @@ export default class UpdateCommand extends Command {
     this.channel = args.channel || await this.determineChannel()
     await this.config.runHook('preupdate', {channel: this.channel})
     const manifest = await this.fetchManifest()
-    const reason = await this.skipUpdate(manifest)
+    this.currentVersion = await this.determineCurrentVersion()
+    this.updatedVersion = (manifest as any).sha ? `${manifest.version}-${(manifest as any).sha}` : manifest.version
+    const reason = await this.skipUpdate()
     if (reason) cli.action.stop(reason || 'done')
     else await this.update(manifest)
     this.debug('tidy')
@@ -94,14 +100,14 @@ export default class UpdateCommand extends Command {
   private async update(manifest: IManifest, channel = 'stable') {
     const {version, channel: manifestChannel} = manifest
     if (manifestChannel) channel = manifestChannel
-    cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.config.version)} to ${color.green(version)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
+    cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.currentVersion)} to ${color.green(this.updatedVersion)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
     const http: typeof HTTP = require('http-call').HTTP
     const filesize = (n: number): string => {
       const [num, suffix] = require('filesize')(n, {output: 'array'})
       return num.toFixed(1) + ` ${suffix}`
     }
     await this.ensureClientDir()
-    const output = path.join(this.clientRoot, version)
+    const output = path.join(this.clientRoot, this.updatedVersion)
 
     const gzUrl = manifest.gz || this.config.s3Url(this.config.s3Key('versioned', {
       version,
@@ -145,20 +151,20 @@ export default class UpdateCommand extends Command {
     await extraction
 
     await this.setChannel()
-    await this.createBin(version)
+    await this.createBin(this.updatedVersion)
     await this.touch()
     await this.reexec()
   }
 
-  private async skipUpdate(manifest: IManifest): Promise<string | false> {
+  private async skipUpdate(): Promise<string | false> {
     if (!this.config.binPath) {
       const instructions = this.config.scopedEnvVar('UPDATE_INSTRUCTIONS')
       if (instructions) this.warn(instructions)
       return 'not updatable'
     }
-    if (this.config.version === manifest.version) {
+    if (this.currentVersion === this.updatedVersion) {
       if (this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE')) return 'done'
-      return `already on latest version: ${this.config.version}`
+      return `already on latest version: ${this.currentVersion}`
     }
     return false
   }
@@ -170,6 +176,17 @@ export default class UpdateCommand extends Command {
       return String(channel).trim()
     }
     return this.config.channel || 'stable'
+  }
+
+  private async determineCurrentVersion(): Promise<string|undefined> {
+    try {
+      const currentVersion = await fs.readlink(path.join(this.clientRoot, 'current'))
+      const matches = currentVersion.match(/\.\.[/|\\](.+)[/|\\]bin/)
+      return matches ? matches[1] : this.config.version
+    } catch (error) {
+      this.debug(error)
+    }
+    return this.config.version
   }
 
   private s3ChannelManifestKey(bin: string, platform: string, arch: string, folder?: string): string {
