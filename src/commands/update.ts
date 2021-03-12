@@ -18,7 +18,7 @@ export default class UpdateCommand extends Command {
 
   static flags: flags.Input<any> = {
     autoupdate: flags.boolean({hidden: true}),
-    'to-existing-version': flags.string({description: 'switch to an already installed version'}),
+    'from-local': flags.boolean({description: 'interactively choose an already installed version'}),
   }
 
   private autoupdate!: boolean
@@ -39,21 +39,32 @@ export default class UpdateCommand extends Command {
 
     if (this.autoupdate) await this.debounce()
 
-    cli.action.start(`${this.config.name}: Updating CLI`)
-
     this.channel = args.channel || await this.determineChannel()
 
-    const pinToVersion = flags['to-existing-version']
-    if (pinToVersion) {
+    if (flags['from-local']) {
+      await this.ensureClientDir()
+      this.debug(`Looking for locally installed versions at ${this.clientRoot}`)
+
+      // Do not show known non-local version folder names, bin and current.
+      const versions = fs.readdirSync(this.clientRoot).filter(dirOrFile => dirOrFile !== 'bin' && dirOrFile !== 'current')
+      if (versions.length === 0) throw new Error('No locally installed versions found.')
+
+      this.log(`Found versions: \n${versions.map(version => `     ${version}`).join('\n')}\n`)
+
+      const pinToVersion = await cli.prompt('Enter a version to update to')
+      if (!versions.includes(pinToVersion)) throw new Error(`Version ${pinToVersion} not found in the locally installed versions.`)
+
       if (!await fs.pathExists(path.join(this.clientRoot, pinToVersion))) {
         throw new Error(`Version ${pinToVersion} is not already installed at ${this.clientRoot}.`)
       }
+      cli.action.start(`${this.config.name}: Updating CLI`)
       this.debug(`switching to existing version ${pinToVersion}`)
       this.updateToExistingVersion(pinToVersion)
 
       this.log()
       this.log(`Updating to an already installed version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${this.channel}.`)
     } else {
+      cli.action.start(`${this.config.name}: Updating CLI`)
       await this.config.runHook('preupdate', {channel: this.channel})
       const manifest = await this.fetchManifest()
       this.currentVersion = await this.determineCurrentVersion()
