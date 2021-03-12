@@ -18,7 +18,7 @@ export default class UpdateCommand extends Command {
 
   static flags: flags.Input<any> = {
     autoupdate: flags.boolean({hidden: true}),
-    "to-existing-version": flags.string({description: "switch to an already installed version"}),
+    'to-existing-version': flags.string({description: 'switch to an already installed version'}),
   }
 
   private autoupdate!: boolean
@@ -43,7 +43,7 @@ export default class UpdateCommand extends Command {
 
     this.channel = args.channel || await this.determineChannel()
 
-    const pinToVersion = flags["to-existing-version"];
+    const pinToVersion = flags['to-existing-version']
     if (pinToVersion) {
       if (!await fs.pathExists(path.join(this.clientRoot, pinToVersion))) {
         throw new Error(`Version ${pinToVersion} is not already installed at ${this.clientRoot}.`)
@@ -51,7 +51,7 @@ export default class UpdateCommand extends Command {
       this.debug(`switching to existing version ${pinToVersion}`)
       this.updateToExistingVersion(pinToVersion)
 
-      this.log();
+      this.log()
       this.log(`Updating to an already installed version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${this.channel}.`)
     } else {
       await this.config.runHook('preupdate', {channel: this.channel})
