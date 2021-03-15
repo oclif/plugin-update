@@ -18,6 +18,7 @@ export default class UpdateCommand extends Command {
 
   static flags: flags.Input<any> = {
     autoupdate: flags.boolean({hidden: true}),
+    'from-local': flags.boolean({description: 'interactively choose an already installed version'}),
   }
 
   private autoupdate!: boolean
@@ -38,18 +39,44 @@ export default class UpdateCommand extends Command {
 
     if (this.autoupdate) await this.debounce()
 
-    cli.action.start(`${this.config.name}: Updating CLI`)
     this.channel = args.channel || await this.determineChannel()
-    await this.config.runHook('preupdate', {channel: this.channel})
-    const manifest = await this.fetchManifest()
-    this.currentVersion = await this.determineCurrentVersion()
-    this.updatedVersion = (manifest as any).sha ? `${manifest.version}-${(manifest as any).sha}` : manifest.version
-    const reason = await this.skipUpdate()
-    if (reason) cli.action.stop(reason || 'done')
-    else await this.update(manifest)
-    this.debug('tidy')
-    await this.tidy()
-    await this.config.runHook('update', {channel: this.channel})
+
+    if (flags['from-local']) {
+      await this.ensureClientDir()
+      this.debug(`Looking for locally installed versions at ${this.clientRoot}`)
+
+      // Do not show known non-local version folder names, bin and current.
+      const versions = fs.readdirSync(this.clientRoot).filter(dirOrFile => dirOrFile !== 'bin' && dirOrFile !== 'current')
+      if (versions.length === 0) throw new Error('No locally installed versions found.')
+
+      this.log(`Found versions: \n${versions.map(version => `     ${version}`).join('\n')}\n`)
+
+      const pinToVersion = await cli.prompt('Enter a version to update to')
+      if (!versions.includes(pinToVersion)) throw new Error(`Version ${pinToVersion} not found in the locally installed versions.`)
+
+      if (!await fs.pathExists(path.join(this.clientRoot, pinToVersion))) {
+        throw new Error(`Version ${pinToVersion} is not already installed at ${this.clientRoot}.`)
+      }
+      cli.action.start(`${this.config.name}: Updating CLI`)
+      this.debug(`switching to existing version ${pinToVersion}`)
+      this.updateToExistingVersion(pinToVersion)
+
+      this.log()
+      this.log(`Updating to an already installed version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${this.channel}.`)
+    } else {
+      cli.action.start(`${this.config.name}: Updating CLI`)
+      await this.config.runHook('preupdate', {channel: this.channel})
+      const manifest = await this.fetchManifest()
+      this.currentVersion = await this.determineCurrentVersion()
+      this.updatedVersion = (manifest as any).sha ? `${manifest.version}-${(manifest as any).sha}` : manifest.version
+      const reason = await this.skipUpdate()
+      if (reason) cli.action.stop(reason || 'done')
+      else await this.update(manifest)
+      this.debug('tidy')
+      await this.tidy()
+      await this.config.runHook('update', {channel: this.channel})
+    }
+
     this.debug('done')
     cli.action.stop()
   }
@@ -57,6 +84,7 @@ export default class UpdateCommand extends Command {
   private async fetchManifest(): Promise<IManifest> {
     const http: typeof HTTP = require('http-call').HTTP
 
+    cli.action.status = 'fetching manifest'
     if (!this.config.scopedEnvVarTrue('USE_LEGACY_UPDATE')) {
       try {
         const newManifestUrl = this.config.s3Url(
@@ -97,18 +125,15 @@ export default class UpdateCommand extends Command {
     }
   }
 
-  private async update(manifest: IManifest, channel = 'stable') {
-    const {version, channel: manifestChannel} = manifest
-    if (manifestChannel) channel = manifestChannel
-    cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.currentVersion)} to ${color.green(this.updatedVersion)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
-    const http: typeof HTTP = require('http-call').HTTP
+  private async downloadAndExtract(output: string, manifest: IManifest, channel: string) {
+    const {version} = manifest
+
     const filesize = (n: number): string => {
       const [num, suffix] = require('filesize')(n, {output: 'array'})
       return num.toFixed(1) + ` ${suffix}`
     }
-    await this.ensureClientDir()
-    const output = path.join(this.clientRoot, this.updatedVersion)
 
+    const http: typeof HTTP = require('http-call').HTTP
     const gzUrl = manifest.gz || this.config.s3Url(this.config.s3Key('versioned', {
       version,
       channel,
@@ -149,11 +174,29 @@ export default class UpdateCommand extends Command {
 
     stream.resume()
     await extraction
+  }
+
+  private async update(manifest: IManifest, channel = 'stable') {
+    const {channel: manifestChannel} = manifest
+    if (manifestChannel) channel = manifestChannel
+    cli.action.start(`${this.config.name}: Updating CLI from ${color.green(this.currentVersion)} to ${color.green(this.updatedVersion)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
+
+    await this.ensureClientDir()
+    const output = path.join(this.clientRoot, this.updatedVersion)
+
+    if (!await fs.pathExists(output)) {
+      await this.downloadAndExtract(output, manifest, channel)
+    }
 
     await this.setChannel()
     await this.createBin(this.updatedVersion)
     await this.touch()
     await this.reexec()
+  }
+
+  private async updateToExistingVersion(version: string) {
+    await this.createBin(version)
+    await this.touch()
   }
 
   private async skipUpdate(): Promise<string | false> {
@@ -279,7 +322,7 @@ export default class UpdateCommand extends Command {
       .on('error', reject)
       .on('close', (status: number) => {
         try {
-          this.exit(status)
+          if (status > 0) this.exit(status)
         } catch (error) {
           reject(error)
         }
