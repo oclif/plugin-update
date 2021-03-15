@@ -1,14 +1,17 @@
 ---
 version: 2
 jobs:
-  # This plugin requires a custom image to test releases.
-  # Currently it's using Node v10.
   node-10: &test
     docker:
-      - image: rasphilco/release:10.17.0
+      - image: node:latest
     working_directory: ~/cli
     steps:
       - checkout
+      - run: |
+          apt-get update
+          apt-get install -y p7zip-full \
+            osslsigncode \
+            nsis
       - restore_cache: &restore_cache
           keys:
             - v3-yarn-{{checksum ".circleci/config.yml"}}-{{ checksum "yarn.lock"}}
