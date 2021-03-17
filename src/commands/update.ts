@@ -223,7 +223,7 @@ export default class UpdateCommand extends Command {
 
   private async determineCurrentVersion(): Promise<string|undefined> {
     try {
-      const currentVersion = await fs.readFile(path.join(this.clientRoot, 'bin', this.config.bin), 'utf8')
+      const currentVersion = await fs.readFile(this.clientBin, 'utf8')
       const matches = currentVersion.match(/\.\.[/|\\](.+)[/|\\]bin/)
       return matches ? matches[1] : this.config.version
     } catch (error) {
