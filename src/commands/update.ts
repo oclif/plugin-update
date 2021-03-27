@@ -88,7 +88,7 @@ export default class UpdateCommand extends Command {
       this.debug(`Updating to ${this.updatedVersion}`)
       const reason = await this.skipUpdate()
       if (reason) cli.action.stop(reason || 'done')
-      else await this.update(manifest)
+      else await this.update(manifest, this.channel, targetVersion || '')
       this.debug('tidy')
       await this.tidy()
       await this.config.runHook('update', {channel: this.channel})
@@ -142,28 +142,27 @@ export default class UpdateCommand extends Command {
     }
   }
 
-  private async downloadAndExtract(output: string, manifest: IManifest, channel: string) {
-    const {version} = manifest
-
+  private async downloadAndExtract(output: string, manifest: IManifest, channel: string, targetVersion?: string) {
     const filesize = (n: number): string => {
       const [num, suffix] = require('filesize')(n, {output: 'array'})
       return num.toFixed(1) + ` ${suffix}`
     }
 
     const http: typeof HTTP = require('http-call').HTTP
-    const gzUrl = manifest.gz || this.config.s3Url(this.config.s3Key('versioned', {
-      version,
+    const gzUrl = !targetVersion && manifest.gz ? manifest.gz : this.config.s3Url(this.config.s3Key('versioned', {
+      version: targetVersion,
       channel,
       bin: this.config.bin,
       platform: this.config.platform,
       arch: this.config.arch,
-      ext: 'gz',
+      ext: '.tar.gz',
     }))
+
     const {response: stream} = await http.stream(gzUrl)
     stream.pause()
 
     const baseDir = manifest.baseDir || this.config.s3Key('baseDir', {
-      version,
+      version: targetVersion,
       channel,
       bin: this.config.bin,
       platform: this.config.platform,
@@ -193,7 +192,7 @@ export default class UpdateCommand extends Command {
     await extraction
   }
 
-  private async update(manifest: IManifest, channel = 'stable') {
+  private async update(manifest: IManifest, channel = 'stable', targetVersion: string) {
     const {channel: manifestChannel} = manifest
     if (manifestChannel) channel = manifestChannel
 
@@ -203,7 +202,7 @@ export default class UpdateCommand extends Command {
     const output = path.join(this.clientRoot, this.updatedVersion)
 
     if (!await fs.pathExists(output)) {
-      await this.downloadAndExtract(output, manifest, channel)
+      await this.downloadAndExtract(output, manifest, channel, targetVersion)
     }
 
     await this.setChannel()
@@ -405,3 +404,4 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
     }
   }
 }
+
