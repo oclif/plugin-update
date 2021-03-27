@@ -44,12 +44,11 @@ export default class UpdateCommand extends Command {
     this.channel = args.channel || await this.determineChannel()
 
     if (flags['from-local']) {
-      // Do not show known non-local version folder names, bin and current.
-      const versions = fs.readdirSync(this.clientRoot).filter(dirOrFile => dirOrFile !== 'bin' && dirOrFile !== 'current')
-
       await this.ensureClientDir()
       this.debug(`Looking for locally installed versions at ${this.clientRoot}`)
 
+      // Do not show known non-local version folder names, bin and current.
+      const versions = fs.readdirSync(this.clientRoot).filter(dirOrFile => dirOrFile !== 'bin' && dirOrFile !== 'current')
       if (versions.length === 0) throw new Error('No locally installed versions found.')
 
       this.log(`Found versions: \n${versions.map(version => `     ${version}`).join('\n')}\n`)
