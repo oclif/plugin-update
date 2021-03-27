@@ -71,10 +71,9 @@ export default class UpdateCommand extends Command {
       if (flags['switch-to']) {
         targetVersion = semver.clean(flags['switch-to'])
         this.debug(`Flag overriden target version: ${targetVersion}`)
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [_, channel] = targetVersion?.split('-') || ['', '']
-        if (channel) {
-          this.channel = channel.substr(0, channel.indexOf('.'))
+        const versionParts = targetVersion?.split('-') || ['', '']
+        if (versionParts && versionParts[1]) {
+          this.channel = versionParts[1].substr(0, versionParts[1].indexOf('.'))
         }
         this.debug(`Flag overriden target channel: ${this.channel}`)
       }
@@ -155,7 +154,7 @@ export default class UpdateCommand extends Command {
       bin: this.config.bin,
       platform: this.config.platform,
       arch: this.config.arch,
-      ext: '.tar.gz',
+      ext: targetVersion ? '.tar.gz' : 'gz',
     }))
 
     const {response: stream} = await http.stream(gzUrl)
