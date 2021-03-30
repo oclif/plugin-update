@@ -42,7 +42,7 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
           return false
         case 'symlink':
           // If the binary is within node_modules/.bin, then we want to hold that symlink
-          return name.indexOf('node_modules/.bin') === -1;
+          return name.indexOf('node_modules/.bin') === -1
         default:
           throw new Error(header.type)
         }
