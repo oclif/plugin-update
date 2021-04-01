@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [oclif-dev manifest] Add `--color=256` to force using color on manifest file
+- [oclif-dev manifest] remove manifest from git
 ## [0.0.1] - 2020-09-24
 
 ### Fixed

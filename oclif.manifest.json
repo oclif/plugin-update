@@ -1,1 +1,0 @@
-{"version":"0.0.0","commands":{"autoupdate":{"id":"autoupdate","description":"update the <%= config.bin %> CLI","pluginName":"@vtex/cli-plugin-autoupdate","pluginType":"core","aliases":[],"flags":{"autoupdate":{"name":"autoupdate","type":"boolean","hidden":true,"allowNo":false}},"args":[{"name":"channel"}]}}}
