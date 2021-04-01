@@ -252,10 +252,10 @@
   resolved "https://registry.yarnpkg.com/@types/sinonjs__fake-timers/-/sinonjs__fake-timers-6.0.1.tgz#681df970358c82836b42f989188d133e218c458e"
   integrity sha512-yYezQwGWty8ziyYLdZjwxyMb0CZR49h8JALHGrxjQHWlqGgc8kLdHEgWrgL0uZ29DMvEVBDnHU2Wg36zKSIUtA==
 
-"@types/supports-color@^7.2.0":
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/@types/supports-color/-/supports-color-7.2.0.tgz#edd98ae52ee786b733a5dea0a23da4eb18ef7310"
-  integrity sha512-gtUcOP6qIpjbSDdWjMBRNSks42ccx1709mwKTgelW63BESIADw8Ju7klpydDDb9Kr0iRXfpwrXH8+zoU8TCqiA==
+"@types/supports-color@^7.2.1":
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/@types/supports-color/-/supports-color-7.2.1.tgz#58a6efe82d9eca92cf316b16112fcd2675ffa6c0"
+  integrity sha512-glb1BXM/pchMWTt9kg67CceKqyAW3NGBviNPKXN84JJhk3shqVpyi5d5MM4MWYoZHHk/Ioct7Yt1TNqQORiIAw==
 
 "@types/write-json-file@^3.2.1":
   version "3.2.1"
