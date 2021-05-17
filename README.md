@@ -28,8 +28,9 @@ USAGE
   $ oclif-example update [CHANNEL]
 
 OPTIONS
-  --from-local  interactively choose an already installed version
+  -v, --switch-to=switch-to  specify a specific version to switch to
+  --from-local               interactively choose an already installed version
 ```
 
-_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v1.4.0-3/src/commands/update.ts)_
+_See code: [src/commands/update.ts](https://github.com/sumwatshade/plugin-update/blob/v1.4.0/src/commands/update.ts)_
 <!-- commandsstop -->

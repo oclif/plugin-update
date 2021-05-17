@@ -1,3 +1,25 @@
+# [1.4.0](https://github.com/sumwatshade/plugin-update/compare/v1.3.10...v1.4.0) (2021-05-17)
+
+
+### Bug Fixes
+
+* determine current version helper ([#212](https://github.com/sumwatshade/plugin-update/issues/212)) ([94e7d61](https://github.com/sumwatshade/plugin-update/commit/94e7d61719f630502c360b2e69a09528558391fe))
+* ensure tarball is extracted correctly ([8023c08](https://github.com/sumwatshade/plugin-update/commit/8023c08336db171c1402f4a8a0c4bb9a0eaa8ee9))
+* preserve old behavior ([3c8d231](https://github.com/sumwatshade/plugin-update/commit/3c8d231a010c205c557dcf690cf28e98c22c774f))
+* release a version ([a67e8fa](https://github.com/sumwatshade/plugin-update/commit/a67e8fa4426f1880905344e71d7873207a0b7b95))
+* remove oclif references ([3d6acd2](https://github.com/sumwatshade/plugin-update/commit/3d6acd24cc530f1e814c782326c9755837add7f3))
+* test deployment ([4c01af7](https://github.com/sumwatshade/plugin-update/commit/4c01af7708be73ab47fa20e48f6b4ba160d89d61))
+* test deployment ([e7d87eb](https://github.com/sumwatshade/plugin-update/commit/e7d87ebc4af25b7656fa42fabbc32308aac9b61f))
+* use clientBin property for reading version ([#226](https://github.com/sumwatshade/plugin-update/issues/226)) ([800dba6](https://github.com/sumwatshade/plugin-update/commit/800dba6798b5187b2e8f108287681505aeddc7f9))
+
+
+### Features
+
+* **switching:** allows cli to switch versions with param ([72d6602](https://github.com/sumwatshade/plugin-update/commit/72d660271dc2a3cadd9c265c4858c8b9e42c208a))
+* save clients nested via their git sha ([#211](https://github.com/sumwatshade/plugin-update/issues/211)) ([fc81773](https://github.com/sumwatshade/plugin-update/commit/fc81773d189f01ea15eaa8dc78ef3d7c1d9fa435))
+* support oclif upload/promote cmds new s3 key structure ([#204](https://github.com/sumwatshade/plugin-update/issues/204)) ([c2d7a46](https://github.com/sumwatshade/plugin-update/commit/c2d7a469f58c180b59af9c0b24b6c35bd531f964))
+* use existing versions if available ([#223](https://github.com/sumwatshade/plugin-update/issues/223)) ([da27783](https://github.com/sumwatshade/plugin-update/commit/da27783f710b1856c619b3721b7ff91b2f0dd92b))
+
 ## [1.3.9](https://github.com/oclif/plugin-update/compare/v1.3.8...v1.3.9) (2018-11-26)
 
 
