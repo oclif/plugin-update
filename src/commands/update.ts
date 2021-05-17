@@ -7,7 +7,6 @@ import * as fs from 'fs-extra'
 import HTTP from 'http-call'
 import * as _ from 'lodash'
 import * as path from 'path'
-import * as semver from 'semver'
 
 import {extract} from '../tar'
 import {ls, wait} from '../util'
@@ -20,20 +19,19 @@ export default class UpdateCommand extends Command {
   static flags: flags.Input<any> = {
     autoupdate: flags.boolean({hidden: true}),
     'from-local': flags.boolean({description: 'interactively choose an already installed version'}),
-    'switch-to': flags.string({char: 'v', description: 'specify a specific version to switch to'}),
   }
 
-  private autoupdate!: boolean
+  protected autoupdate!: boolean
 
-  private channel!: string
+  protected channel!: string
 
-  private currentVersion?: string
+  protected currentVersion?: string
 
-  private updatedVersion!: string
+  protected updatedVersion!: string
 
-  private readonly clientRoot = this.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.config.dataDir, 'client')
+  protected readonly clientRoot = this.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.config.dataDir, 'client')
 
-  private readonly clientBin = path.join(this.clientRoot, 'bin', this.config.windows ? `${this.config.bin}.cmd` : this.config.bin)
+  protected readonly clientBin = path.join(this.clientRoot, 'bin', this.config.windows ? `${this.config.bin}.cmd` : this.config.bin)
 
   async run() {
     const {args, flags} = this.parse(UpdateCommand)
@@ -66,27 +64,16 @@ export default class UpdateCommand extends Command {
       this.log()
       this.log(`Updating to an already installed version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${this.channel}.`)
     } else {
-      let targetVersion
-      if (flags['switch-to']) {
-        targetVersion = semver.clean(flags['switch-to'])
-        this.debug(`Flag overriden target version: ${targetVersion}`)
-        const versionParts = targetVersion?.split('-') || ['', '']
-        if (versionParts && versionParts[1]) {
-          this.channel = versionParts[1].substr(0, versionParts[1].indexOf('.'))
-        }
-        this.debug(`Flag overriden target channel: ${this.channel}`)
-      }
-
       cli.action.start(`${this.config.name}: Updating CLI`)
       await this.config.runHook('preupdate', {channel: this.channel})
       const manifest = await this.fetchManifest()
       this.currentVersion = await this.determineCurrentVersion()
 
-      this.updatedVersion = (manifest as any).sha ? `${targetVersion || manifest.version}-${(manifest as any).sha}` : targetVersion || manifest.version
+      this.updatedVersion = (manifest as any).sha ? `${manifest.version}-${(manifest as any).sha}` : manifest.version
       this.debug(`Updating to ${this.updatedVersion}`)
       const reason = await this.skipUpdate()
       if (reason) cli.action.stop(reason || 'done')
-      else await this.update(manifest, this.channel, targetVersion || '')
+      else await this.update(manifest, this.channel)
       this.debug('tidy')
       await this.tidy()
       await this.config.runHook('update', {channel: this.channel})
@@ -96,7 +83,7 @@ export default class UpdateCommand extends Command {
     cli.action.stop()
   }
 
-  private async fetchManifest(): Promise<IManifest> {
+  protected async fetchManifest(): Promise<IManifest> {
     const http: typeof HTTP = require('http-call').HTTP
 
     cli.action.status = 'fetching manifest'
@@ -140,27 +127,27 @@ export default class UpdateCommand extends Command {
     }
   }
 
-  private async downloadAndExtract(output: string, manifest: IManifest, channel: string, targetVersion?: string) {
+  protected async downloadAndExtract(output: string, manifest: IManifest, channel: string) {
     const filesize = (n: number): string => {
       const [num, suffix] = require('filesize')(n, {output: 'array'})
       return num.toFixed(1) + ` ${suffix}`
     }
 
     const http: typeof HTTP = require('http-call').HTTP
-    const gzUrl = !targetVersion && manifest.gz ? manifest.gz : this.config.s3Url(this.config.s3Key('versioned', {
-      version: targetVersion,
+    const gzUrl = !this.updatedVersion && manifest.gz ? manifest.gz : this.config.s3Url(this.config.s3Key('versioned', {
+      version: this.updatedVersion,
       channel,
       bin: this.config.bin,
       platform: this.config.platform,
       arch: this.config.arch,
-      ext: targetVersion ? '.tar.gz' : 'gz',
+      ext: this.updatedVersion ? '.tar.gz' : 'gz',
     }))
 
     const {response: stream} = await http.stream(gzUrl)
     stream.pause()
 
     const baseDir = manifest.baseDir || this.config.s3Key('baseDir', {
-      version: targetVersion,
+      version: this.updatedVersion,
       channel,
       bin: this.config.bin,
       platform: this.config.platform,
@@ -190,7 +177,7 @@ export default class UpdateCommand extends Command {
     await extraction
   }
 
-  private async update(manifest: IManifest, channel = 'stable', targetVersion: string) {
+  protected async update(manifest: IManifest, channel = 'stable') {
     const {channel: manifestChannel} = manifest
     if (manifestChannel) channel = manifestChannel
 
@@ -200,7 +187,7 @@ export default class UpdateCommand extends Command {
     const output = path.join(this.clientRoot, this.updatedVersion)
 
     if (!await fs.pathExists(output)) {
-      await this.downloadAndExtract(output, manifest, channel, targetVersion)
+      await this.downloadAndExtract(output, manifest, channel)
     }
 
     await this.setChannel()
@@ -209,12 +196,12 @@ export default class UpdateCommand extends Command {
     await this.reexec()
   }
 
-  private async updateToExistingVersion(version: string) {
+  protected async updateToExistingVersion(version: string) {
     await this.createBin(version)
     await this.touch()
   }
 
-  private async skipUpdate(): Promise<string | false> {
+  protected async skipUpdate(): Promise<string | false> {
     if (!this.config.binPath) {
       const instructions = this.config.scopedEnvVar('UPDATE_INSTRUCTIONS')
       if (instructions) this.warn(instructions)
@@ -227,7 +214,7 @@ export default class UpdateCommand extends Command {
     return false
   }
 
-  private async determineChannel(): Promise<string> {
+  protected async determineChannel(): Promise<string> {
     const channelPath = path.join(this.config.dataDir, 'channel')
     if (fs.existsSync(channelPath)) {
       const channel = await fs.readFile(channelPath, 'utf8')
@@ -236,7 +223,7 @@ export default class UpdateCommand extends Command {
     return this.config.channel || 'stable'
   }
 
-  private async determineCurrentVersion(): Promise<string|undefined> {
+  protected async determineCurrentVersion(): Promise<string|undefined> {
     try {
       const currentVersion = await fs.readFile(this.clientBin, 'utf8')
       const matches = currentVersion.match(/\.\.[/|\\](.+)[/|\\]bin/)
@@ -253,12 +240,12 @@ export default class UpdateCommand extends Command {
     return path.join(s3SubDir, 'channels', this.channel, `${bin}-${platform}-${arch}-buildmanifest`)
   }
 
-  private async setChannel() {
+  protected async setChannel() {
     const channelPath = path.join(this.config.dataDir, 'channel')
     fs.writeFile(channelPath, this.channel, 'utf8')
   }
 
-  private async logChop() {
+  protected async logChop() {
     try {
       this.debug('log chop')
       const logChopper = require('log-chopper').default
@@ -268,13 +255,13 @@ export default class UpdateCommand extends Command {
     }
   }
 
-  private async mtime(f: string) {
+  protected async mtime(f: string) {
     const {mtime} = await fs.stat(f)
     return mtime
   }
 
   // when autoupdating, wait until the CLI isn't active
-  private async debounce(): Promise<void> {
+  protected async debounce(): Promise<void> {
     let output = false
     const lastrunfile = path.join(this.config.cacheDir, 'lastrun')
     const m = await this.mtime(lastrunfile)
@@ -294,7 +281,7 @@ export default class UpdateCommand extends Command {
   }
 
   // removes any unused CLIs
-  private async tidy() {
+  protected async tidy() {
     try {
       const root = this.clientRoot
       if (!await fs.pathExists(root)) return
@@ -314,7 +301,7 @@ export default class UpdateCommand extends Command {
     }
   }
 
-  private async touch() {
+  protected async touch() {
     // touch the client so it won't be tidied up right away
     try {
       const p = path.join(this.clientRoot, this.config.version)
@@ -326,7 +313,7 @@ export default class UpdateCommand extends Command {
     }
   }
 
-  private async reexec() {
+  protected async reexec() {
     cli.action.stop()
     return new Promise((_, reject) => {
       this.debug('restarting CLI after update', this.clientBin)
@@ -345,7 +332,7 @@ export default class UpdateCommand extends Command {
     })
   }
 
-  private async createBin(version: string) {
+  protected async createBin(version: string) {
     const dst = this.clientBin
     const {bin} = this.config
     const binPathEnvVar = this.config.scopedEnvVarKey('BINPATH')
@@ -387,7 +374,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
     }
   }
 
-  private async ensureClientDir() {
+  protected async ensureClientDir() {
     try {
       await fs.mkdirp(this.clientRoot)
     } catch (error) {
