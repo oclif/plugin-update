@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/sumwatshade/plugin-update/compare/v1.4.0...v1.4.1) (2021-05-17)
+
+
+### Bug Fixes
+
+* add public release config ([db7cec9](https://github.com/sumwatshade/plugin-update/commit/db7cec9bcc545afe8102fcd570502eab26bb253d))
+
 # [1.4.0](https://github.com/sumwatshade/plugin-update/compare/v1.3.10...v1.4.0) (2021-05-17)
 
 
