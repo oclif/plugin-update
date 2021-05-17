@@ -70,6 +70,10 @@
       "@oclif/plugin-help"
     ]
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
   "repository": "sumwatshade/plugin-update",
   "scripts": {
     "lint": "eslint . --ext .ts --config .eslintrc",
