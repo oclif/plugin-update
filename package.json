@@ -1,5 +1,5 @@
 {
-  "name": "@oclif/plugin-update",
+  "name": "@sumwatshade/oclif-plugin-update",
   "version": "1.4.0-3",
   "author": "Jeff Dickey @jdxcode",
   "bugs": "https://github.com/oclif/plugin-update/issues",
