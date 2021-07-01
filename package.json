@@ -42,7 +42,7 @@
     "mocha": "^8.3.2",
     "qqjs": "^0.3.11",
     "ts-node": "^9.1.1",
-    "tslib": "^2.1.0",
+    "tslib": "^2.3.0",
     "typescript": "3.8.3"
   },
   "engines": {
