@@ -3,24 +3,28 @@ version: 2
 jobs:
   # This plugin requires a custom image to test releases.
   # Currently it's using Node v10.
-  node-10: &test
-    docker:
-      - image: rasphilco/release:10.17.0
-    working_directory: ~/cli
-    steps:
-      - checkout
-      - restore_cache: &restore_cache
-          keys:
-            - v3-yarn-{{checksum ".circleci/config.yml"}}-{{ checksum "yarn.lock"}}
-            - v3-yarn-{{checksum ".circleci/config.yml"}}
-      - run: yarn
-      - run: yarn test
+  # node-10: &test
+  #   docker:
+  #     - image: rasphilco/release:10.17.0
+  #   working_directory: ~/cli
+  #   steps:
+  #     - checkout
+  #     - restore_cache: &restore_cache
+  #         keys:
+  #           - v3-yarn-{{checksum ".circleci/config.yml"}}-{{ checksum "yarn.lock"}}
+  #           - v3-yarn-{{checksum ".circleci/config.yml"}}
+  #     - run: yarn
+  #     - run: yarn test
   release:
-    <<: *test
+    docker:
+      - image: node:lts
     steps:
       - add_ssh_keys
       - checkout
-      - restore_cache: *restore_cache
+      - restore_cache:
+          keys:
+            - v3-yarn-{{checksum ".circleci/config.yml"}}-{{ checksum "yarn.lock"}}
+            - v3-yarn-{{checksum ".circleci/config.yml"}}
       - run: yarn global add @oclif/semantic-release@3 semantic-release@15
       - run: yarn --frozen-lockfile
       - run: |
@@ -35,12 +39,12 @@ jobs:
 
 workflows:
   version: 2
-  "@oclif/plugin-update":
+  '@oclif/plugin-update':
     jobs:
-      - node-10
+      # - node-10
       - release:
           context: org-global
           filters:
-            branches: {only: master}
-          requires:
-            - node-10
+            branches: { only: master }
+          # requires:
+          #   - node-10
