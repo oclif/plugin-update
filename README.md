@@ -30,5 +30,5 @@ OPTIONS
   --from-local  interactively choose an already installed version
 ```
 
-_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v1.4.0-3/src/commands/update.ts)_
+_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v1.5.0/src/commands/update.ts)_
 <!-- commandsstop -->
