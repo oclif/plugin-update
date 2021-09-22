@@ -39,7 +39,7 @@ export const init: Config.Hook<'init'> = async function (opts) {
       if (opts.config.channel === 'stable') days = 14
       m.setHours(m.getHours() + (days * 24))
       return m < new Date()
-    } catch (error) {
+    } catch (error: any) {
       if (error.code !== 'ENOENT') cli.error(error.stack)
       if ((global as any).testing) return false
       debug('autoupdate ENOENT')

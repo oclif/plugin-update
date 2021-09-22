@@ -17,7 +17,7 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
       const crypto = require('crypto')
       let shaValidated = false
       let extracted = false
-      const check = () => shaValidated && extracted && resolve()
+      const check = () => shaValidated && extracted && resolve(null)
 
       if (sha) {
         const hasher = crypto.createHash('sha256')
@@ -64,7 +64,7 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
         const tmp = getTmp()
         await fs.move(output, tmp)
         await fs.remove(tmp).catch(debug)
-      } catch (error) {
+      } catch (error: any) {
         debug(error)
         await fs.remove(output)
       }
@@ -75,7 +75,7 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
     await fs.remove(tmp).catch(debug)
     await touch(output)
     debug('done extracting')
-  } catch (error) {
+  } catch (error: any) {
     await fs.remove(tmp).catch(process.emitWarning)
     throw error
   }
