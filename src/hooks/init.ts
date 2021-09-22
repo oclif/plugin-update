@@ -1,4 +1,4 @@
-import * as Config from '@oclif/config'
+import {Interfaces} from '@oclif/core'
 import cli from 'cli-ux'
 import * as spawn from 'cross-spawn'
 import * as fs from 'fs-extra'
@@ -17,7 +17,7 @@ async function mtime(f: string) {
   return mtime
 }
 
-export const init: Config.Hook<'init'> = async function (opts) {
+export const init: Interfaces.Hook<'init'> = async function (opts) {
   if (opts.id === 'update') return
   if (opts.config.scopedEnvVarTrue('DISABLE_AUTOUPDATE')) return
   const binPath = this.config.binPath || this.config.bin
