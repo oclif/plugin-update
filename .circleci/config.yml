@@ -7,10 +7,10 @@ workflows:
   version: 2
   test-and-release:
     jobs:
-      - release-management/validate-pr:
-          filters:
-            branches:
-              ignore: master
+      # - release-management/validate-pr:
+      #     filters:
+      #       branches:
+      #         ignore: master
       # we don't run the tests on circle because they're using AWS CLI and AWS keys
       # - release-management/test-package:
       #     matrix:
