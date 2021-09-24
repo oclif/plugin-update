@@ -1,5 +1,5 @@
 import color from '@oclif/color'
-import Command, {flags} from '@oclif/command'
+import {Command, Flags} from '@oclif/core'
 import {IManifest} from '@oclif/dev-cli'
 import cli from 'cli-ux'
 import * as spawn from 'cross-spawn'
@@ -16,9 +16,9 @@ export default class UpdateCommand extends Command {
 
   static args = [{name: 'channel', optional: true}]
 
-  static flags: flags.Input<any> = {
-    autoupdate: flags.boolean({hidden: true}),
-    'from-local': flags.boolean({description: 'interactively choose an already installed version'}),
+  static flags = {
+    autoupdate: Flags.boolean({hidden: true}),
+    'from-local': Flags.boolean({description: 'interactively choose an already installed version'}),
   }
 
   private autoupdate!: boolean
@@ -34,7 +34,7 @@ export default class UpdateCommand extends Command {
   private readonly clientBin = path.join(this.clientRoot, 'bin', this.config.windows ? `${this.config.bin}.cmd` : this.config.bin)
 
   async run() {
-    const {args, flags} = this.parse(UpdateCommand)
+    const {args, flags} = await this.parse(UpdateCommand)
     this.autoupdate = Boolean(flags.autoupdate)
 
     if (this.autoupdate) await this.debounce()
