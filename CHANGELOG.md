@@ -1,3 +1,16 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [1.5.0](https://github.com/oclif/plugin-update/compare/v1.4.0...v1.5.0) (2021-08-05)
+
+## [1.4.0](https://github.com/oclif/plugin-update/compare/v1.4.0-3...v1.4.0) (2021-08-05)
+
+
+### Bug Fixes
+
+* allow 6 weeks before deleting CLIs ([#286](https://github.com/oclif/plugin-update/issues/286)) ([2ffc92a](https://github.com/oclif/plugin-update/commit/2ffc92a3687fd8e9ed939c59c6721d08ec7e6fa1))
+
 ## [1.3.9](https://github.com/oclif/plugin-update/compare/v1.3.8...v1.3.9) (2018-11-26)
 
 

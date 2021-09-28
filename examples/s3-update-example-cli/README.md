@@ -6,7 +6,6 @@ s3-update-example-cli
 [![Version](https://img.shields.io/npm/v/s3-update-example-cli.svg)](https://npmjs.org/package/s3-update-example-cli)
 [![CircleCI](https://circleci.com/gh/jdxcode/s3-update-example-cli/tree/master.svg?style=shield)](https://circleci.com/gh/jdxcode/s3-update-example-cli/tree/master)
 [![Appveyor CI](https://ci.appveyor.com/api/projects/status/github/jdxcode/s3-update-example-cli?branch=master&svg=true)](https://ci.appveyor.com/project/jdxcode/s3-update-example-cli/branch/master)
-[![Codecov](https://codecov.io/gh/jdxcode/s3-update-example-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/jdxcode/s3-update-example-cli)
 [![Downloads/week](https://img.shields.io/npm/dw/s3-update-example-cli.svg)](https://npmjs.org/package/s3-update-example-cli)
 [![License](https://img.shields.io/npm/l/s3-update-example-cli.svg)](https://github.com/jdxcode/s3-update-example-cli/blob/master/package.json)
 

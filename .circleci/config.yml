@@ -1,50 +1,37 @@
 ---
-version: 2
-jobs:
-  node-10: &test
-    docker:
-      - image: node:latest
-    working_directory: ~/cli
-    steps:
-      - checkout
-      - run: |
-          apt-get update
-          apt-get install -y p7zip-full \
-            osslsigncode \
-            nsis \
-            awscli
-      - restore_cache: &restore_cache
-          keys:
-            - v3-yarn-{{checksum ".circleci/config.yml"}}-{{ checksum "yarn.lock"}}
-            - v3-yarn-{{checksum ".circleci/config.yml"}}
-      - run: yarn
-      - run: yarn test
-  release:
-    <<: *test
-    steps:
-      - add_ssh_keys
-      - checkout
-      - restore_cache: *restore_cache
-      - run: yarn global add @oclif/semantic-release@3 semantic-release@15
-      - run: yarn --frozen-lockfile
-      - run: |
-          export PATH=/usr/local/share/.config/yarn/global/node_modules/.bin:$PATH
-          semantic-release -e @oclif/semantic-release
-      - save_cache:
-          key: v3-yarn-{{checksum ".circleci/config.yml"}}-{{checksum "yarn.lock"}}
-          paths:
-            - ~/cli/node_modules
-            - /usr/local/share/.cache/yarn
-            - /usr/local/share/.config/yarn
+version: 2.1
+orbs:
+  release-management: salesforce/npm-release-management@4
 
 workflows:
   version: 2
-  "@oclif/plugin-update":
+  test-and-release:
     jobs:
-      - node-10
-      - release:
-          context: org-global
+      - release-management/validate-pr:
           filters:
-            branches: {only: master}
-          requires:
-            - node-10
+            branches:
+              ignore: master
+      # we don't run the tests on circle because they're using AWS CLI and AWS keys
+      # - release-management/test-package:
+      #     matrix:
+      #       parameters:
+      #         os:
+      #           - linux
+      #           - windows
+      #         node_version:
+      #           - latest
+      #           - lts
+      #           - maintenance
+      #       exclude:
+      #         - os: windows
+      #           node_version: lts
+      #         - os: windows
+      #           node_version: maintenance
+      - release-management/release-package:
+          github-release: true
+          # requires:
+          #   - release-management/test-package
+          filters:
+            branches:
+              only: master
+          # context: CLI_CTC
