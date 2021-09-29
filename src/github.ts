@@ -7,7 +7,19 @@ import RemoteUpdater from './remote'
 export default class GithubUpdater extends RemoteUpdater {
   protected async fetchManifest(): Promise<IManifest> {
     const http: typeof HTTP = require('http-call').HTTP
-    const [owner, repo] = this.config.pjson.repository.split('/')
+
+    let owner
+    let repo
+    try {
+      const url = this.config.pjson.repository.url
+      const matches = url.match(/.+?:(.+?)\/(.+?)\.git/)
+      owner = matches[1]
+      repo = matches[2]
+    } catch (error) {
+      this.debug(error)
+      throw new Error('Github repository not defined')
+    }
+
     const {body} = await http.get(`https://api.github.com/repos/${owner}/${repo}/releases/latest`)
 
     if (typeof body === 'string') {

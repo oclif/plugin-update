@@ -18,28 +18,30 @@ export default abstract class Updater {
 
   protected readonly warn: (...args: any[]) => void
 
-  protected readonly channel = this.command.channel
+  protected readonly exit: (...args: any[]) => void
 
-  protected readonly exit = this.command.exit
+  protected readonly channel: string
 
-  protected readonly name = this.command.config.name
+  protected readonly clientRoot: string
 
-  protected readonly clientRoot = this.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.config.dataDir, 'client')
-
-  protected readonly clientBin = path.join(this.clientRoot, 'bin', this.config.windows ? `${this.config.bin}.cmd` : this.config.bin)
+  protected readonly clientBin: string
 
   constructor(command: UpdateCommand, debug: (...args: any[]) => void, log: (...args: any[]) => void, warn: (...args: any[]) => void) {
     this.command = command
     this.config = command.config
+    this.channel = command.channel
+    this.exit = command.exit
     this.debug = debug
     this.log = log
     this.warn = warn
+    this.clientRoot = this.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.config.dataDir, 'client')
+    this.clientBin = path.join(this.clientRoot, 'bin', this.config.windows ? `${this.config.bin}.cmd` : this.config.bin)
   }
 
   abstract update(): void
 
   protected start() {
-    cli.action.start(`${this.name}: Updating CLI`)
+    cli.action.start(`${this.config.name}: Updating CLI`)
   }
 
   protected stop() {
