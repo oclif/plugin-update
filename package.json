@@ -58,7 +58,6 @@
   ],
   "license": "MIT",
   "oclif": {
-    "autoupdate": "github",
     "commands": "./lib/commands",
     "bin": "oclif-example",
     "hooks": {
