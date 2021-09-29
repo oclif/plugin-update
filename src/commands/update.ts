@@ -5,6 +5,7 @@ import * as fs from 'fs-extra'
 
 import Command, {flags} from '@oclif/command'
 
+import GithubUpdater from '../github'
 import LocalUpdater from '../local'
 import S3Updater from '../s3'
 import Updater from '../updater'
@@ -36,6 +37,8 @@ export default class UpdateCommand extends Command {
 
     if (flags['from-local']) {
       this.updater = new LocalUpdater(this, this.debug, this.log, this.warn)
+    } else if ((this.config.pjson.oclif as any).autoupdate === 'github') {
+      this.updater = new GithubUpdater(this, this.debug, this.log, this.warn)
     } else {
       this.updater = new S3Updater(this, this.debug, this.log, this.warn)
     }

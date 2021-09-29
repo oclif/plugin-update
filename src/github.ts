@@ -41,7 +41,8 @@ export default class GithubUpdater extends RemoteUpdater {
 
   protected async initializeDownload(output: string, manifest: IManifest) {
     const {gz: gzUrl, baseDir} = manifest
-    await this.downloadAndExtract(output, gzUrl, baseDir)
+    const sha256gz: string | undefined = manifest.sha256gz === '' ? undefined : manifest.sha256gz
+    await this.downloadAndExtract(output, gzUrl, baseDir, sha256gz)
   }
 
   // Get the name of the manifest we are looking for - no channel support for now
