@@ -3,10 +3,13 @@ import * as path from 'path'
 import cli from 'cli-ux'
 import * as spawn from 'cross-spawn'
 import * as fs from 'fs-extra'
+import HTTP from 'http-call'
+import {throttle} from 'lodash'
 
 import color from '@oclif/color'
 import {IManifest} from '@oclif/dev-cli'
 
+import {extract} from './tar'
 import Updater from './updater'
 import {ls} from './util'
 
@@ -17,7 +20,7 @@ export default abstract class RemoteUpdater extends Updater {
 
   protected abstract fetchManifest(): Promise<IManifest>
 
-  protected abstract downloadAndExtract(output: string, manifest: IManifest, channel: string): void
+  protected abstract initializeDownload(output: string, manifest: IManifest): void
 
   async update() {
     this.start()
@@ -49,7 +52,7 @@ export default abstract class RemoteUpdater extends Updater {
     const output = path.join(this.clientRoot, this.updatedVersion)
 
     if (!await fs.pathExists(output)) {
-      await this.downloadAndExtract(output, manifest, channel)
+      await this.initializeDownload(output, manifest)
     }
 
     await this.setChannel()
@@ -67,6 +70,40 @@ export default abstract class RemoteUpdater extends Updater {
       this.debug(error)
     }
     return this.config.version
+  }
+
+  protected async downloadAndExtract(output: string, gzUrl: string, baseDir: string, sha256gz?: string) {
+    const filesize = (n: number): string => {
+      const [num, suffix] = require('filesize')(n, {output: 'array'})
+      return num.toFixed(1) + ` ${suffix}`
+    }
+
+    const http: typeof HTTP = require('http-call').HTTP
+    const {response: stream} = await http.stream(gzUrl)
+    stream.pause()
+
+    const extraction = extract(stream, baseDir, output, sha256gz)
+
+    // to-do: use cli.action.type
+    if ((cli.action as any).frames) {
+      // if spinner action
+      const total = parseInt(stream.headers['content-length']!, 10)
+      let current = 0
+      const updateStatus = throttle(
+        (newStatus: string) => {
+          cli.action.status = newStatus
+        },
+        250,
+        {leading: true, trailing: false},
+      )
+      stream.on('data', data => {
+        current += data.length
+        updateStatus(`${filesize(current)}/${filesize(total)}`)
+      })
+    }
+
+    stream.resume()
+    await extraction
   }
 
   private async logChop() {

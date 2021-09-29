@@ -1,27 +1,51 @@
-// import HTTP from 'http-call'
+import HTTP from 'http-call'
 
-// import {Updater} from '.'
+import {IManifest} from '@oclif/dev-cli'
 
-// export class GithubUpdater extends Updater {
-//   release?: {tag_name: string}
+import RemoteUpdater from './remote'
 
-//   async update() {
-//     const release = await this.fetchRelease()
-//     const version = release.tag_name.split('v')[1]
-//     const base = this.base(version)
-//     const asset = release.assets.find((a: any) => a.name === `${base}.tar.gz`)
-//     if (!asset) throw new Error('release not found')
-//     return super.update({url: asset.browser_download_url, version})
-//   }
+export default class GithubUpdater extends RemoteUpdater {
+  protected async fetchManifest(): Promise<IManifest> {
+    const http: typeof HTTP = require('http-call').HTTP
+    const [owner, repo] = this.config.pjson.repository.split('/')
+    const {body} = await http.get(`https://api.github.com/repos/${owner}/${repo}/releases/latest`)
 
-//   async needsUpdate() {
-//     const version = (await this.fetchRelease()).tag_name.split('v')[1]
-//     return this.config.version !== version
-//   }
+    if (typeof body === 'string') {
+      const release = JSON.parse(body)
+      const version = release.tag_name
+      const binKey = this.getBinKey(
+        this.config.bin,
+        version,
+        this.config.platform,
+        this.config.arch,
+      )
+      const asset = release.assets.find((a: any) => a.name === binKey)
 
-//   private async fetchRelease() {
-//     const [owner, repo] = this.config.pjson.repository.split('/')
-//     const {body} = await HTTP.get(`https://api.github.com/repos/${owner}/${repo}/releases/latest`)
-//     return this.release = body
-//   }
-// }
+      if (asset) {
+        return {
+          version,
+          channel: 'stable', // No channel support for now
+          gz: asset.url,
+          sha256gz: '', // Skipping sha validation for now
+          baseDir: this.config.bin,
+          node: {
+            compatible: '', // Included because it is part of IManifest, but we don't have this data
+            recommended: '', // Included because it is part of IManifest, but we don't have this data
+          },
+        }
+      }
+    }
+
+    throw new Error('No compatible release found')
+  }
+
+  protected async initializeDownload(output: string, manifest: IManifest) {
+    const {gz: gzUrl, baseDir} = manifest
+    await this.downloadAndExtract(output, gzUrl, baseDir)
+  }
+
+  // Get the name of the manifest we are looking for - no channel support for now
+  private getBinKey(bin: string, version: string, platform: string, arch: string): string {
+    return `${bin}-${version}-${platform}-${arch}.tar.gz`
+  }
+}
