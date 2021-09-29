@@ -72,7 +72,7 @@
     "pretest": "yarn build --noEmit && tsc -p test --noEmit",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
     "posttest": "yarn lint",
-    "prepack": "yarn build && oclif manifest",
+    "prepack": "yarn build && oclif manifest .",
     "postpack": "rm -f oclif.manifest.json",
     "version": "oclif readme && git add README.md",
     "build": "rm -rf lib && tsc"
