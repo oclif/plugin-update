@@ -24,11 +24,14 @@ update the oclif-example CLI
 
 ```
 USAGE
-  $ oclif-example update [CHANNEL]
+  $ oclif-example update [CHANNEL] [--from-local]
 
-OPTIONS
+FLAGS
   --from-local  interactively choose an already installed version
+
+DESCRIPTION
+  update the oclif-example CLI
 ```
 
-_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v1.5.0/src/commands/update.ts)_
+_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v2.0.0/src/commands/update.ts)_
 <!-- commandsstop -->
