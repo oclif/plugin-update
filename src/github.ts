@@ -12,9 +12,14 @@ export default class GithubUpdater extends RemoteUpdater {
     let repo
     try {
       const url = this.config.pjson.repository.url
-      const matches = url.match(/.+?:(.+?)\/(.+?)\.git/)
-      owner = matches[1]
-      repo = matches[2]
+
+      if (url.includes('.git')) {
+        const matches = url.match(/(?:git\+ssh:\/\/)?.+?[:/](.+?)\/(.+?)\.git/)
+        owner = matches[1]
+        repo = matches[2]
+      } else {
+        throw new Error(`Repo url not in expected format: ${url}`)
+      }
     } catch (error) {
       this.debug(error)
       throw new Error('Github repository not defined')
