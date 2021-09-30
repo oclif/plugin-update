@@ -2,6 +2,9 @@ import {expect} from 'chai'
 import * as path from 'path'
 import * as qq from 'qqjs'
 
+// eslint-disable-next-line no-warning-comments
+// TODO: Fix this to be proper unit tests, not integration tests that require AWS.
+
 const skipIfWindows = process.platform === 'win32' ? it.skip : it
 
 describe('update', () => {
