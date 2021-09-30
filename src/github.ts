@@ -1,27 +1,73 @@
-// import HTTP from 'http-call'
+import HTTP from 'http-call'
 
-// import {Updater} from '.'
+import {IManifest} from '@oclif/dev-cli'
 
-// export class GithubUpdater extends Updater {
-//   release?: {tag_name: string}
+import RemoteUpdater from './remote'
 
-//   async update() {
-//     const release = await this.fetchRelease()
-//     const version = release.tag_name.split('v')[1]
-//     const base = this.base(version)
-//     const asset = release.assets.find((a: any) => a.name === `${base}.tar.gz`)
-//     if (!asset) throw new Error('release not found')
-//     return super.update({url: asset.browser_download_url, version})
-//   }
+export default class GithubUpdater extends RemoteUpdater {
+  protected async fetchManifest(): Promise<IManifest> {
+    const http: typeof HTTP = require('http-call').HTTP
 
-//   async needsUpdate() {
-//     const version = (await this.fetchRelease()).tag_name.split('v')[1]
-//     return this.config.version !== version
-//   }
+    let owner
+    let repo
+    try {
+      const url = this.config.pjson.repository.url
 
-//   private async fetchRelease() {
-//     const [owner, repo] = this.config.pjson.repository.split('/')
-//     const {body} = await HTTP.get(`https://api.github.com/repos/${owner}/${repo}/releases/latest`)
-//     return this.release = body
-//   }
-// }
+      if (url.includes('.git')) {
+        const matches = url.match(/(?:git\+ssh:\/\/)?.+?[:/](.+?)\/(.+?)\.git/)
+        owner = matches[1]
+        repo = matches[2]
+      } else {
+        throw new Error(`Repo url not in expected format: ${url}`)
+      }
+    } catch (error) {
+      this.debug(error)
+      throw new Error('Github repository not defined')
+    }
+
+    const {body} = await http.get(`https://api.github.com/repos/${owner}/${repo}/releases/latest`, this.getReqHeaders())
+    const release = typeof body === 'string' ? JSON.parse(body) : body
+    const version = release.tag_name
+    const binKey = this.getBinKey(
+      this.config.bin,
+      version,
+      this.config.platform,
+      this.config.arch,
+    )
+    const asset = release.assets.find((a: any) => a.name === binKey)
+
+    if (asset) {
+      return {
+        version,
+        channel: 'stable', // No channel support for now
+        gz: asset.url,
+        sha256gz: '', // Skipping sha validation for now
+        baseDir: this.config.bin,
+        node: {
+          compatible: this.config.pjson.oclif.update.node.version || '', // Included because it is part of IManifest
+          recommended: this.config.pjson.oclif.update.node.version || '', // Included because it is part of IManifest
+        },
+      }
+    }
+
+    throw new Error('No compatible release found')
+  }
+
+  protected async initializeDownload(output: string, manifest: IManifest) {
+    const {gz: gzUrl, baseDir} = manifest
+    const sha256gz: string | undefined = manifest.sha256gz === '' ? undefined : manifest.sha256gz
+    await this.downloadAndExtract(output, gzUrl, baseDir, sha256gz)
+  }
+
+  // Get the name of the manifest we are looking for - no channel support for now
+  private getBinKey(bin: string, version: string, platform: string, arch: string): string {
+    return `${bin}-${version}-${platform}-${arch}.tar.gz`
+  }
+
+  protected getReqHeaders(): {headers?: {Authorization?: string}} | undefined {
+    const token = this.config.scopedEnvVar('GITHUB_TOKEN')
+    if (token) {
+      return {headers: {Authorization: 'Bearer ' + token}}
+    }
+  }
+}
