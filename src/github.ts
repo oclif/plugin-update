@@ -20,7 +20,7 @@ export default class GithubUpdater extends RemoteUpdater {
       throw new Error('Github repository not defined')
     }
 
-    const {body} = await http.get(`https://api.github.com/repos/${owner}/${repo}/releases/latest`)
+    const {body} = await http.get(`https://api.github.com/repos/${owner}/${repo}/releases/latest`, this.getReqHeaders())
 
     if (typeof body === 'string') {
       const release = JSON.parse(body)
@@ -60,5 +60,12 @@ export default class GithubUpdater extends RemoteUpdater {
   // Get the name of the manifest we are looking for - no channel support for now
   private getBinKey(bin: string, version: string, platform: string, arch: string): string {
     return `${bin}-${version}-${platform}-${arch}.tar.gz`
+  }
+
+  protected getReqHeaders(): {headers?: {Authorization?: string}} | undefined {
+    const token = this.config.scopedEnvVar('GITHUB_TOKEN')
+    if (token) {
+      return {headers: {Authorization: 'Bearer ' + token}}
+    }
   }
 }

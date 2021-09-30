@@ -78,4 +78,8 @@ export default class S3Updater extends RemoteUpdater {
     if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
     return path.join(s3SubDir, 'channels', this.channel, `${bin}-${platform}-${arch}-buildmanifest`)
   }
+
+  protected getReqHeaders(): {headers?: {Authorization?: string}} | undefined {
+    return undefined
+  }
 }

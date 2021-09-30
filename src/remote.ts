@@ -22,6 +22,8 @@ export default abstract class RemoteUpdater extends Updater {
 
   protected abstract initializeDownload(output: string, manifest: IManifest): void
 
+  protected abstract getReqHeaders(): {headers?: {Authorization?: string}} | undefined
+
   async update() {
     this.start()
 
@@ -79,7 +81,7 @@ export default abstract class RemoteUpdater extends Updater {
     }
 
     const http: typeof HTTP = require('http-call').HTTP
-    const {response: stream} = await http.stream(gzUrl)
+    const {response: stream} = await http.stream(gzUrl, this.getReqHeaders())
     stream.pause()
 
     const extraction = extract(stream, baseDir, output, sha256gz)
