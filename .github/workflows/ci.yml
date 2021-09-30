@@ -1,3 +1,4 @@
+# This should be re-enabled when ./test/commands/update.test.ts is updated to not use AWS.
 # name: Node.js CI
 
 # on:
@@ -11,7 +12,7 @@
 #     runs-on: windows-latest
 #     strategy:
 #       matrix:
-#         node-version: [10.x, 12.x]
+#         node-version: [14.x, 12.x]
 #     steps:
 #       - uses: actions/checkout@v2
 #       - name: Use Node.js ${{ matrix.node-version }}

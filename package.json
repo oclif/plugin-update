@@ -41,6 +41,7 @@
     "globby": "^11.0.2",
     "mocha": "^8.3.2",
     "qqjs": "^0.3.11",
+    "shx": "^0.3.3",
     "ts-node": "^9.1.1",
     "tslib": "^2.1.0",
     "typescript": "3.8.3"
@@ -75,8 +76,8 @@
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
     "posttest": "yarn lint",
     "prepack": "yarn build && oclif-dev manifest",
-    "postpack": "rm -f oclif.manifest.json",
+    "postpack": "shx rm -f oclif.manifest.json",
     "version": "oclif-dev readme && git add README.md",
-    "build": "rm -rf lib && tsc"
+    "build": "shx rm -rf lib && tsc"
   }
 }

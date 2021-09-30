@@ -11,7 +11,7 @@ workflows:
           filters:
             branches:
               ignore: master
-      # we don't run the tests on circle because they're using AWS CLI and AWS keys
+      # This should be re-enabled when ./test/commands/update.test.ts is updated to not use AWS.
       # - release-management/test-package:
       #     matrix:
       #       parameters:
@@ -22,11 +22,6 @@ workflows:
       #           - latest
       #           - lts
       #           - maintenance
-      #       exclude:
-      #         - os: windows
-      #           node_version: lts
-      #         - os: windows
-      #           node_version: maintenance
       - release-management/release-package:
           github-release: true
           # requires:
@@ -34,4 +29,3 @@ workflows:
           filters:
             branches:
               only: master
-          # context: CLI_CTC
