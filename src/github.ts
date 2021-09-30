@@ -21,30 +21,27 @@ export default class GithubUpdater extends RemoteUpdater {
     }
 
     const {body} = await http.get(`https://api.github.com/repos/${owner}/${repo}/releases/latest`, this.getReqHeaders())
+    const release = typeof body === 'string' ? JSON.parse(body) : body
+    const version = release.tag_name
+    const binKey = this.getBinKey(
+      this.config.bin,
+      version,
+      this.config.platform,
+      this.config.arch,
+    )
+    const asset = release.assets.find((a: any) => a.name === binKey)
 
-    if (typeof body === 'string') {
-      const release = JSON.parse(body)
-      const version = release.tag_name
-      const binKey = this.getBinKey(
-        this.config.bin,
+    if (asset) {
+      return {
         version,
-        this.config.platform,
-        this.config.arch,
-      )
-      const asset = release.assets.find((a: any) => a.name === binKey)
-
-      if (asset) {
-        return {
-          version,
-          channel: 'stable', // No channel support for now
-          gz: asset.url,
-          sha256gz: '', // Skipping sha validation for now
-          baseDir: this.config.bin,
-          node: {
-            compatible: '', // Included because it is part of IManifest, but we don't have this data
-            recommended: '', // Included because it is part of IManifest, but we don't have this data
-          },
-        }
+        channel: 'stable', // No channel support for now
+        gz: asset.url,
+        sha256gz: '', // Skipping sha validation for now
+        baseDir: this.config.bin,
+        node: {
+          compatible: this.config.pjson.oclif.update.node.version || '', // Included because it is part of IManifest
+          recommended: this.config.pjson.oclif.update.node.version || '', // Included because it is part of IManifest
+        },
       }
     }
 
