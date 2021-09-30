@@ -35,7 +35,7 @@
     "@types/supports-color": "^7.2.0",
     "@types/write-json-file": "^3.2.1",
     "chai": "^4.3.4",
-    "eslint": "^7.21.0",
+    "eslint": "^7.32.0",
     "eslint-config-oclif": "^3.1.0",
     "eslint-config-oclif-typescript": "^0.2.0",
     "globby": "^11.0.2",
