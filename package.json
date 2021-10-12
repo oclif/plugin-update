@@ -5,7 +5,7 @@
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
     "@oclif/color": "^0.1.0",
-    "@oclif/core": "^0.5.39",
+    "@oclif/core": "^1.0.1",
     "@types/semver": "^7.3.4",
     "cli-ux": "^5.5.1",
     "cross-spawn": "^7.0.3",
@@ -19,7 +19,6 @@
     "tar-fs": "^2.1.1"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "^1.26.0",
     "@oclif/plugin-help": "^5.1.0",
     "@oclif/test": "^1.2.8",
     "@types/chai": "^4.2.15",
