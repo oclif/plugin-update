@@ -85,25 +85,6 @@ export default class UpdateCommand extends Command {
     const http: typeof HTTP = require('http-call').HTTP
 
     cli.action.status = 'fetching manifest'
-    if (!this.config.scopedEnvVarTrue('USE_LEGACY_UPDATE')) {
-      try {
-        const newManifestUrl = this.config.s3Url(
-          this.s3ChannelManifestKey(
-            this.config.bin,
-            this.config.platform,
-            this.config.arch,
-            (this.config.pjson.oclif.update.s3 as any).folder,
-          ),
-        )
-        const {body} = await http.get<IManifest | string>(newManifestUrl)
-        if (typeof body === 'string') {
-          return JSON.parse(body)
-        }
-        return body
-      } catch (error: any) {
-        this.debug(error.message)
-      }
-    }
 
     try {
       const url = this.config.s3Url(this.config.s3Key('manifest', {
