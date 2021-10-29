@@ -51,7 +51,7 @@ export default class UpdateCommand extends Command {
 
       this.log(`Found versions: \n${versions.map(version => `     ${version}`).join('\n')}\n`)
 
-      const pinToVersion = await cli.prompt('Enter a version to update to')
+      const pinToVersion = await this.getPinToVersion()
       if (!versions.includes(pinToVersion)) throw new Error(`Version ${pinToVersion} not found in the locally installed versions.`)
 
       if (!await fs.pathExists(path.join(this.clientRoot, pinToVersion))) {
@@ -79,6 +79,10 @@ export default class UpdateCommand extends Command {
 
     this.debug('done')
     cli.action.stop()
+  }
+
+  private async getPinToVersion(): Promise<string> {
+    return cli.prompt('Enter a version to update to')
   }
 
   private async fetchManifest(): Promise<IManifest> {
@@ -284,15 +288,14 @@ export default class UpdateCommand extends Command {
       const root = this.clientRoot
       if (!await fs.pathExists(root)) return
       const files = await ls(root)
-      const promises = files.map(async f => {
+      await Promise.all(files.map(async f => {
         if (['bin', 'current', this.config.version].includes(path.basename(f.path))) return
         const mtime = f.stat.mtime
         mtime.setHours(mtime.getHours() + (42 * 24))
         if (mtime < new Date()) {
           await fs.remove(f.path)
         }
-      })
-      for (const p of promises) await p // eslint-disable-line no-await-in-loop
+      }))
       await this.logChop()
     } catch (error) {
       cli.warn(error)

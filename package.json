@@ -40,6 +40,7 @@
     "eslint-config-oclif-typescript": "^0.2.0",
     "globby": "^11.0.2",
     "mocha": "^8.3.2",
+    "nock": "^13.1.4",
     "qqjs": "^0.3.11",
     "shx": "^0.3.3",
     "ts-node": "^9.1.1",
