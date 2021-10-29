@@ -23,8 +23,8 @@ workflows:
                 - maintenance
       - release-management/release-package:
           github-release: true
-            requires:
-              - release-management/test-package
+          requires:
+            - release-management/test-package
           filters:
             branches:
               only: master
