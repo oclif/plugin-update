@@ -159,16 +159,16 @@ describe('update plugin', () => {
     const gzContents = zlib.gzipSync(await getStream(tar.pack(config.root, {finalize: true})))
 
     nock(/oclif-staging.s3.amazonaws.com/)
-      .get(platformRegex)
-      .reply(200, {version: '2.0.0'})
-      .get(manifestRegex)
-      .reply(200, {version: '2.0.0'})
-      .get(tarballRegex)
-      .reply(200, gzContents, {
-        'X-Transfer-Length': String(gzContents.length),
-        'content-length': String(gzContents.length),
-        'Content-Encoding': 'gzip',
-      })
+    .get(platformRegex)
+    .reply(200, {version: '2.0.0'})
+    .get(manifestRegex)
+    .reply(200, {version: '2.0.0'})
+    .get(tarballRegex)
+    .reply(200, gzContents, {
+      'X-Transfer-Length': String(gzContents.length),
+      'content-length': String(gzContents.length),
+      'Content-Encoding': 'gzip',
+    })
 
     sandbox.stub(UpdateCli.prototype, 'reexec' as any).resolves()
 
@@ -177,5 +177,4 @@ describe('update plugin', () => {
     const stdout = stripAnsi(collector.stdout.join(' '))
     expect(stdout).to.matches(/Updating to an already installed version will not update the channel/)
   })
-
 })

@@ -37,14 +37,14 @@ export class Tar {
 
         const ignore = (_: any, header: any) => {
           switch (header.type) {
-            case 'directory':
-            case 'file':
-              if (process.env.OCLIF_DEBUG_UPDATE_FILES) debug(header.name)
-              return false
-            case 'symlink':
-              return true
-            default:
-              throw new Error(header.type)
+          case 'directory':
+          case 'file':
+            if (process.env.OCLIF_DEBUG_UPDATE_FILES) debug(header.name)
+            return false
+          case 'symlink':
+            return true
+          default:
+            throw new Error(header.type)
           }
         }
         const extract = tar.extract(tmp, {ignore})
