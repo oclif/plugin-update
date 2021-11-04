@@ -8,3 +8,5 @@
 /tmp
 /oclif-plugin-update-*.tgz
 /.vscode
+/.nyc_output
+/.idea

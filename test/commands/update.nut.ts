@@ -1,53 +1,54 @@
 import {expect} from 'chai'
-import * as path from 'path'
-import * as qq from 'qqjs'
-
+import * as path from 'node:path'
+import * as shelljs from 'shelljs'
+import * as fs from 'fs-extra'
 const skipIfWindows = process.platform === 'win32' ? it.skip : it
 
-describe('update', () => {
+describe.skip('update', () => {
   skipIfWindows('tests the updater', async () => {
-    await qq.rm([process.env.HOME!, '.local', 'share', 'oclif-example-s3-cli'])
-    await qq.x('aws s3 rm --recursive s3://oclif-staging/s3-update-example-cli')
-    const sha = await qq.x.stdout('git', ['rev-parse', '--short', 'HEAD'])
-    const stdout = await qq.x.stdout('npm', ['pack', '--unsafe-perm'])
+    await shelljs.rm([process.env.HOME!, '.local', 'share', 'oclif-example-s3-cli'])
+    await shelljs.exec('aws s3 rm --recursive s3://oclif-staging/s3-update-example-cli')
+    const sha = await shelljs.exec('git rev-parse --short HEAD').stdout
+    const stdout = await shelljs.exec('npm pack --unsafe-perm').stdout
     const tarball = path.resolve(stdout.split('\n').pop()!)
 
-    qq.cd('examples/s3-update-example-cli')
-    /* eslint-disable require-atomic-updates */
+    shelljs.cd('examples/s3-update-example-cli')
     process.env.EXAMPLE_CLI_DISABLE_AUTOUPDATE = '1'
     process.env.YARN_CACHE_FOLDER = path.resolve('tmp', 'yarn')
-    /* eslint-enable require-atomic-updates */
-    await qq.rm(process.env.YARN_CACHE_FOLDER)
-    const pjson = await qq.readJSON('package.json')
-    pjson.name = `s3-update-example-cli-${Math.floor(Math.random() * 100000)}`
+    await shelljs.rm(process.env.YARN_CACHE_FOLDER)
+    const pjson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
+    pjson.name = `s3-update-example-cli-${Math.floor(Math.random() * 100_000)}`
     pjson.oclif.bin = pjson.name
     delete pjson.dependencies['@oclif/plugin-update']
-    await qq.writeJSON('package.json', pjson)
+    fs.writeFileSync('package.json', JSON.stringify(pjson, undefined, 2))
 
-    await qq.rm('yarn.lock')
-    await qq.x(`yarn add ${tarball}`)
-    // await qq.x('yarn')
+    await shelljs.rm('yarn.lock')
+    await shelljs.exec(`yarn add ${tarball}`)
+    // await shelljs.exec('yarn')
 
     const release = async (version: string) => {
-      const pjson = await qq.readJSON('package.json')
+      const pjson = await JSON.parse(fs.readFileSync('package.json', 'utf8'))
       pjson.version = version
-      await qq.writeJSON('package.json', pjson)
-      await qq.x('./node_modules/.bin/oclif-dev pack')
-      await qq.x('./node_modules/.bin/oclif-dev publish')
+      fs.writeFileSync('package.json', JSON.stringify(pjson, undefined, 2))
+      await shelljs.exec('./node_modules/.bin/oclif-dev pack')
+      await shelljs.exec('./node_modules/.bin/oclif-dev publish')
     }
+
     const checkVersion = async (version: string, nodeVersion = pjson.oclif.update.node.version) => {
-      const stdout = await qq.x.stdout(`./tmp/${pjson.oclif.bin}/bin/${pjson.oclif.bin}`, ['version'])
+      const stdout = await shelljs.exec(`./tmp/${pjson.oclif.bin}/bin/${pjson.oclif.bin} 'version'`).stdout
       expect(stdout).to.equal(`${pjson.oclif.bin}/${version} ${process.platform}-${process.arch} node-v${nodeVersion}`)
     }
+
     const update = async (channel?: string) => {
       const f = `tmp/${pjson.oclif.bin}/package.json`
-      const pj = await qq.readJSON(f)
+      const pj = JSON.parse(fs.readFileSync(f, 'utf8'))
       pj.version = '0.0.0'
-      await qq.writeJSON(f, pj)
+      fs.writeFileSync(f, JSON.stringify(pj, undefined, 2))
       const args = ['update']
       if (channel) args.push(channel)
-      await qq.x(`./tmp/${pjson.oclif.bin}/bin/${pjson.oclif.bin}`, args)
+      await shelljs.exec(`./tmp/${pjson.oclif.bin}/bin/${pjson.oclif.bin} ${args.join(' ')}`)
     }
+
     await release('1.0.0')
     await checkVersion('1.0.0', process.versions.node)
     await release('2.0.0-beta')
