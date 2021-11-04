@@ -8,3 +8,5 @@
 /tmp
 /oclif-plugin-update-*.tgz
 /.vscode
+/.idea
+.DS_Store
