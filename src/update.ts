@@ -8,7 +8,7 @@ import * as _ from 'lodash'
 import {EventEmitter} from 'events'
 import * as path from 'path'
 
-import {Tar} from './tar'
+import {extract} from './tar'
 import {ls, wait} from './util'
 
 export interface UpdateCliOptions {
@@ -136,7 +136,7 @@ export default class UpdateCli extends EventEmitter {
       platform: this.options.config.platform,
       arch: this.options.config.arch,
     })
-    const extraction = Tar.extract(stream, baseDir, output, manifest.sha256gz)
+    const extraction = extract(stream, baseDir, output, manifest.sha256gz)
 
     const total = parseInt(stream.headers['content-length']!, 10)
     let current = 0
