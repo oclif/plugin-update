@@ -18,8 +18,7 @@ type OutputCollectors = {
   stderr: string[];
 }
 async function loadConfig(options: {root: string}): Promise<IConfig> {
-  const config = await Config.load(options.root)
-  return config
+  return Config.load(options.root)
 }
 
 function setupClientRoot(ctx: { config: IConfig }, createVersion?: string): string {
