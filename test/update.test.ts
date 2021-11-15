@@ -11,7 +11,7 @@ import * as getStream from 'get-stream'
 import * as tar from 'tar-fs'
 import * as sinon from 'sinon'
 import stripAnsi = require('strip-ansi')
-import {Tar} from '../src/tar'
+import * as extract from '../src/tar'
 
 type OutputCollectors = {
   stdout: string[];
@@ -122,7 +122,7 @@ describe('update plugin', () => {
     })
 
     sandbox.stub(UpdateCli.prototype, 'reexec' as any).resolves()
-    sandbox.stub(Tar, 'extract').resolves()
+    sandbox.stub(extract, 'extract').resolves()
 
     updateCli = initUpdateCli({args: {}, flags: {}, config: config as Config, collector: collector})
     await updateCli.runUpdate()
