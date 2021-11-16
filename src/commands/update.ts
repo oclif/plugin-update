@@ -23,7 +23,7 @@ export default class UpdateCommand extends Command {
 
   async run(): Promise<void> {
     const {args, flags} = await this.parse(UpdateCommand)
-    const updateCli = new UpdateCli({args, flags, config: this.config, exit: this.exit, getPinToVersion: getPinToVersion})
+    const updateCli = new UpdateCli({channel: args.channel, autoUpdate: flags.autoupdate, fromLocal: flags['from-local'], config: this.config, exit: this.exit, getPinToVersion: getPinToVersion})
     updateCli
     .on('debug', (...args: any) => {
       this.debug(...args)

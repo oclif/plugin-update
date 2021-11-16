@@ -12,8 +12,9 @@ import {extract} from './tar'
 import {ls, wait} from './util'
 
 export interface UpdateCliOptions {
-  args: {[p: string]: any};
-  flags: {[p: string]: any};
+  channel?: string;
+  autoUpdate: boolean;
+  fromLocal: boolean;
   config: Config;
   exit: any;
   getPinToVersion: () => Promise<string>;
@@ -39,13 +40,13 @@ export default class UpdateCli extends EventEmitter {
   }
 
   async runUpdate() {
-    this.autoupdate = Boolean(this.options.flags.autoupdate)
+    this.autoupdate = Boolean(this.options.autoUpdate)
 
     if (this.autoupdate) await this.debounce()
 
-    this.channel = this.options.args.channel || await this.determineChannel()
+    this.channel = this.options.channel || await this.determineChannel()
 
-    if (this.options.flags['from-local']) {
+    if (this.options.fromLocal) {
       await this.ensureClientDir()
       this.emit('debug', `Looking for locally installed versions at ${this.clientRoot}`)
 

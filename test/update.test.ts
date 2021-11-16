@@ -35,8 +35,8 @@ function setupClientRoot(ctx: { config: IConfig }, createVersion?: string): stri
   return clientRoot
 }
 
-function initUpdateCli(options: {args: {[p: string]: any}; flags: {[p: string]: any}; config: Config; collector: OutputCollectors}): UpdateCli {
-  const updateCli = new UpdateCli({args: options.args, flags: options.flags, config: options.config, exit: undefined, getPinToVersion: async () => '2.0.0'})
+function initUpdateCli(options: {channel?: string; autoUpdate: boolean; fromLocal: boolean; config: Config; collector: OutputCollectors}): UpdateCli {
+  const updateCli = new UpdateCli({autoUpdate: options.autoUpdate, fromLocal: options.fromLocal, channel: options.channel, config: options.config, exit: undefined, getPinToVersion: async () => '2.0.0'})
   expect(updateCli).to.be.ok
   updateCli
   .on('debug', () => {
@@ -91,7 +91,7 @@ describe('update plugin', () => {
 
     sandbox.stub(UpdateCli.prototype, 'reexec' as any).resolves()
 
-    updateCli = initUpdateCli({args: {}, flags: {}, config: config as Config, collector: collector})
+    updateCli = initUpdateCli({autoUpdate: false, fromLocal: false, config: config as Config, collector: collector})
     await updateCli.runUpdate()
     const stdout = collector.stdout.join(' ')
     expect(stdout).to.include('already on latest version')
@@ -123,7 +123,7 @@ describe('update plugin', () => {
     sandbox.stub(UpdateCli.prototype, 'reexec' as any).resolves()
     sandbox.stub(extract, 'extract').resolves()
 
-    updateCli = initUpdateCli({args: {}, flags: {}, config: config as Config, collector: collector})
+    updateCli = initUpdateCli({autoUpdate: false, fromLocal: false, config: config as Config, collector: collector})
     await updateCli.runUpdate()
     const stdout = stripAnsi(collector.stdout.join(' '))
     expect(stdout).to.matches(/Updating CLI from 2.0.0 to 2.0.1/)
@@ -140,7 +140,7 @@ describe('update plugin', () => {
 
     sandbox.stub(UpdateCli.prototype, 'reexec' as any).resolves()
 
-    updateCli = initUpdateCli({args: {}, flags: {}, config: config as Config, collector: collector})
+    updateCli = initUpdateCli({autoUpdate: false, fromLocal: false, config: config as Config, collector: collector})
     await updateCli.runUpdate()
     const stdout = collector.stdout.join(' ')
     expect(stdout).to.include('not updatable')
@@ -171,7 +171,7 @@ describe('update plugin', () => {
 
     sandbox.stub(UpdateCli.prototype, 'reexec' as any).resolves()
 
-    updateCli = initUpdateCli({args: {}, flags: {'from-local': true}, config: config as Config, collector: collector})
+    updateCli = initUpdateCli({autoUpdate: false, fromLocal: true, config: config as Config, collector: collector})
     await updateCli.runUpdate()
     const stdout = stripAnsi(collector.stdout.join(' '))
     expect(stdout).to.matches(/Updating to an already installed version will not update the channel/)
