@@ -2,7 +2,7 @@ import {Command, Flags} from '@oclif/core'
 import cli from 'cli-ux'
 import * as path from 'path'
 
-import UpdatePlugin from '../update'
+import UpdateCli from '../update'
 import {Options} from 'cli-ux/lib/action/base'
 
 async function getPinToVersion(): Promise<string> {
@@ -23,8 +23,8 @@ export default class UpdateCommand extends Command {
 
   async run(): Promise<void> {
     const {args, flags} = await this.parse(UpdateCommand)
-    const updatePlugin = new UpdatePlugin({args, flags, config: this.config, exit: this.exit, getPinToVersion: getPinToVersion})
-    updatePlugin
+    const updateCli = new UpdateCli({args, flags, config: this.config, exit: this.exit, getPinToVersion: getPinToVersion})
+    updateCli
     .on('debug', (...args: any) => {
       this.debug(...args)
     })
@@ -43,6 +43,6 @@ export default class UpdateCommand extends Command {
     .on('action.status', (status: string | undefined) => {
       cli.action.status = status
     })
-    return updatePlugin.runUpdate()
+    return updateCli.runUpdate()
   }
 }
