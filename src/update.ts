@@ -1,5 +1,4 @@
 import color from '@oclif/color'
-import Command, {flags} from '@oclif/command'
 import {IManifest} from '@oclif/dev-cli'
 import cli from 'cli-ux'
 import * as spawn from 'cross-spawn'
@@ -38,7 +37,7 @@ export default class UpdateCli {
   }
 
   async runUpdate() {
-    if (Boolean(this.options.autoUpdate)) await this.debounce()
+    if (this.options.autoUpdate) await this.debounce()
 
     this.channel = this.options.channel || await this.determineChannel()
 

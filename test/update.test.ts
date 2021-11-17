@@ -2,11 +2,8 @@ import * as fs from 'fs-extra'
 import * as path from 'path'
 import {load, Config, IConfig} from '@oclif/config'
 import UpdateCli, {UpdateCliOptions} from '../src/update'
-import {Options} from 'cli-ux/lib/action/base'
 import * as zlib from 'zlib'
 import * as nock from 'nock'
-import * as getStream from 'get-stream'
-import * as tar from 'tar-fs'
 import * as sinon from 'sinon'
 import stripAnsi = require('strip-ansi')
 import * as extract from '../src/tar'
@@ -41,7 +38,7 @@ function initUpdateCli(options: Partial<UpdateCliOptions>): UpdateCli {
     autoUpdate: options.autoUpdate || false,
     config: options.config!,
     exit: undefined,
-    getPinToVersion: async () => '2.0.0'
+    getPinToVersion: async () => '2.0.0',
   })
   expect(updateCli).to.be.ok
   return updateCli
@@ -59,10 +56,10 @@ describe('update plugin', () => {
     config.binPath = config.binPath || config.bin
     collector = {stdout: [], stderr: []}
     sandbox = sinon.createSandbox()
-    sandbox.stub(cli, 'log').callsFake((line) => collector.stdout.push(line || ''))
-    sandbox.stub(cli, 'warn').callsFake((line) => collector.stderr.push(line ? `${line}` : ''))
-    sandbox.stub(cli.action, 'start').callsFake((line) => collector.stdout.push(line || ''))
-    sandbox.stub(cli.action, 'stop').callsFake((line) => collector.stdout.push(line || ''))
+    sandbox.stub(cli, 'log').callsFake(line => collector.stdout.push(line || ''))
+    sandbox.stub(cli, 'warn').callsFake(line => collector.stderr.push(line ? `${line}` : ''))
+    sandbox.stub(cli.action, 'start').callsFake(line => collector.stdout.push(line || ''))
+    sandbox.stub(cli.action, 'stop').callsFake(line => collector.stdout.push(line || ''))
   })
   afterEach(() => {
     nock.cleanAll()
@@ -76,10 +73,10 @@ describe('update plugin', () => {
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
     nock(/oclif-staging.s3.amazonaws.com/)
-      .get(platformRegex)
-      .reply(200, {version: '2.0.0'})
-      .get(manifestRegex)
-      .reply(200, {version: '2.0.0'})
+    .get(platformRegex)
+    .reply(200, {version: '2.0.0'})
+    .get(manifestRegex)
+    .reply(200, {version: '2.0.0'})
 
     sandbox.stub(UpdateCli.prototype, 'reexec' as any).resolves()
 
@@ -105,16 +102,16 @@ describe('update plugin', () => {
     const gzContents = zlib.gzipSync(' ')
 
     nock(/oclif-staging.s3.amazonaws.com/)
-      .get(platformRegex)
-      .reply(200, {version: '2.0.1'})
-      .get(manifestRegex)
-      .reply(200, {version: '2.0.1'})
-      .get(tarballRegex)
-      .reply(200, gzContents, {
-        'X-Transfer-Length': String(gzContents.length),
-        'content-length': String(gzContents.length),
-        'Content-Encoding': 'gzip',
-      })
+    .get(platformRegex)
+    .reply(200, {version: '2.0.1'})
+    .get(manifestRegex)
+    .reply(200, {version: '2.0.1'})
+    .get(tarballRegex)
+    .reply(200, gzContents, {
+      'X-Transfer-Length': String(gzContents.length),
+      'content-length': String(gzContents.length),
+      'Content-Encoding': 'gzip',
+    })
 
     updateCli = initUpdateCli({config: config as Config})
     await updateCli.runUpdate()
@@ -126,10 +123,10 @@ describe('update plugin', () => {
     // unset binPath
     config.binPath = undefined
     nock(/oclif-staging.s3.amazonaws.com/)
-      .get(/tarballs\/example-cli\/.+?/)
-      .reply(200, {version: '2.0.0'})
-      .get(/channels\/stable\/example-cli-.+?-buildmanifest/)
-      .reply(200, {version: '2.0.0'})
+    .get(/tarballs\/example-cli\/.+?/)
+    .reply(200, {version: '2.0.0'})
+    .get(/channels\/stable\/example-cli-.+?-buildmanifest/)
+    .reply(200, {version: '2.0.0'})
 
     sandbox.stub(UpdateCli.prototype, 'reexec' as any).resolves()
 
@@ -155,16 +152,16 @@ describe('update plugin', () => {
     const gzContents = zlib.gzipSync(' ')
 
     nock(/oclif-staging.s3.amazonaws.com/)
-      .get(platformRegex)
-      .reply(200, {version: '2.0.0'})
-      .get(manifestRegex)
-      .reply(200, {version: '2.0.0'})
-      .get(tarballRegex)
-      .reply(200, gzContents, {
-        'X-Transfer-Length': String(gzContents.length),
-        'content-length': String(gzContents.length),
-        'Content-Encoding': 'gzip',
-      })
+    .get(platformRegex)
+    .reply(200, {version: '2.0.0'})
+    .get(manifestRegex)
+    .reply(200, {version: '2.0.0'})
+    .get(tarballRegex)
+    .reply(200, gzContents, {
+      'X-Transfer-Length': String(gzContents.length),
+      'content-length': String(gzContents.length),
+      'Content-Encoding': 'gzip',
+    })
 
     updateCli = initUpdateCli({fromLocal: true, config: config as Config, getPinToVersion: async () => '2.0.0'})
     await updateCli.runUpdate()
