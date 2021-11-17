@@ -7,7 +7,7 @@ import * as qq from 'qqjs'
 
 const skipIfWindows = process.platform === 'win32' ? it.skip : it
 
-describe('update', () => {
+describe.skip('update', () => {
   skipIfWindows('tests the updater', async () => {
     await qq.rm([process.env.HOME!, '.local', 'share', 'oclif-example-s3-cli'])
     await qq.x('aws s3 rm --recursive s3://oclif-staging/s3-update-example-cli')
