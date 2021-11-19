@@ -29,4 +29,4 @@ workflows:
           filters:
             branches:
               only: main
-          context: CLI_CTC
+          context: SF-CLI-RELEASE-PROCESS
