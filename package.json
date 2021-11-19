@@ -38,7 +38,7 @@
     "chai": "^4.3.4",
     "eslint": "^7.21.0",
     "eslint-config-oclif": "^3.1.0",
-    "eslint-config-oclif-typescript": "^0.2.0",
+    "eslint-config-oclif-typescript": "^1.0.2",
     "globby": "^11.0.2",
     "mocha": "^8.3.2",
     "nock": "^13.2.1",
