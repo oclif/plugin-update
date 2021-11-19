@@ -23,8 +23,10 @@ workflows:
                 - maintenance
       - release-management/release-package:
           github-release: true
+          tag: core-v1
           requires:
             - release-management/test-package
           filters:
             branches:
               only: main
+          context: CLI_CTC
