@@ -1,6 +1,6 @@
 import color from '@oclif/color'
 import {Config} from '@oclif/core'
-import {IManifest} from '@oclif/dev-cli'
+import {IManifest} from 'oclif'
 
 import cli from 'cli-ux'
 import * as spawn from 'cross-spawn'
@@ -159,8 +159,6 @@ export default class UpdateCli {
   }
 
   private async update(manifest: IManifest, channel = 'stable') {
-    const {channel: manifestChannel} = manifest
-    if (manifestChannel) channel = manifestChannel
     cli.action.start(`${this.options.config.name}: Updating CLI from ${color.green(this.currentVersion)} to ${color.green(this.updatedVersion)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
 
     await this.ensureClientDir()
