@@ -17,13 +17,7 @@ export default class UpdateCommand extends Command {
     'from-local': Flags.boolean({description: 'interactively choose an already installed version'}),
   }
 
-  private autoupdate!: boolean
-
   private channel!: string
-
-  private currentVersion?: string
-
-  private updatedVersion!: string
 
   private readonly clientRoot = this.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.config.dataDir, 'client')
 
