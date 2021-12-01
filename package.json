@@ -5,7 +5,7 @@
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
     "@oclif/color": "^0.1.0",
-    "@oclif/command": "^1.8.3",
+    "@oclif/command": "^1.8.6",
     "@oclif/config": "^1.17.1",
     "@oclif/errors": "^1.3.5",
     "@types/semver": "^7.3.4",
