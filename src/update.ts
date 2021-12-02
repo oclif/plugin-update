@@ -58,6 +58,7 @@ export default class UpdateCli {
       if (!await fs.pathExists(path.join(this.clientRoot, pinToVersion))) {
         throw new Error(`Version ${pinToVersion} is not already installed at ${this.clientRoot}.`)
       }
+
       cli.action.start(`${this.options.config.name}: Updating CLI`)
       cli.debug(`switching to existing version ${pinToVersion}`)
       this.updateToExistingVersion(pinToVersion)
@@ -100,6 +101,7 @@ export default class UpdateCli {
       if (typeof body === 'string') {
         return JSON.parse(body)
       }
+
       return body
     } catch (error: any) {
       if (error.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${this.channel}`)
@@ -108,7 +110,7 @@ export default class UpdateCli {
   }
 
   private async downloadAndExtract(output: string, manifest: IManifest, channel: string) {
-    const {version} = manifest
+    const {version, gz, sha256gz} = manifest
 
     const filesize = (n: number): string => {
       const [num, suffix] = require('filesize')(n, {output: 'array'})
@@ -116,7 +118,7 @@ export default class UpdateCli {
     }
 
     const http: typeof HTTP = require('http-call').HTTP
-    const gzUrl = manifest.gz || this.options.config.s3Url(this.options.config.s3Key('versioned', {
+    const gzUrl = gz || this.options.config.s3Url(this.options.config.s3Key('versioned', {
       version,
       channel,
       bin: this.options.config.bin,
@@ -134,12 +136,12 @@ export default class UpdateCli {
       platform: this.options.config.platform,
       arch: this.options.config.arch,
     })
-    const extraction = extract(stream, baseDir, output, manifest.sha256gz)
+    const extraction = extract(stream, baseDir, output, sha256gz)
 
     // to-do: use cli.action.type
     if ((cli.action as any).frames) {
       // if spinner action
-      const total = parseInt(stream.headers['content-length']!, 10)
+      const total = Number.parseInt(stream.headers['content-length']!, 10)
       let current = 0
       const updateStatus = _.throttle(
         (newStatus: string) => {
@@ -185,10 +187,12 @@ export default class UpdateCli {
       if (instructions) cli.warn(instructions)
       return 'not updatable'
     }
+
     if (this.currentVersion === this.updatedVersion) {
       if (this.options.config.scopedEnvVar('HIDE_UPDATED_MESSAGE')) return 'done'
       return `already on latest version: ${this.currentVersion}`
     }
+
     return false
   }
 
@@ -198,21 +202,23 @@ export default class UpdateCli {
       const channel = await fs.readFile(channelPath, 'utf8')
       return String(channel).trim()
     }
+
     return this.options.config.channel || 'stable'
   }
 
   private async determineCurrentVersion(): Promise<string|undefined> {
     try {
       const currentVersion = await fs.readFile(this.clientBin, 'utf8')
-      const matches = currentVersion.match(/\.\.[/|\\](.+)[/|\\]bin/)
+      const matches = currentVersion.match(/\.\.[/\\|](.+)[/\\|]bin/)
       return matches ? matches[1] : this.options.config.version
     } catch (error: any) {
       cli.debug(error)
     }
+
     return this.options.config.version
   }
 
-  private s3ChannelManifestKey(bin: string, platform: string, arch: string, folder?: string): string {
+  private s3ChannelManifestKey(bin: string, platform: string, arch: string, folder = ''): string {
     let s3SubDir = folder || ''
     if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
     return path.join(s3SubDir, 'channels', this.channel, `${bin}-${platform}-${arch}-buildmanifest`)
@@ -252,9 +258,11 @@ export default class UpdateCli {
         await cli.log(msg)
         output = true
       }
+
       await wait(60 * 1000) // wait 1 minute
       return this.debounce()
     }
+
     cli.log('time to update')
   }
 
@@ -312,10 +320,10 @@ export default class UpdateCli {
 
   private async createBin(version: string) {
     const dst = this.clientBin
-    const {bin} = this.options.config
+    const {bin, windows} = this.options.config
     const binPathEnvVar = this.options.config.scopedEnvVarKey('BINPATH')
     const redirectedEnvVar = this.options.config.scopedEnvVarKey('REDIRECTED')
-    if (this.options.config.windows) {
+    if (windows) {
       const body = `@echo off
 setlocal enableextensions
 set ${redirectedEnvVar}=1
