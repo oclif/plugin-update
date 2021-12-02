@@ -67,6 +67,7 @@ describe('update plugin', () => {
     if (fs.pathExistsSync(clientRoot)) {
       fs.removeSync(clientRoot)
     }
+
     sandbox.restore()
   })
   it('should not update - already on same version', async () => {

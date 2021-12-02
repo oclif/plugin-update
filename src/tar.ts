@@ -5,6 +5,19 @@ import {touch} from './util'
 
 const debug = require('debug')('oclif-update')
 
+const ignore = (_: any, header: any) => {
+  switch (header.type) {
+  case 'directory':
+  case 'file':
+    if (process.env.OCLIF_DEBUG_UPDATE_FILES) debug(header.name)
+    return false
+  case 'symlink':
+    return true
+  default:
+    throw new Error(header.type)
+  }
+}
+
 export async function extract(stream: NodeJS.ReadableStream, basename: string, output: string, sha?: string) {
   const getTmp = () => `${output}.partial.${Math.random().toString().split('.')[1].slice(0, 5)}`
   let tmp = getTmp()
@@ -34,18 +47,6 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
         })
       } else shaValidated = true
 
-      const ignore = (_: any, header: any) => {
-        switch (header.type) {
-        case 'directory':
-        case 'file':
-          if (process.env.OCLIF_DEBUG_UPDATE_FILES) debug(header.name)
-          return false
-        case 'symlink':
-          return true
-        default:
-          throw new Error(header.type)
-        }
-      }
       const extract = tar.extract(tmp, {ignore})
       extract.on('error', reject)
       extract.on('finish', () => {
@@ -69,6 +70,7 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
         await fs.remove(output)
       }
     }
+
     const from = path.join(tmp, basename)
     debug('moving %s to %s', from, output)
     await fs.rename(from, output)
