@@ -33,5 +33,5 @@ DESCRIPTION
   update the oclif-example CLI
 ```
 
-_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v2.1.0/src/commands/update.ts)_
+_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v2.1.1/src/commands/update.ts)_
 <!-- commandsstop -->
