@@ -15,7 +15,7 @@
   "devDependencies": {
     "@oclif/dev-cli": "^1.17.0",
     "@types/node": "^8.10.59",
-    "aws-sdk": "^2.304.0",
+    "aws-sdk": "^2.814.0",
     "globby": "^8.0.1",
     "ts-node": "^7.0.1",
     "tslib": "^1.9.3",

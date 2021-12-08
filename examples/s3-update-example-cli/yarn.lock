@@ -186,18 +186,19 @@ atob@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.1.tgz#ae2d5a729477f289d60dd7f96a6314a22dd6c22a"
 
-aws-sdk@^2.304.0:
-  version "2.304.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.304.0.tgz#080bd9604ff5c18bc38d67904dbd484ebf3e11f7"
+aws-sdk@^2.814.0:
+  version "2.814.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.814.0.tgz#7a1c36006e0b5826f14bd2511b1d229ef6814bb0"
+  integrity sha512-empd1m/J/MAkL6d9OeRpmg9thobULu0wk4v8W3JToaxGi2TD7PIdvE6yliZKyOVAdJINhBWEBhxR4OUIHhcGbQ==
   dependencies:
-    buffer "4.9.1"
+    buffer "4.9.2"
     events "1.1.1"
-    ieee754 "1.1.8"
+    ieee754 "1.1.13"
     jmespath "0.15.0"
     querystring "0.2.0"
     sax "1.2.1"
     url "0.10.3"
-    uuid "3.1.0"
+    uuid "3.3.2"
     xml2js "0.4.19"
 
 balanced-match@^1.0.0:
@@ -273,9 +274,10 @@ buffer-from@^1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.1.1.tgz#32713bc028f75c02fdb710d7c7bcec1f2c6070ef"
 
-buffer@4.9.1:
-  version "4.9.1"
-  resolved "https://registry.yarnpkg.com/buffer/-/buffer-4.9.1.tgz#6d1bb601b07a4efced97094132093027c95bc298"
+buffer@4.9.2:
+  version "4.9.2"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-4.9.2.tgz#230ead344002988644841ab0244af8c44bbe3ef8"
+  integrity sha512-xq+q3SRMOxGivLhBNaUdC64hDTQwejJ+H0T/NB1XMtTVEwNTrfFF3gAxiyW0Bu/xWEGhjVKgUcMhCrUy2+uCWg==
   dependencies:
     base64-js "^1.0.2"
     ieee754 "^1.1.4"
@@ -711,13 +713,10 @@ hyperlinker@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/hyperlinker/-/hyperlinker-1.0.0.tgz#23dc9e38a206b208ee49bc2d6c8ef47027df0c0e"
 
-ieee754@1.1.8:
-  version "1.1.8"
-  resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.1.8.tgz#be33d40ac10ef1926701f6f08a2d86fbfd1ad3e4"
-
-ieee754@^1.1.4:
-  version "1.1.12"
-  resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.1.12.tgz#50bf24e5b9c8bb98af4964c941cdb0918da7b60b"
+ieee754@1.1.13, ieee754@^1.1.4:
+  version "1.1.13"
+  resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.1.13.tgz#ec168558e95aa181fd87d37f55c32bbcb6708b84"
+  integrity sha512-4vf7I2LYV/HaWerSo3XmlMkp5eZ83i+/CDluXi/IGTs/O1sejBNhTtnxzmRZfvOUqj7lZjqHkeTvpgSFDlWZTg==
 
 ignore@^3.3.5:
   version "3.3.8"
@@ -1606,9 +1605,10 @@ util-deprecate@~1.0.1:
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=
 
-uuid@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.1.0.tgz#3dd3d3e790abc24d7b0d3a034ffababe28ebbc04"
+uuid@3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
+  integrity sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
 
 validate-npm-package-license@^3.0.1:
   version "3.0.3"
