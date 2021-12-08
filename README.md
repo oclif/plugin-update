@@ -2,10 +2,10 @@
 ====================
 
 [![Version](https://img.shields.io/npm/v/@oclif/plugin-update.svg)](https://npmjs.org/package/@oclif/plugin-update)
-[![CircleCI](https://circleci.com/gh/oclif/plugin-update/tree/master.svg?style=shield)](https://circleci.com/gh/oclif/plugin-update/tree/master)
-[![Appveyor CI](https://ci.appveyor.com/api/projects/status/github/oclif/plugin-update?branch=master&svg=true)](https://ci.appveyor.com/project/oclif/plugin-update/branch/master)
+[![CircleCI](https://circleci.com/gh/oclif/plugin-update/tree/main.svg?style=shield)](https://circleci.com/gh/oclif/plugin-update/tree/main)
+[![Appveyor CI](https://ci.appveyor.com/api/projects/status/github/oclif/plugin-update?branch=main&svg=true)](https://ci.appveyor.com/project/oclif/plugin-update/branch/main)
 [![Downloads/week](https://img.shields.io/npm/dw/@oclif/plugin-update.svg)](https://npmjs.org/package/@oclif/plugin-update)
-[![License](https://img.shields.io/npm/l/@oclif/plugin-update.svg)](https://github.com/oclif/plugin-update/blob/master/package.json)
+[![License](https://img.shields.io/npm/l/@oclif/plugin-update.svg)](https://github.com/oclif/plugin-update/blob/main/package.json)
 
 <!-- toc -->
 * [Usage](#usage)
