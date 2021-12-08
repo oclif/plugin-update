@@ -1,7 +1,7 @@
 {
   "name": "@oclif/plugin-update",
   "version": "2.1.2",
-  "author": "Jeff Dickey @jdxcode",
+  "author": "Salesforce",
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
     "@oclif/color": "^1.0.0",

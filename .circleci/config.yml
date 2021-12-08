@@ -23,10 +23,19 @@ workflows:
                 - maintenance
       - release-management/release-package:
           github-release: true
-          tag: core-v1
           requires:
             - release-management/test-package
           filters:
             branches:
               only: main
           context: SF-CLI-RELEASE-PROCESS
+  dependabot-automerge:
+    triggers:
+      - schedule:
+          cron: '0 2,5,8,11 * * *'
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - release-management/dependabot-automerge
