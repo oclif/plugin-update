@@ -78,5 +78,6 @@
     "postpack": "rm -f oclif.manifest.json",
     "version": "oclif readme && git add README.md",
     "build": "rm -rf lib && tsc"
-  }
+  },
+  "main": "lib/index.js"
 }
