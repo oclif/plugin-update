@@ -1,11 +1,11 @@
-import {Interfaces} from '@oclif/core'
-import cli from 'cli-ux'
+import {CliUx, Interfaces} from '@oclif/core'
 import * as spawn from 'cross-spawn'
 import * as fs from 'fs-extra'
 import * as path from 'path'
 
 import {touch} from '../util'
 
+// eslint-disable-next-line unicorn/prefer-module
 const debug = require('debug')('cli:updater')
 
 function timestamp(msg: string): string {
@@ -40,7 +40,7 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
       m.setHours(m.getHours() + (days * 24))
       return m < new Date()
     } catch (error: any) {
-      if (error.code !== 'ENOENT') cli.error(error.stack)
+      if (error.code !== 'ENOENT') CliUx.ux.error(error.stack)
       if ((global as any).testing) return false
       debug('autoupdate ENOENT')
       return true
