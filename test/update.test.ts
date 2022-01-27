@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra'
 import * as path from 'path'
-import {Config} from '@oclif/core'
+import {Config, CliUx} from '@oclif/core'
 import {Config as IConfig} from '@oclif/core/lib/interfaces'
 import UpdateCli, {UpdateCliOptions} from '../src/update'
 import * as zlib from 'zlib'
@@ -9,7 +9,6 @@ import * as sinon from 'sinon'
 import stripAnsi = require('strip-ansi')
 import * as extract from '../src/tar'
 import {expect} from 'chai'
-import cli from 'cli-ux'
 
 type OutputCollectors = {
   stdout: string[];
@@ -57,10 +56,10 @@ describe('update plugin', () => {
     config.binPath = config.binPath || config.bin
     collector = {stdout: [], stderr: []}
     sandbox = sinon.createSandbox()
-    sandbox.stub(cli, 'log').callsFake(line => collector.stdout.push(line || ''))
-    sandbox.stub(cli, 'warn').callsFake(line => collector.stderr.push(line ? `${line}` : ''))
-    sandbox.stub(cli.action, 'start').callsFake(line => collector.stdout.push(line || ''))
-    sandbox.stub(cli.action, 'stop').callsFake(line => collector.stdout.push(line || ''))
+    sandbox.stub(CliUx.ux, 'log').callsFake(line => collector.stdout.push(line || ''))
+    sandbox.stub(CliUx.ux, 'warn').callsFake(line => collector.stderr.push(line ? `${line}` : ''))
+    sandbox.stub(CliUx.ux.action, 'start').callsFake(line => collector.stdout.push(line || ''))
+    sandbox.stub(CliUx.ux.action, 'stop').callsFake(line => collector.stdout.push(line || ''))
   })
   afterEach(() => {
     nock.cleanAll()

@@ -1,8 +1,8 @@
+/* eslint-disable unicorn/prefer-module */
 import color from '@oclif/color'
-import {Config} from '@oclif/core'
+import {Config, CliUx} from '@oclif/core'
 import {IManifest} from 'oclif'
 
-import cli from 'cli-ux'
 import * as spawn from 'cross-spawn'
 import * as fs from 'fs-extra'
 import HTTP from 'http-call'
@@ -37,20 +37,20 @@ export default class UpdateCli {
     this.clientBin = path.join(this.clientRoot, 'bin', this.options.config.windows ? `${this.options.config.bin}.cmd` : this.options.config.bin)
   }
 
-  async runUpdate() {
+  async runUpdate(): Promise<void> {
     if (this.options.autoUpdate) await this.debounce()
 
     this.channel = this.options.channel || await this.determineChannel()
 
     if (this.options.fromLocal) {
       await this.ensureClientDir()
-      cli.debug(`Looking for locally installed versions at ${this.clientRoot}`)
+      CliUx.ux.debug(`Looking for locally installed versions at ${this.clientRoot}`)
 
       // Do not show known non-local version folder names, bin and current.
       const versions = fs.readdirSync(this.clientRoot).filter(dirOrFile => dirOrFile !== 'bin' && dirOrFile !== 'current')
       if (versions.length === 0) throw new Error('No locally installed versions found.')
 
-      cli.log(`Found versions: \n${versions.map(version => `     ${version}`).join('\n')}\n`)
+      CliUx.ux.log(`Found versions: \n${versions.map(version => `     ${version}`).join('\n')}\n`)
 
       const pinToVersion = await this.options.getPinToVersion()
       if (!versions.includes(pinToVersion)) throw new Error(`Version ${pinToVersion} not found in the locally installed versions.`)
@@ -59,34 +59,34 @@ export default class UpdateCli {
         throw new Error(`Version ${pinToVersion} is not already installed at ${this.clientRoot}.`)
       }
 
-      cli.action.start(`${this.options.config.name}: Updating CLI`)
-      cli.debug(`switching to existing version ${pinToVersion}`)
+      CliUx.ux.action.start(`${this.options.config.name}: Updating CLI`)
+      CliUx.ux.debug(`switching to existing version ${pinToVersion}`)
       this.updateToExistingVersion(pinToVersion)
 
-      cli.log()
-      cli.log(`Updating to an already installed version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${this.channel}.`)
+      CliUx.ux.log()
+      CliUx.ux.log(`Updating to an already installed version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${this.channel}.`)
     } else {
-      cli.action.start(`${this.options.config.name}: Updating CLI`)
+      CliUx.ux.action.start(`${this.options.config.name}: Updating CLI`)
       await this.options.config.runHook('preupdate', {channel: this.channel})
       const manifest = await this.fetchManifest()
       this.currentVersion = await this.determineCurrentVersion()
       this.updatedVersion = (manifest as any).sha ? `${manifest.version}-${(manifest as any).sha}` : manifest.version
       const reason = await this.skipUpdate()
-      if (reason) cli.action.stop(reason || 'done')
+      if (reason) CliUx.ux.action.stop(reason || 'done')
       else await this.update(manifest)
-      cli.debug('tidy')
+      CliUx.ux.debug('tidy')
       await this.tidy()
       await this.options.config.runHook('update', {channel: this.channel})
     }
 
-    cli.debug('done')
-    cli.action.stop()
+    CliUx.ux.debug('done')
+    CliUx.ux.action.stop()
   }
 
   private async fetchManifest(): Promise<IManifest> {
     const http: typeof HTTP = require('http-call').HTTP
 
-    cli.action.status = 'fetching manifest'
+    CliUx.ux.action.status = 'fetching manifest'
 
     try {
       const url = this.options.config.s3Url(this.options.config.s3Key('manifest', {
@@ -139,13 +139,13 @@ export default class UpdateCli {
     const extraction = extract(stream, baseDir, output, sha256gz)
 
     // to-do: use cli.action.type
-    if ((cli.action as any).frames) {
+    if ((CliUx.ux.action as any).frames) {
       // if spinner action
       const total = Number.parseInt(stream.headers['content-length']!, 10)
       let current = 0
       const updateStatus = _.throttle(
         (newStatus: string) => {
-          cli.action.status = newStatus
+          CliUx.ux.action.status = newStatus
         },
         250,
         {leading: true, trailing: false},
@@ -161,7 +161,7 @@ export default class UpdateCli {
   }
 
   private async update(manifest: IManifest, channel = 'stable') {
-    cli.action.start(`${this.options.config.name}: Updating CLI from ${color.green(this.currentVersion)} to ${color.green(this.updatedVersion)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
+    CliUx.ux.action.start(`${this.options.config.name}: Updating CLI from ${color.green(this.currentVersion)} to ${color.green(this.updatedVersion)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
 
     await this.ensureClientDir()
     const output = path.join(this.clientRoot, this.updatedVersion)
@@ -184,7 +184,7 @@ export default class UpdateCli {
   private async skipUpdate(): Promise<string | false> {
     if (!this.options.config.binPath) {
       const instructions = this.options.config.scopedEnvVar('UPDATE_INSTRUCTIONS')
-      if (instructions) cli.warn(instructions)
+      if (instructions) CliUx.ux.warn(instructions)
       return 'not updatable'
     }
 
@@ -212,7 +212,7 @@ export default class UpdateCli {
       const matches = currentVersion.match(/\.\.[/\\|](.+)[/\\|]bin/)
       return matches ? matches[1] : this.options.config.version
     } catch (error: any) {
-      cli.debug(error)
+      CliUx.ux.debug(error)
     }
 
     return this.options.config.version
@@ -231,11 +231,11 @@ export default class UpdateCli {
 
   private async logChop() {
     try {
-      cli.debug('log chop')
+      CliUx.ux.debug('log chop')
       const logChopper = require('log-chopper').default
       await logChopper.chop(this.options.config.errlog)
     } catch (error: any) {
-      cli.debug(error.message)
+      CliUx.ux.debug(error.message)
     }
   }
 
@@ -253,9 +253,9 @@ export default class UpdateCli {
     if (m > new Date()) {
       const msg = `waiting until ${m.toISOString()} to update`
       if (output) {
-        cli.debug(msg)
+        CliUx.ux.debug(msg)
       } else {
-        await cli.log(msg)
+        await CliUx.ux.log(msg)
         output = true
       }
 
@@ -263,7 +263,7 @@ export default class UpdateCli {
       return this.debounce()
     }
 
-    cli.log('time to update')
+    CliUx.ux.log('time to update')
   }
 
   // removes any unused CLIs
@@ -283,7 +283,7 @@ export default class UpdateCli {
       for (const p of promises) await p // eslint-disable-line no-await-in-loop
       await this.logChop()
     } catch (error: any) {
-      cli.warn(error)
+      CliUx.ux.warn(error)
     }
   }
 
@@ -291,18 +291,18 @@ export default class UpdateCli {
     // touch the client so it won't be tidied up right away
     try {
       const p = path.join(this.clientRoot, this.options.config.version)
-      cli.debug('touching client at', p)
+      CliUx.ux.debug('touching client at', p)
       if (!await fs.pathExists(p)) return
       await fs.utimes(p, new Date(), new Date())
     } catch (error: any) {
-      cli.warn(error)
+      CliUx.ux.warn(error)
     }
   }
 
   private async reexec() {
-    cli.action.stop()
+    CliUx.ux.action.stop()
     return new Promise((_, reject) => {
-      cli.debug('restarting CLI after update', this.clientBin)
+      CliUx.ux.debug('restarting CLI after update', this.clientBin)
       spawn(this.clientBin, ['update'], {
         stdio: 'inherit',
         env: {...process.env, [this.options.config.scopedEnvVarKey('HIDE_UPDATED_MESSAGE')]: '1'},

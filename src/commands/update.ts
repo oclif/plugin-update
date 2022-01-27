@@ -1,10 +1,9 @@
-import {Command, Flags, Config} from '@oclif/core'
-import cli from 'cli-ux'
+import {Command, Flags, Config, CliUx} from '@oclif/core'
 import * as path from 'path'
 import UpdateCli from '../update'
 
 async function getPinToVersion(): Promise<string> {
-  return cli.prompt('Enter a version to update to')
+  return CliUx.ux.prompt('Enter a version to update to')
 }
 
 export default class UpdateCommand extends Command {
@@ -23,7 +22,7 @@ export default class UpdateCommand extends Command {
 
   private readonly clientBin = path.join(this.clientRoot, 'bin', this.config.windows ? `${this.config.bin}.cmd` : this.config.bin)
 
-  async run() {
+  async run(): Promise<void> {
     const {args, flags} = await this.parse(UpdateCommand)
     const updateCli = new UpdateCli({channel: args.channel, autoUpdate: flags.autoupdate, fromLocal: flags['from-local'], config: this.config as Config, exit: this.exit, getPinToVersion: getPinToVersion})
     return updateCli.runUpdate()
