@@ -37,6 +37,7 @@ function initUpdateCli(options: Partial<UpdateCliOptions>): UpdateCli {
     fromLocal: options.fromLocal || false,
     autoUpdate: options.autoUpdate || false,
     config: options.config!,
+    version: undefined,
     exit: undefined,
     getPinToVersion: async () => '2.0.0',
   })

@@ -16,10 +16,13 @@ export interface UpdateCliOptions {
   channel?: string;
   autoUpdate: boolean;
   fromLocal: boolean;
+  version: string | undefined;
   config: Config;
   exit: any;
   getPinToVersion: () => Promise<string>;
 }
+
+export type VersionIndex = Record<string, string>
 
 export default class UpdateCli {
   private channel!: string
@@ -65,12 +68,32 @@ export default class UpdateCli {
 
       CliUx.ux.log()
       CliUx.ux.log(`Updating to an already installed version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${this.channel}.`)
+    } else if (this.options.version) {
+      CliUx.ux.action.start(`${this.options.config.name}: Updating CLI`)
+      await this.options.config.runHook('preupdate', {channel: this.channel})
+
+      const index = await this.fetchVersionIndex()
+      const url = index[this.options.version]
+      if (!url) {
+        throw new Error(`${this.options.version} not found in index:\n${Object.keys(index).join(', ')}`)
+      }
+
+      const manifest = await this.fetchVersionManifest(this.options.version, url)
+      this.currentVersion = await this.determineCurrentVersion()
+      this.updatedVersion = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
+      const reason = await this.skipUpdate()
+      if (reason) CliUx.ux.action.stop(reason || 'done')
+      else await this.update(manifest)
+
+      CliUx.ux.debug('tidy')
+      await this.tidy()
+      await this.options.config.runHook('update', {channel: this.channel})
     } else {
       CliUx.ux.action.start(`${this.options.config.name}: Updating CLI`)
       await this.options.config.runHook('preupdate', {channel: this.channel})
-      const manifest = await this.fetchManifest()
+      const manifest = await this.fetchChannelManifest()
       this.currentVersion = await this.determineCurrentVersion()
-      this.updatedVersion = (manifest as any).sha ? `${manifest.version}-${(manifest as any).sha}` : manifest.version
+      this.updatedVersion = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
       const reason = await this.skipUpdate()
       if (reason) CliUx.ux.action.stop(reason || 'done')
       else await this.update(manifest)
@@ -83,21 +106,39 @@ export default class UpdateCli {
     CliUx.ux.action.stop()
   }
 
-  private async fetchManifest(): Promise<IManifest> {
+  private async fetchChannelManifest(): Promise<IManifest> {
+    const s3Key = this.s3ChannelManifestKey(
+      this.options.config.bin,
+      this.options.config.platform,
+      this.options.config.arch,
+      (this.options.config.pjson.oclif.update.s3 as any).folder,
+    )
+    return this.fetchManifest(s3Key)
+  }
+
+  private async fetchVersionManifest(version: string, url: string): Promise<IManifest> {
+    const parts = url.split('/')
+    const hashIndex = parts.indexOf(version) + 1
+    const hash = parts[hashIndex]
+    const s3Key = this.s3VersionManifestKey(
+      this.options.config.bin,
+      version,
+      hash,
+      this.options.config.platform,
+      this.options.config.arch,
+      (this.options.config.pjson.oclif.update.s3 as any).folder,
+    )
+    return this.fetchManifest(s3Key)
+  }
+
+  private async fetchManifest(s3Key: string): Promise<IManifest> {
     const http: typeof HTTP = require('http-call').HTTP
 
     CliUx.ux.action.status = 'fetching manifest'
 
     try {
-      const url = this.options.config.s3Url(this.options.config.s3Key('manifest', {
-        channel: this.channel,
-        platform: this.options.config.platform,
-        arch: this.options.config.arch,
-      }))
+      const url = this.options.config.s3Url(s3Key)
       const {body} = await http.get<IManifest | string>(url)
-
-      // in case the content-type is not set, parse as a string
-      // this will happen if uploading without `oclif-dev publish`
       if (typeof body === 'string') {
         return JSON.parse(body)
       }
@@ -107,6 +148,28 @@ export default class UpdateCli {
       if (error.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${this.channel}`)
       throw error
     }
+  }
+
+  private async fetchVersionIndex(): Promise<VersionIndex> {
+    const http: typeof HTTP = require('http-call').HTTP
+
+    CliUx.ux.action.status = 'fetching version index'
+
+    const newIndexUrl = this.options.config.s3Url(
+      this.s3VersionIndexKey(
+        this.options.config.bin,
+        this.options.config.platform,
+        this.options.config.arch,
+        (this.options.config.pjson.oclif.update.s3 as any).folder,
+      ),
+    )
+
+    const {body} = await http.get<VersionIndex>(newIndexUrl)
+    if (typeof body === 'string') {
+      return JSON.parse(body)
+    }
+
+    return body
   }
 
   private async downloadAndExtract(output: string, manifest: IManifest, channel: string) {
@@ -222,6 +285,19 @@ export default class UpdateCli {
     let s3SubDir = folder || ''
     if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
     return path.join(s3SubDir, 'channels', this.channel, `${bin}-${platform}-${arch}-buildmanifest`)
+  }
+
+  // eslint-disable-next-line max-params
+  private s3VersionManifestKey(bin: string, version: string, hash: string, platform: string, arch: string, folder = ''): string {
+    let s3SubDir = folder || ''
+    if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
+    return path.join(s3SubDir, 'versions', version, hash, `${bin}-v${version}-${hash}-${platform}-${arch}-buildmanifest`)
+  }
+
+  private s3VersionIndexKey(bin: string, platform: string, arch: string, folder = ''): string {
+    let s3SubDir = folder || ''
+    if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
+    return path.join(s3SubDir, 'versions', `${bin}-${platform}-${arch}-tar-gz.json`)
   }
 
   private async setChannel() {
