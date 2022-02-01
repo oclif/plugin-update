@@ -37,9 +37,10 @@ function initUpdateCli(options: Partial<UpdateCliOptions>): UpdateCli {
     fromLocal: options.fromLocal || false,
     autoUpdate: options.autoUpdate || false,
     config: options.config!,
-    version: undefined,
-    exit: undefined,
-    getPinToVersion: async () => '2.0.0',
+    version: options.version,
+    exit: () => {
+      // do nothing
+    },
   })
   expect(updateCli).to.be.ok
   return updateCli
@@ -80,14 +81,12 @@ describe('update plugin', () => {
     .get(manifestRegex)
     .reply(200, {version: '2.0.0'})
 
-    sandbox.stub(UpdateCli.prototype, 'reexec' as any).resolves()
-
     updateCli = initUpdateCli({config: config! as Config})
     await updateCli.runUpdate()
     const stdout = collector.stdout.join(' ')
     expect(stdout).to.include('already on latest version')
   })
-  it('should update', async () => {
+  it('should update to channel', async () => {
     clientRoot = setupClientRoot({config})
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
@@ -97,7 +96,6 @@ describe('update plugin', () => {
     fs.mkdirpSync(path.join(`${newVersionPath}.partial.11111`, 'bin'))
     fs.writeFileSync(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
     // fs.writeFileSync(path.join(newVersionPath, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
-    sandbox.stub(UpdateCli.prototype, 'reexec' as any).resolves()
     sandbox.stub(extract, 'extract').resolves()
     sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
 
@@ -120,6 +118,47 @@ describe('update plugin', () => {
     const stdout = stripAnsi(collector.stdout.join(' '))
     expect(stdout).to.matches(/Updating CLI from 2.0.0 to 2.0.1/)
   })
+  it('should update to version', async () => {
+    const hash = 'f289627'
+    clientRoot = setupClientRoot({config})
+    const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
+    const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
+    const versionManifestRegex = new RegExp(`example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`)
+    const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`)
+    const indexRegex = new RegExp(`example-cli-${config.platform}-${config.arch}-tar-gz.json`)
+    const newVersionPath = path.join(clientRoot, '2.0.1')
+    // fs.mkdirpSync(path.join(newVersionPath, 'bin'))
+    fs.mkdirpSync(path.join(`${newVersionPath}.partial.11111`, 'bin'))
+    fs.writeFileSync(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+    // fs.writeFileSync(path.join(newVersionPath, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+    sandbox.stub(extract, 'extract').resolves()
+    sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
+
+    const gzContents = zlib.gzipSync(' ')
+
+    nock(/oclif-staging.s3.amazonaws.com/)
+    .get(platformRegex)
+    .reply(200, {version: '2.0.1'})
+    .get(manifestRegex)
+    .reply(200, {version: '2.0.1'})
+    .get(versionManifestRegex)
+    .reply(200, {version: '2.0.1'})
+    .get(tarballRegex)
+    .reply(200, gzContents, {
+      'X-Transfer-Length': String(gzContents.length),
+      'content-length': String(gzContents.length),
+      'Content-Encoding': 'gzip',
+    })
+    .get(indexRegex)
+    .reply(200, {
+      '2.0.1': `versions/example-cli/2.0.1/${hash}/example-cli-v2.0.1-${config.platform}-${config.arch}.gz`,
+    })
+
+    updateCli = initUpdateCli({config: config as Config, version: '2.0.1'})
+    await updateCli.runUpdate()
+    const stdout = stripAnsi(collector.stdout.join(' '))
+    expect(stdout).to.matches(/Updating CLI from 2.0.0 to 2.0.1/)
+  })
   it('should not update - not updatable', async () => {
     clientRoot = setupClientRoot({config})
     // unset binPath
@@ -129,8 +168,6 @@ describe('update plugin', () => {
     .reply(200, {version: '2.0.0'})
     .get(/channels\/stable\/example-cli-.+?-buildmanifest/)
     .reply(200, {version: '2.0.0'})
-
-    sandbox.stub(UpdateCli.prototype, 'reexec' as any).resolves()
 
     updateCli = initUpdateCli({config: config as Config})
     await updateCli.runUpdate()
@@ -147,7 +184,6 @@ describe('update plugin', () => {
     fs.mkdirpSync(path.join(`${newVersionPath}.partial.11111`, 'bin'))
     fs.writeFileSync(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.0/bin', 'utf8')
     fs.writeFileSync(path.join(newVersionPath, 'bin', 'example-cli'), '../2.0.0/bin', 'utf8')
-    sandbox.stub(UpdateCli.prototype, 'reexec' as any).resolves()
     sandbox.stub(extract, 'extract').resolves()
     sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
 
@@ -165,7 +201,7 @@ describe('update plugin', () => {
       'Content-Encoding': 'gzip',
     })
 
-    updateCli = initUpdateCli({fromLocal: true, config: config as Config, getPinToVersion: async () => '2.0.0'})
+    updateCli = initUpdateCli({fromLocal: true, config: config as Config, version: '2.0.0'})
     await updateCli.runUpdate()
     const stdout = stripAnsi(collector.stdout.join(' '))
     expect(stdout).to.matches(/Updating to an already installed version will not update the channel/)

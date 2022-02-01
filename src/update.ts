@@ -1,9 +1,8 @@
 /* eslint-disable unicorn/prefer-module */
 import color from '@oclif/color'
-import {Config, CliUx} from '@oclif/core'
-import {IManifest} from 'oclif'
+import {Config, CliUx, Interfaces} from '@oclif/core'
 
-import * as spawn from 'cross-spawn'
+// import * as spawn from 'cross-spawn'
 import * as fs from 'fs-extra'
 import HTTP from 'http-call'
 import * as _ from 'lodash'
@@ -18,11 +17,16 @@ export interface UpdateCliOptions {
   fromLocal: boolean;
   version: string | undefined;
   config: Config;
-  exit: any;
-  getPinToVersion: () => Promise<string>;
+  exit: (code?: number | undefined) => void;
 }
 
 export type VersionIndex = Record<string, string>
+
+function composeS3SubDir(config: Config): string {
+  let s3SubDir = (config.pjson.oclif.update.s3 as any).folder || ''
+  if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
+  return s3SubDir
+}
 
 export default class UpdateCli {
   private channel!: string
@@ -35,9 +39,58 @@ export default class UpdateCli {
 
   private readonly clientBin: string
 
+  public static findLocalVersions(config: Config): string[] {
+    const clientRoot = UpdateCli.getClientRoot(config)
+    const versions = fs.readdirSync(clientRoot).filter(dirOrFile => dirOrFile !== 'bin' && dirOrFile !== 'current')
+    if (versions.length === 0) throw new Error('No locally installed versions found.')
+    return versions
+  }
+
+  public static async fetchVersionIndex(config: Config): Promise<VersionIndex> {
+    const http: typeof HTTP = require('http-call').HTTP
+
+    CliUx.ux.action.status = 'fetching version index'
+    const newIndexUrl = config.s3Url(
+      UpdateCli.s3VersionIndexKey(config),
+    )
+
+    const {body} = await http.get<VersionIndex>(newIndexUrl)
+    if (typeof body === 'string') {
+      return JSON.parse(body)
+    }
+
+    return body
+  }
+
+  private static s3ChannelManifestKey(config: Config, channel: string): string {
+    const {bin, platform, arch} = config
+    const s3SubDir = composeS3SubDir(config)
+    return path.join(s3SubDir, 'channels', channel, `${bin}-${platform}-${arch}-buildmanifest`)
+  }
+
+  private static s3VersionManifestKey(config: Config, version: string, hash: string): string {
+    const {bin, platform, arch} = config
+    const s3SubDir = composeS3SubDir(config)
+    return path.join(s3SubDir, 'versions', version, hash, `${bin}-v${version}-${hash}-${platform}-${arch}-buildmanifest`)
+  }
+
+  private static s3VersionIndexKey(config: Config): string {
+    const {bin, platform, arch} = config
+    const s3SubDir = composeS3SubDir(config)
+    return path.join(s3SubDir, 'versions', `${bin}-${platform}-${arch}-tar-gz.json`)
+  }
+
+  private static getClientRoot(config: Config): string {
+    return config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(config.dataDir, 'client')
+  }
+
+  private static getClientBin(config: Config): string {
+    return path.join(UpdateCli.getClientRoot(config), 'bin', config.windows ? `${config.bin}.cmd` : config.bin)
+  }
+
   constructor(private options: UpdateCliOptions) {
-    this.clientRoot = this.options.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.options.config.dataDir, 'client')
-    this.clientBin = path.join(this.clientRoot, 'bin', this.options.config.windows ? `${this.options.config.bin}.cmd` : this.options.config.bin)
+    this.clientRoot = UpdateCli.getClientRoot(options.config)
+    this.clientBin = UpdateCli.getClientBin(options.config)
   }
 
   async runUpdate(): Promise<void> {
@@ -47,32 +100,22 @@ export default class UpdateCli {
 
     if (this.options.fromLocal) {
       await this.ensureClientDir()
-      CliUx.ux.debug(`Looking for locally installed versions at ${this.clientRoot}`)
-
-      // Do not show known non-local version folder names, bin and current.
-      const versions = fs.readdirSync(this.clientRoot).filter(dirOrFile => dirOrFile !== 'bin' && dirOrFile !== 'current')
-      if (versions.length === 0) throw new Error('No locally installed versions found.')
-
-      CliUx.ux.log(`Found versions: \n${versions.map(version => `     ${version}`).join('\n')}\n`)
-
-      const pinToVersion = await this.options.getPinToVersion()
-      if (!versions.includes(pinToVersion)) throw new Error(`Version ${pinToVersion} not found in the locally installed versions.`)
-
-      if (!await fs.pathExists(path.join(this.clientRoot, pinToVersion))) {
-        throw new Error(`Version ${pinToVersion} is not already installed at ${this.clientRoot}.`)
+      const version = this.options.version!
+      if (!await fs.pathExists(path.join(this.clientRoot, version))) {
+        throw new Error(`Version ${version} is not already installed at ${this.clientRoot}.`)
       }
 
       CliUx.ux.action.start(`${this.options.config.name}: Updating CLI`)
-      CliUx.ux.debug(`switching to existing version ${pinToVersion}`)
-      this.updateToExistingVersion(pinToVersion)
+      CliUx.ux.debug(`switching to existing version ${version}`)
+      this.updateToExistingVersion(version)
 
       CliUx.ux.log()
       CliUx.ux.log(`Updating to an already installed version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${this.channel}.`)
     } else if (this.options.version) {
       CliUx.ux.action.start(`${this.options.config.name}: Updating CLI`)
-      await this.options.config.runHook('preupdate', {channel: this.channel})
+      await this.options.config.runHook('preupdate', {channel: this.channel, version: this.options.version})
 
-      const index = await this.fetchVersionIndex()
+      const index = await UpdateCli.fetchVersionIndex(this.options.config)
       const url = index[this.options.version]
       if (!url) {
         throw new Error(`${this.options.version} not found in index:\n${Object.keys(index).join(', ')}`)
@@ -87,58 +130,49 @@ export default class UpdateCli {
 
       CliUx.ux.debug('tidy')
       await this.tidy()
-      await this.options.config.runHook('update', {channel: this.channel})
+      await this.options.config.runHook('update', {channel: this.channel, version: this.updatedVersion})
+
+      CliUx.ux.log()
+      CliUx.ux.log(`Updating to a specific version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${this.channel}.`)
     } else {
       CliUx.ux.action.start(`${this.options.config.name}: Updating CLI`)
-      await this.options.config.runHook('preupdate', {channel: this.channel})
       const manifest = await this.fetchChannelManifest()
       this.currentVersion = await this.determineCurrentVersion()
       this.updatedVersion = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
+      await this.options.config.runHook('preupdate', {channel: this.channel, version: this.updatedVersion})
       const reason = await this.skipUpdate()
       if (reason) CliUx.ux.action.stop(reason || 'done')
       else await this.update(manifest)
       CliUx.ux.debug('tidy')
       await this.tidy()
-      await this.options.config.runHook('update', {channel: this.channel})
+      await this.options.config.runHook('update', {channel: this.channel, version: this.updatedVersion})
     }
 
     CliUx.ux.debug('done')
     CliUx.ux.action.stop()
   }
 
-  private async fetchChannelManifest(): Promise<IManifest> {
-    const s3Key = this.s3ChannelManifestKey(
-      this.options.config.bin,
-      this.options.config.platform,
-      this.options.config.arch,
-      (this.options.config.pjson.oclif.update.s3 as any).folder,
-    )
+  private async fetchChannelManifest(): Promise<Interfaces.S3Manifest> {
+    const s3Key = UpdateCli.s3ChannelManifestKey(this.options.config, this.channel)
     return this.fetchManifest(s3Key)
   }
 
-  private async fetchVersionManifest(version: string, url: string): Promise<IManifest> {
+  private async fetchVersionManifest(version: string, url: string): Promise<Interfaces.S3Manifest> {
     const parts = url.split('/')
     const hashIndex = parts.indexOf(version) + 1
     const hash = parts[hashIndex]
-    const s3Key = this.s3VersionManifestKey(
-      this.options.config.bin,
-      version,
-      hash,
-      this.options.config.platform,
-      this.options.config.arch,
-      (this.options.config.pjson.oclif.update.s3 as any).folder,
-    )
+    const s3Key = UpdateCli.s3VersionManifestKey(this.options.config, version, hash)
     return this.fetchManifest(s3Key)
   }
 
-  private async fetchManifest(s3Key: string): Promise<IManifest> {
+  private async fetchManifest(s3Key: string): Promise<Interfaces.S3Manifest> {
     const http: typeof HTTP = require('http-call').HTTP
 
     CliUx.ux.action.status = 'fetching manifest'
 
     try {
       const url = this.options.config.s3Url(s3Key)
-      const {body} = await http.get<IManifest | string>(url)
+      const {body} = await http.get<Interfaces.S3Manifest | string>(url)
       if (typeof body === 'string') {
         return JSON.parse(body)
       }
@@ -150,29 +184,7 @@ export default class UpdateCli {
     }
   }
 
-  private async fetchVersionIndex(): Promise<VersionIndex> {
-    const http: typeof HTTP = require('http-call').HTTP
-
-    CliUx.ux.action.status = 'fetching version index'
-
-    const newIndexUrl = this.options.config.s3Url(
-      this.s3VersionIndexKey(
-        this.options.config.bin,
-        this.options.config.platform,
-        this.options.config.arch,
-        (this.options.config.pjson.oclif.update.s3 as any).folder,
-      ),
-    )
-
-    const {body} = await http.get<VersionIndex>(newIndexUrl)
-    if (typeof body === 'string') {
-      return JSON.parse(body)
-    }
-
-    return body
-  }
-
-  private async downloadAndExtract(output: string, manifest: IManifest, channel: string) {
+  private async downloadAndExtract(output: string, manifest: Interfaces.S3Manifest, channel: string) {
     const {version, gz, sha256gz} = manifest
 
     const filesize = (n: number): string => {
@@ -223,7 +235,7 @@ export default class UpdateCli {
     await extraction
   }
 
-  private async update(manifest: IManifest, channel = 'stable') {
+  private async update(manifest: Interfaces.S3Manifest, channel = 'stable') {
     CliUx.ux.action.start(`${this.options.config.name}: Updating CLI from ${color.green(this.currentVersion)} to ${color.green(this.updatedVersion)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
 
     await this.ensureClientDir()
@@ -236,10 +248,10 @@ export default class UpdateCli {
     await this.setChannel()
     await this.createBin(this.updatedVersion)
     await this.touch()
-    await this.reexec()
+    CliUx.ux.action.stop()
   }
 
-  private async updateToExistingVersion(version: string) {
+  private async updateToExistingVersion(version: string): Promise<void> {
     await this.createBin(version)
     await this.touch()
   }
@@ -281,31 +293,12 @@ export default class UpdateCli {
     return this.options.config.version
   }
 
-  private s3ChannelManifestKey(bin: string, platform: string, arch: string, folder = ''): string {
-    let s3SubDir = folder || ''
-    if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
-    return path.join(s3SubDir, 'channels', this.channel, `${bin}-${platform}-${arch}-buildmanifest`)
-  }
-
-  // eslint-disable-next-line max-params
-  private s3VersionManifestKey(bin: string, version: string, hash: string, platform: string, arch: string, folder = ''): string {
-    let s3SubDir = folder || ''
-    if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
-    return path.join(s3SubDir, 'versions', version, hash, `${bin}-v${version}-${hash}-${platform}-${arch}-buildmanifest`)
-  }
-
-  private s3VersionIndexKey(bin: string, platform: string, arch: string, folder = ''): string {
-    let s3SubDir = folder || ''
-    if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
-    return path.join(s3SubDir, 'versions', `${bin}-${platform}-${arch}-tar-gz.json`)
-  }
-
-  private async setChannel() {
+  private async setChannel(): Promise<void> {
     const channelPath = path.join(this.options.config.dataDir, 'channel')
     fs.writeFile(channelPath, this.channel, 'utf8')
   }
 
-  private async logChop() {
+  private async logChop(): Promise<void> {
     try {
       CliUx.ux.debug('log chop')
       const logChopper = require('log-chopper').default
@@ -315,7 +308,7 @@ export default class UpdateCli {
     }
   }
 
-  private async mtime(f: string) {
+  private async mtime(f: string): Promise<Date> {
     const {mtime} = await fs.stat(f)
     return mtime
   }
@@ -343,7 +336,7 @@ export default class UpdateCli {
   }
 
   // removes any unused CLIs
-  private async tidy() {
+  private async tidy(): Promise<void> {
     try {
       const root = this.clientRoot
       if (!await fs.pathExists(root)) return
@@ -363,7 +356,7 @@ export default class UpdateCli {
     }
   }
 
-  private async touch() {
+  private async touch(): Promise<void> {
     // touch the client so it won't be tidied up right away
     try {
       const p = path.join(this.clientRoot, this.options.config.version)
@@ -375,26 +368,7 @@ export default class UpdateCli {
     }
   }
 
-  private async reexec() {
-    CliUx.ux.action.stop()
-    return new Promise((_, reject) => {
-      CliUx.ux.debug('restarting CLI after update', this.clientBin)
-      spawn(this.clientBin, ['update'], {
-        stdio: 'inherit',
-        env: {...process.env, [this.options.config.scopedEnvVarKey('HIDE_UPDATED_MESSAGE')]: '1'},
-      })
-      .on('error', reject)
-      .on('close', (status: number) => {
-        try {
-          if (status > 0) this.options.exit(status)
-        } catch (error: any) {
-          reject(error)
-        }
-      })
-    })
-  }
-
-  private async createBin(version: string) {
+  private async createBin(version: string): Promise<void> {
     const dst = this.clientBin
     const {bin, windows} = this.options.config
     const binPathEnvVar = this.options.config.scopedEnvVarKey('BINPATH')
@@ -436,7 +410,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
     }
   }
 
-  private async ensureClientDir() {
+  private async ensureClientDir(): Promise<void> {
     try {
       await fs.mkdirp(this.clientRoot)
     } catch (error: any) {

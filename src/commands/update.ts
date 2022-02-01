@@ -1,10 +1,7 @@
-import {Command, Flags, Config, CliUx} from '@oclif/core'
-import * as path from 'path'
+import {Command, Flags, Config} from '@oclif/core'
+import {prompt} from 'inquirer'
+import {sort} from 'semver'
 import UpdateCli from '../update'
-
-async function getPinToVersion(): Promise<string> {
-  return CliUx.ux.prompt('Enter a version to update to')
-}
 
 export default class UpdateCommand extends Command {
   static description = 'update the <%= config.bin %> CLI'
@@ -13,14 +10,19 @@ export default class UpdateCommand extends Command {
 
   static flags = {
     autoupdate: Flags.boolean({hidden: true}),
-    'from-local': Flags.boolean({description: 'Interactively choose an already installed version.'}),
+    'from-local': Flags.boolean({
+      description: 'Interactively choose an already installed version. This is ignored if a channel is provided.',
+      exclusive: ['version', 'interactive'],
+    }),
     version: Flags.string({
       description: 'Install a specific version.',
-      exclusive: ['from-local'],
+      exclusive: ['from-local', 'interactive'],
+    }),
+    interactive: Flags.boolean({
+      description: 'Interactively select version to install. This is ignored if a channel is provided.',
+      exclusive: ['from-local', 'version'],
     }),
   }
-
-  private readonly clientRoot = this.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.config.dataDir, 'client')
 
   async run(): Promise<void> {
     const {args, flags} = await this.parse(UpdateCommand)
@@ -29,15 +31,43 @@ export default class UpdateCommand extends Command {
       this.error('You cannot specifiy both a version and a channel.')
     }
 
+    let version = flags.version
+    if (flags['from-local']) {
+      version = await this.promptForLocalVersion()
+    } else if (flags.interactive) {
+      version = await this.promptForRemoteVersion()
+    }
+
     const updateCli = new UpdateCli({
       channel: args.channel,
       autoUpdate: flags.autoupdate,
       fromLocal: flags['from-local'],
-      version: flags.version,
+      version,
       config: this.config as Config,
       exit: this.exit,
-      getPinToVersion: getPinToVersion,
     })
     return updateCli.runUpdate()
+  }
+
+  private async promptForRemoteVersion(): Promise<string> {
+    const choices = sort(Object.keys(await UpdateCli.fetchVersionIndex(this.config))).reverse()
+    const {version} = await prompt<{version: string}>({
+      name: 'version',
+      message: 'Select a version to update to',
+      type: 'list',
+      choices,
+    })
+    return version
+  }
+
+  private async promptForLocalVersion(): Promise<string> {
+    const choices = sort(UpdateCli.findLocalVersions(this.config)).reverse()
+    const {version} = await prompt<{version: string}>({
+      name: 'version',
+      message: 'Select a version to update to',
+      type: 'list',
+      choices,
+    })
+    return version
   }
 }

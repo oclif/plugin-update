@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra'
 import * as path from 'path'
 
-export async function touch(p: string) {
+export async function touch(p: string): Promise<void> {
   try {
     await fs.utimes(p, new Date(), new Date())
   } catch {
@@ -9,7 +9,7 @@ export async function touch(p: string) {
   }
 }
 
-export async function ls(dir: string) {
+export async function ls(dir: string): Promise<Array<{path: string, stat: fs.Stats}>> {
   const files = await fs.readdir(dir)
   const paths = files.map(f => path.join(dir, f))
   return Promise.all(paths.map(path => fs.stat(path).then(stat => ({path, stat}))))
