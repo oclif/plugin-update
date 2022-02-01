@@ -34,7 +34,6 @@ function setupClientRoot(ctx: { config: IConfig }, createVersion?: string): stri
 
 function initUpdateCli(options: Partial<UpdateCliOptions>): UpdateCli {
   const updateCli = new UpdateCli({channel: options.channel,
-    local: options.local || false,
     autoUpdate: options.autoUpdate || false,
     config: options.config!,
     version: options.version,
@@ -127,11 +126,7 @@ describe('update plugin', () => {
     const versionManifestRegex = new RegExp(`example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`)
     const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`)
     const indexRegex = new RegExp(`example-cli-${config.platform}-${config.arch}-tar-gz.json`)
-    const newVersionPath = path.join(clientRoot, '2.0.1')
-    // fs.mkdirpSync(path.join(newVersionPath, 'bin'))
-    fs.mkdirpSync(path.join(`${newVersionPath}.partial.11111`, 'bin'))
-    fs.writeFileSync(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
-    // fs.writeFileSync(path.join(newVersionPath, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+
     sandbox.stub(extract, 'extract').resolves()
     sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
 
@@ -202,9 +197,9 @@ describe('update plugin', () => {
       'Content-Encoding': 'gzip',
     })
 
-    updateCli = initUpdateCli({local: true, config: config as Config, version: '2.0.0'})
+    updateCli = initUpdateCli({config: config as Config, version: '2.0.0'})
     await updateCli.runUpdate()
     const stdout = stripAnsi(collector.stdout.join(' '))
-    expect(stdout).to.matches(/Updating to an already installed version will not update the channel/)
+    expect(stdout).to.matches(/Updating to a specific version will not update the channel/)
   })
 })

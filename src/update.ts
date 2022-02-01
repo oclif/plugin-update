@@ -13,7 +13,6 @@ import {ls, rm, wait} from './util'
 export interface UpdateCliOptions {
   channel?: string;
   autoUpdate: boolean;
-  local: boolean;
   version: string | undefined;
   hard: boolean;
   config: Config;
@@ -39,11 +38,13 @@ export default class UpdateCli {
 
   private readonly clientBin: string
 
-  public static findLocalVersions(config: Config): string[] {
+  public static async findLocalVersions(config: Config): Promise<string[]> {
     const clientRoot = UpdateCli.getClientRoot(config)
-    const versions = fs.readdirSync(clientRoot).filter(dirOrFile => dirOrFile !== 'bin' && dirOrFile !== 'current')
-    if (versions.length === 0) throw new Error('No locally installed versions found.')
-    return versions
+    await UpdateCli.ensureClientDir(clientRoot)
+    return fs
+    .readdirSync(clientRoot)
+    .filter(dirOrFile => dirOrFile !== 'bin' && dirOrFile !== 'current')
+    .map(f => path.join(clientRoot, f))
   }
 
   public static async fetchVersionIndex(config: Config): Promise<VersionIndex> {
@@ -60,6 +61,21 @@ export default class UpdateCli {
     }
 
     return body
+  }
+
+  private static async ensureClientDir(clientRoot: string): Promise<void> {
+    try {
+      await fs.mkdirp(clientRoot)
+    } catch (error: any) {
+      if (error.code === 'EEXIST') {
+        // for some reason the client directory is sometimes a file
+        // if so, this happens. Delete it and recreate
+        await fs.remove(clientRoot)
+        await fs.mkdirp(clientRoot)
+      } else {
+        throw error
+      }
+    }
   }
 
   private static s3ChannelManifestKey(config: Config, channel: string): string {
@@ -98,54 +114,43 @@ export default class UpdateCli {
 
     this.channel = this.options.channel || await this.determineChannel()
 
-    if (this.options.local) {
-      await this.ensureClientDir()
-      const version = this.options.version!
-      if (!await fs.pathExists(path.join(this.clientRoot, version))) {
-        throw new Error(`Version ${version} is not already installed at ${this.clientRoot}.`)
-      }
+    if (this.options.hard) {
+      CliUx.ux.action.start(`${this.options.config.name}: Removing old installations`)
+      await rm(path.dirname(this.clientRoot))
+    }
 
-      CliUx.ux.action.start(`${this.options.config.name}: Updating CLI`)
-      CliUx.ux.debug(`switching to existing version ${version}`)
-      this.updateToExistingVersion(version)
+    CliUx.ux.action.start(`${this.options.config.name}: Updating CLI`)
 
-      CliUx.ux.log()
-      CliUx.ux.log(`Updating to an already installed version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${this.channel}.`)
-    } else if (this.options.version) {
-      if (this.options.hard) {
-        CliUx.ux.action.start(`${this.options.config.name}: Removing old installations`)
-        await rm(path.dirname(this.clientRoot))
-      }
-
-      CliUx.ux.action.start(`${this.options.config.name}: Updating CLI`)
+    if (this.options.version) {
       await this.options.config.runHook('preupdate', {channel: this.channel, version: this.options.version})
 
-      const index = await UpdateCli.fetchVersionIndex(this.options.config)
-      const url = index[this.options.version]
-      if (!url) {
-        throw new Error(`${this.options.version} not found in index:\n${Object.keys(index).join(', ')}`)
+      const localVersion = await this.findLocalVersion(this.options.version)
+
+      if (localVersion) {
+        this.updateToExistingVersion(localVersion)
+      } else {
+        const index = await UpdateCli.fetchVersionIndex(this.options.config)
+        const url = index[this.options.version]
+        if (!url) {
+          throw new Error(`${this.options.version} not found in index:\n${Object.keys(index).join(', ')}`)
+        }
+
+        const manifest = await this.fetchVersionManifest(this.options.version, url)
+        this.currentVersion = await this.determineCurrentVersion()
+        this.updatedVersion = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
+        const reason = await this.skipUpdate()
+        if (reason) CliUx.ux.action.stop(reason || 'done')
+        else await this.update(manifest)
+
+        CliUx.ux.debug('tidy')
+        await this.tidy()
       }
 
-      const manifest = await this.fetchVersionManifest(this.options.version, url)
-      this.currentVersion = await this.determineCurrentVersion()
-      this.updatedVersion = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
-      const reason = await this.skipUpdate()
-      if (reason) CliUx.ux.action.stop(reason || 'done')
-      else await this.update(manifest)
-
-      CliUx.ux.debug('tidy')
-      await this.tidy()
       await this.options.config.runHook('update', {channel: this.channel, version: this.updatedVersion})
-
+      CliUx.ux.action.stop()
       CliUx.ux.log()
       CliUx.ux.log(`Updating to a specific version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${this.channel}.`)
     } else {
-      if (this.options.hard) {
-        CliUx.ux.action.start(`${this.options.config.name}: Removing old installations`)
-        await rm(path.dirname(this.clientRoot))
-      }
-
-      CliUx.ux.action.start(`${this.options.config.name}: Updating CLI`)
       const manifest = await this.fetchChannelManifest()
       this.currentVersion = await this.determineCurrentVersion()
       this.updatedVersion = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
@@ -156,10 +161,10 @@ export default class UpdateCli {
       CliUx.ux.debug('tidy')
       await this.tidy()
       await this.options.config.runHook('update', {channel: this.channel, version: this.updatedVersion})
+      CliUx.ux.action.stop()
     }
 
     CliUx.ux.debug('done')
-    CliUx.ux.action.stop()
   }
 
   private async fetchChannelManifest(): Promise<Interfaces.S3Manifest> {
@@ -248,7 +253,7 @@ export default class UpdateCli {
   private async update(manifest: Interfaces.S3Manifest, channel = 'stable') {
     CliUx.ux.action.start(`${this.options.config.name}: Updating CLI from ${color.green(this.currentVersion)} to ${color.green(this.updatedVersion)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
 
-    await this.ensureClientDir()
+    await UpdateCli.ensureClientDir(this.clientRoot)
     const output = path.join(this.clientRoot, this.updatedVersion)
 
     if (!await fs.pathExists(output)) {
@@ -301,6 +306,13 @@ export default class UpdateCli {
     }
 
     return this.options.config.version
+  }
+
+  private async findLocalVersion(version: string): Promise<string | undefined> {
+    const versions = await UpdateCli.findLocalVersions(this.options.config)
+    return versions
+    .map(file => path.basename(file))
+    .find(file => file.startsWith(version))
   }
 
   private async setChannel(): Promise<void> {
@@ -417,21 +429,6 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
       await fs.chmod(dst, 0o755)
       await fs.remove(path.join(this.clientRoot, 'current'))
       await fs.symlink(`./${version}`, path.join(this.clientRoot, 'current'))
-    }
-  }
-
-  private async ensureClientDir(): Promise<void> {
-    try {
-      await fs.mkdirp(this.clientRoot)
-    } catch (error: any) {
-      if (error.code === 'EEXIST') {
-        // for some reason the client directory is sometimes a file
-        // if so, this happens. Delete it and recreate
-        await fs.remove(this.clientRoot)
-        await fs.mkdirp(this.clientRoot)
-      } else {
-        throw error
-      }
     }
   }
 }

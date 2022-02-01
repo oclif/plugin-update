@@ -1,5 +1,6 @@
-import {Command, Flags, Config} from '@oclif/core'
+import {Command, Flags, Config, CliUx} from '@oclif/core'
 import {prompt} from 'inquirer'
+import * as path from 'path'
 import {sort} from 'semver'
 import UpdateCli from '../update'
 
@@ -18,16 +19,8 @@ export default class UpdateCommand extends Command {
       command: '<%= config.bin %> <%= command.id %> --version 1.0.0',
     },
     {
-      description: 'Update to a previously installed version:',
-      command: '<%= config.bin %> <%= command.id %> --version 1.0.0 --local',
-    },
-    {
       description: 'Interactively select version:',
       command: '<%= config.bin %> <%= command.id %> --interactive',
-    },
-    {
-      description: 'Interactively select a previously installed version:',
-      command: '<%= config.bin %> <%= command.id %> --interactive --local',
     },
     {
       description: 'Remove all existing versions and install stable channel version:',
@@ -41,9 +34,7 @@ export default class UpdateCommand extends Command {
 
   static flags = {
     autoupdate: Flags.boolean({hidden: true}),
-    local: Flags.boolean({
-      description: 'Switch to an already installed version. This is ignored if a channel is provided.',
-    }),
+    available: Flags.boolean({hidden: true}),
     version: Flags.string({
       description: 'Install a specific version.',
       exclusive: ['interactive'],
@@ -54,49 +45,43 @@ export default class UpdateCommand extends Command {
     }),
     hard: Flags.boolean({
       description: 'Remove all existing versions before updating to new version.',
-      exclusive: ['local'],
     }),
   }
 
   async run(): Promise<void> {
     const {args, flags} = await this.parse(UpdateCommand)
 
-    if (args.channel && flags.version) {
-      this.error('You cannot specifiy both a version and a channel.')
+    if (flags.available) {
+      const index = await UpdateCli.fetchVersionIndex(this.config)
+      const allVersions = sort(Object.keys(index)).reverse()
+      const localVersions = await UpdateCli.findLocalVersions(this.config)
+
+      const table = allVersions.map(version => {
+        const location = localVersions.find(l => path.basename(l).startsWith(version)) || index[version]
+        return {version, location}
+      })
+
+      CliUx.ux.table(table, {version: {}, location: {}})
+      return
     }
 
-    let version = flags.version
-    if (flags.interactive && flags.local) {
-      version = await this.promptForLocalVersion()
-    } else if (flags.interactive) {
-      version = await this.promptForRemoteVersion()
+    if (args.channel && flags.version) {
+      this.error('You cannot specifiy both a version and a channel.')
     }
 
     const updateCli = new UpdateCli({
       channel: args.channel,
       autoUpdate: flags.autoupdate,
-      local: flags.local,
       hard: flags.hard,
-      version,
+      version: flags.interactive ? await this.promptForVersion() : flags.version,
       config: this.config as Config,
       exit: this.exit,
     })
     return updateCli.runUpdate()
   }
 
-  private async promptForRemoteVersion(): Promise<string> {
+  private async promptForVersion(): Promise<string> {
     const choices = sort(Object.keys(await UpdateCli.fetchVersionIndex(this.config))).reverse()
-    const {version} = await prompt<{version: string}>({
-      name: 'version',
-      message: 'Select a version to update to',
-      type: 'list',
-      choices,
-    })
-    return version
-  }
-
-  private async promptForLocalVersion(): Promise<string> {
-    const choices = sort(UpdateCli.findLocalVersions(this.config)).reverse()
     const {version} = await prompt<{version: string}>({
       name: 'version',
       message: 'Select a version to update to',
