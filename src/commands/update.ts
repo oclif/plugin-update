@@ -10,31 +10,31 @@ export default class UpdateCommand extends Command {
 
   static examples = [
     {
-      description: 'Update to the stable channel.',
+      description: 'Update to the stable channel:',
       command: '<%= config.bin %> <%= command.id %> stable',
     },
     {
-      description: 'Update to a specific version.',
+      description: 'Update to a specific version:',
       command: '<%= config.bin %> <%= command.id %> --version 1.0.0',
     },
     {
-      description: 'Update to a previously installed version.',
+      description: 'Update to a previously installed version:',
       command: '<%= config.bin %> <%= command.id %> --version 1.0.0 --local',
     },
     {
-      description: 'Interactively select version.',
+      description: 'Interactively select version:',
       command: '<%= config.bin %> <%= command.id %> --interactive',
     },
     {
-      description: 'Interactively select a previously installed version.',
+      description: 'Interactively select a previously installed version:',
       command: '<%= config.bin %> <%= command.id %> --interactive --local',
     },
     {
-      description: 'Remove all existing versions and install stable version',
+      description: 'Remove all existing versions and install stable channel version:',
       command: '<%= config.bin %> <%= command.id %> stable --hard',
     },
     {
-      description: 'Remove all existing versions and install specific version',
+      description: 'Remove all existing versions and install specific version:',
       command: '<%= config.bin %> <%= command.id %> --version 1.0.0 --hard',
     },
   ]
