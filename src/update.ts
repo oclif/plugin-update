@@ -2,7 +2,6 @@
 import color from '@oclif/color'
 import {Config, CliUx, Interfaces} from '@oclif/core'
 
-// import * as spawn from 'cross-spawn'
 import * as fs from 'fs-extra'
 import HTTP from 'http-call'
 import * as _ from 'lodash'
