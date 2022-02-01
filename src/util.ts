@@ -15,6 +15,13 @@ export async function ls(dir: string): Promise<Array<{path: string, stat: fs.Sta
   return Promise.all(paths.map(path => fs.stat(path).then(stat => ({path, stat}))))
 }
 
+export async function rm(dir: string): Promise<void> {
+  const files = await ls(dir)
+  for (const file of files) {
+    fs.rmSync(file.path, {recursive: true})
+  }
+}
+
 export function wait(ms: number, unref = false): Promise<void> {
   return new Promise(resolve => {
     const t: any = setTimeout(() => resolve(), ms)

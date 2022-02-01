@@ -34,10 +34,11 @@ function setupClientRoot(ctx: { config: IConfig }, createVersion?: string): stri
 
 function initUpdateCli(options: Partial<UpdateCliOptions>): UpdateCli {
   const updateCli = new UpdateCli({channel: options.channel,
-    fromLocal: options.fromLocal || false,
+    local: options.local || false,
     autoUpdate: options.autoUpdate || false,
     config: options.config!,
     version: options.version,
+    hard: options.hard || false,
     exit: () => {
       // do nothing
     },
@@ -201,7 +202,7 @@ describe('update plugin', () => {
       'Content-Encoding': 'gzip',
     })
 
-    updateCli = initUpdateCli({fromLocal: true, config: config as Config, version: '2.0.0'})
+    updateCli = initUpdateCli({local: true, config: config as Config, version: '2.0.0'})
     await updateCli.runUpdate()
     const stdout = stripAnsi(collector.stdout.join(' '))
     expect(stdout).to.matches(/Updating to an already installed version will not update the channel/)

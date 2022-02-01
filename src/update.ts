@@ -8,13 +8,14 @@ import * as _ from 'lodash'
 import * as path from 'path'
 
 import {extract} from './tar'
-import {ls, wait} from './util'
+import {ls, rm, wait} from './util'
 
 export interface UpdateCliOptions {
   channel?: string;
   autoUpdate: boolean;
-  fromLocal: boolean;
+  local: boolean;
   version: string | undefined;
+  hard: boolean;
   config: Config;
   exit: (code?: number | undefined) => void;
 }
@@ -92,12 +93,12 @@ export default class UpdateCli {
     this.clientBin = UpdateCli.getClientBin(options.config)
   }
 
-  async runUpdate(): Promise<void> {
+  public async runUpdate(): Promise<void> {
     if (this.options.autoUpdate) await this.debounce()
 
     this.channel = this.options.channel || await this.determineChannel()
 
-    if (this.options.fromLocal) {
+    if (this.options.local) {
       await this.ensureClientDir()
       const version = this.options.version!
       if (!await fs.pathExists(path.join(this.clientRoot, version))) {
@@ -111,6 +112,11 @@ export default class UpdateCli {
       CliUx.ux.log()
       CliUx.ux.log(`Updating to an already installed version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${this.channel}.`)
     } else if (this.options.version) {
+      if (this.options.hard) {
+        CliUx.ux.action.start(`${this.options.config.name}: Removing old installations`)
+        await rm(path.dirname(this.clientRoot))
+      }
+
       CliUx.ux.action.start(`${this.options.config.name}: Updating CLI`)
       await this.options.config.runHook('preupdate', {channel: this.channel, version: this.options.version})
 
@@ -134,6 +140,11 @@ export default class UpdateCli {
       CliUx.ux.log()
       CliUx.ux.log(`Updating to a specific version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${this.channel}.`)
     } else {
+      if (this.options.hard) {
+        CliUx.ux.action.start(`${this.options.config.name}: Removing old installations`)
+        await rm(path.dirname(this.clientRoot))
+      }
+
       CliUx.ux.action.start(`${this.options.config.name}: Updating CLI`)
       const manifest = await this.fetchChannelManifest()
       this.currentVersion = await this.determineCurrentVersion()
@@ -323,7 +334,7 @@ export default class UpdateCli {
       if (output) {
         CliUx.ux.debug(msg)
       } else {
-        await CliUx.ux.log(msg)
+        CliUx.ux.log(msg)
         output = true
       }
 
