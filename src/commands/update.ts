@@ -1,8 +1,8 @@
-import {Command, Flags, Config, CliUx} from '@oclif/core'
+import {Command, Flags, CliUx} from '@oclif/core'
 import {prompt} from 'inquirer'
 import * as path from 'path'
 import {sort} from 'semver'
-import UpdateCli from '../update'
+import {Updater} from '../update'
 
 export default class UpdateCommand extends Command {
   static description = 'update the <%= config.bin %> CLI'
@@ -50,11 +50,11 @@ export default class UpdateCommand extends Command {
 
   async run(): Promise<void> {
     const {args, flags} = await this.parse(UpdateCommand)
-
+    const updater = new Updater(this.config)
     if (flags.available) {
-      const index = await UpdateCli.fetchVersionIndex(this.config)
+      const index = await updater.fetchVersionIndex()
       const allVersions = sort(Object.keys(index)).reverse()
-      const localVersions = await UpdateCli.findLocalVersions(this.config)
+      const localVersions = await updater.findLocalVersions()
 
       const table = allVersions.map(version => {
         const location = localVersions.find(l => path.basename(l).startsWith(version)) || index[version]
@@ -69,19 +69,16 @@ export default class UpdateCommand extends Command {
       this.error('You cannot specifiy both a version and a channel.')
     }
 
-    const updateCli = new UpdateCli({
+    return updater.runUpdate({
       channel: args.channel,
       autoUpdate: flags.autoupdate,
       hard: flags.hard,
-      version: flags.interactive ? await this.promptForVersion() : flags.version,
-      config: this.config as Config,
-      exit: this.exit,
+      version: flags.interactive ? await this.promptForVersion(updater) : flags.version,
     })
-    return updateCli.runUpdate()
   }
 
-  private async promptForVersion(): Promise<string> {
-    const choices = sort(Object.keys(await UpdateCli.fetchVersionIndex(this.config))).reverse()
+  private async promptForVersion(updater: Updater): Promise<string> {
+    const choices = sort(Object.keys(await updater.fetchVersionIndex())).reverse()
     const {version} = await prompt<{version: string}>({
       name: 'version',
       message: 'Select a version to update to',

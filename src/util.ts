@@ -16,10 +16,12 @@ export async function ls(dir: string): Promise<Array<{path: string, stat: fs.Sta
 }
 
 export async function rm(dir: string): Promise<void> {
-  const files = await ls(dir)
-  for (const file of files) {
-    fs.rmSync(file.path, {recursive: true})
-  }
+  return new Promise((resolve, reject) => {
+    fs.rm(dir, {recursive: true}, (err: Error | null) => {
+      if (err) reject(err)
+      resolve()
+    })
+  })
 }
 
 export function wait(ms: number, unref = false): Promise<void> {
