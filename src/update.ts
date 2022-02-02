@@ -102,13 +102,16 @@ export class Updater {
   public async fetchVersionIndex(): Promise<Updater.VersionIndex> {
     CliUx.ux.action.status = 'fetching version index'
     const newIndexUrl = this.config.s3Url(this.s3VersionIndexKey())
+    try {
+      const {body} = await HTTP.get<Updater.VersionIndex>(newIndexUrl)
+      if (typeof body === 'string') {
+        return JSON.parse(body)
+      }
 
-    const {body} = await HTTP.get<Updater.VersionIndex>(newIndexUrl)
-    if (typeof body === 'string') {
-      return JSON.parse(body)
+      return body
+    } catch {
+      throw new Error(`No version indices exist for ${this.config.name}.`)
     }
-
-    return body
   }
 
   private async ensureClientDir(): Promise<void> {
