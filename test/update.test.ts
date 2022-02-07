@@ -78,7 +78,7 @@ describe('update plugin', () => {
     updater = initUpdater(config)
     await updater.runUpdate({autoUpdate: false, hard: false})
     const stdout = collector.stdout.join(' ')
-    expect(stdout).to.include('already on latest version')
+    expect(stdout).to.include('already on version 2.0.0')
   })
 
   it('should update to channel', async () => {
