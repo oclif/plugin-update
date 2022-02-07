@@ -40,6 +40,13 @@ export class Updater {
     const {autoUpdate, version, hard} = options
     if (autoUpdate) await this.debounce()
 
+    CliUx.ux.action.start(`${this.config.name}: Updating CLI`)
+
+    if (this.notUpdatable()) {
+      CliUx.ux.action.stop('not updatable')
+      return
+    }
+
     if (hard) {
       CliUx.ux.action.start(`${this.config.name}: Removing old installations`)
       await rm(path.dirname(this.clientRoot))
@@ -48,14 +55,14 @@ export class Updater {
     const channel = options.channel || await this.determineChannel()
     const current = await this.determineCurrentVersion()
 
-    CliUx.ux.action.start(`${this.config.name}: Updating CLI`)
-
     if (version) {
       await this.config.runHook('preupdate', {channel, version})
 
       const localVersion = await this.findLocalVersion(version)
 
-      if (localVersion) {
+      if (this.alreadyOnVersion(current, localVersion || null)) {
+        CliUx.ux.action.stop(this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE') ? 'done' : `already on version ${current}`)
+      } else if (localVersion) {
         this.updateToExistingVersion(current, localVersion)
       } else {
         const index = await this.fetchVersionIndex()
@@ -66,9 +73,7 @@ export class Updater {
 
         const manifest = await this.fetchVersionManifest(version, url)
         const updated = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
-        const reason = await this.skipUpdate(current, updated)
-        if (reason) CliUx.ux.action.stop(reason || 'done')
-        else await this.update(manifest, current, updated)
+        await this.update(manifest, current, updated)
         await this.tidy()
       }
 
@@ -80,10 +85,14 @@ export class Updater {
       const manifest = await this.fetchChannelManifest(channel)
       const updated = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
       await this.config.runHook('preupdate', {channel, version: updated})
-      const reason = await this.skipUpdate(current, updated)
-      if (reason) CliUx.ux.action.stop(reason || 'done')
-      else await this.update(manifest, current, updated, channel)
-      await this.tidy()
+
+      if (!hard && this.alreadyOnVersion(current, updated)) {
+        CliUx.ux.action.stop(this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE') ? 'done' : `already on version ${current}`)
+      } else {
+        await this.update(manifest, current, updated, channel)
+        await this.tidy()
+      }
+
       await this.config.runHook('update', {channel, version: updated})
       CliUx.ux.action.stop()
     }
@@ -249,19 +258,18 @@ export class Updater {
     CliUx.ux.action.stop()
   }
 
-  private async skipUpdate(current: string, updated: string): Promise<string | false> {
+  private notUpdatable(): boolean {
     if (!this.config.binPath) {
       const instructions = this.config.scopedEnvVar('UPDATE_INSTRUCTIONS')
       if (instructions) CliUx.ux.warn(instructions)
-      return 'not updatable'
-    }
-
-    if (current === updated) {
-      if (this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE')) return 'done'
-      return `already on latest version: ${current}`
+      return true
     }
 
     return false
+  }
+
+  private alreadyOnVersion(current: string, updated: string | null): boolean {
+    return current === updated
   }
 
   private async determineChannel(): Promise<string> {
