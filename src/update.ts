@@ -47,6 +47,11 @@ export class Updater {
       return
     }
 
+    // console.log('*'.repeat(process.stdout.columns))
+    // const util = require('util')
+    // console.log(util.inspect(this.config, {depth: 6}))
+    // console.log('*'.repeat(process.stdout.columns))
+
     if (hard) {
       CliUx.ux.action.start(`${this.config.name}: Removing old installations`)
       await rm(path.dirname(this.clientRoot))
@@ -248,6 +253,7 @@ export class Updater {
     await this.setChannel(channel)
     await this.createBin(updated)
     await this.touch()
+    this.updateRoot(current, updated)
     CliUx.ux.action.stop()
   }
 
@@ -255,6 +261,7 @@ export class Updater {
     CliUx.ux.action.start(`${this.config.name}: Updating CLI from ${color.green(current)} to ${color.green(updated)}`)
     await this.createBin(updated)
     await this.touch()
+    this.updateRoot(current, updated)
     CliUx.ux.action.stop()
   }
 
@@ -374,6 +381,14 @@ export class Updater {
       await fs.utimes(p, new Date(), new Date())
     } catch (error: any) {
       CliUx.ux.warn(error)
+    }
+  }
+
+  private updateRoot(current: string, updated: string): void {
+    this.config.root = path.join(this.config.root, updated)
+    const pattern = new RegExp(`${current.split('-')[0]}-.*?(?=\\${path.sep})`)
+    for (const plugin of this.config.plugins) {
+      plugin.root = plugin.root.replace(pattern, updated)
     }
   }
 
