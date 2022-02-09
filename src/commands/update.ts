@@ -1,5 +1,5 @@
 import {Command, Flags, CliUx} from '@oclif/core'
-import {prompt} from 'inquirer'
+import {prompt, Separator} from 'inquirer'
 import * as path from 'path'
 import {sort} from 'semver'
 import {Updater} from '../update'
@@ -83,7 +83,7 @@ export default class UpdateCommand extends Command {
       name: 'version',
       message: 'Select a version to update to',
       type: 'list',
-      choices,
+      choices: [...choices, new Separator()],
     })
     return version
   }

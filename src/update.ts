@@ -56,7 +56,7 @@ export class Updater {
     const current = await this.determineCurrentVersion()
 
     if (version) {
-      await this.config.runHook('preupdate', {channel, version})
+      if (!hard) await this.config.runHook('preupdate', {channel, version})
 
       const localVersion = await this.findLocalVersion(version)
 
@@ -84,7 +84,7 @@ export class Updater {
     } else {
       const manifest = await this.fetchChannelManifest(channel)
       const updated = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
-      await this.config.runHook('preupdate', {channel, version: updated})
+      if (!hard) await this.config.runHook('preupdate', {channel, version: updated})
 
       if (!hard && this.alreadyOnVersion(current, updated)) {
         CliUx.ux.action.stop(this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE') ? 'done' : `already on version ${current}`)
