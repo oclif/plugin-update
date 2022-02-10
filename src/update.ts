@@ -22,6 +22,7 @@ export namespace Updater {
     autoUpdate: boolean;
     version?: string | undefined
     hard: boolean;
+    preserveLinks?: boolean;
   }
 
   export type VersionIndex = Record<string, string>
@@ -37,7 +38,7 @@ export class Updater {
   }
 
   public async runUpdate(options: Updater.Options): Promise<void> {
-    const {autoUpdate, version, hard} = options
+    const {autoUpdate, version, hard, preserveLinks = false} = options
     if (autoUpdate) await this.debounce()
 
     CliUx.ux.action.start(`${this.config.name}: Updating CLI`)
@@ -47,28 +48,26 @@ export class Updater {
       return
     }
 
-    // console.log('*'.repeat(process.stdout.columns))
-    // const util = require('util')
-    // console.log(util.inspect(this.config, {depth: 6}))
-    // console.log('*'.repeat(process.stdout.columns))
-
     if (hard) {
       CliUx.ux.action.start(`${this.config.name}: Removing old installations`)
-      await rm(path.dirname(this.clientRoot))
+      await this.hard(preserveLinks)
     }
 
     const channel = options.channel || await this.determineChannel()
     const current = await this.determineCurrentVersion()
 
     if (version) {
-      if (!hard) await this.config.runHook('preupdate', {channel, version})
-
       const localVersion = await this.findLocalVersion(version)
 
       if (this.alreadyOnVersion(current, localVersion || null)) {
         CliUx.ux.action.stop(this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE') ? 'done' : `already on version ${current}`)
-      } else if (localVersion) {
-        this.updateToExistingVersion(current, localVersion)
+        return
+      }
+
+      if (!hard) await this.config.runHook('preupdate', {channel, version})
+
+      if (localVersion) {
+        await this.updateToExistingVersion(current, localVersion)
       } else {
         const index = await this.fetchVersionIndex()
         const url = index[version]
@@ -79,7 +78,6 @@ export class Updater {
         const manifest = await this.fetchVersionManifest(version, url)
         const updated = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
         await this.update(manifest, current, updated)
-        await this.tidy()
       }
 
       await this.config.runHook('update', {channel, version})
@@ -89,19 +87,20 @@ export class Updater {
     } else {
       const manifest = await this.fetchChannelManifest(channel)
       const updated = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
-      if (!hard) await this.config.runHook('preupdate', {channel, version: updated})
 
       if (!hard && this.alreadyOnVersion(current, updated)) {
         CliUx.ux.action.stop(this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE') ? 'done' : `already on version ${current}`)
       } else {
+        if (!hard) await this.config.runHook('preupdate', {channel, version: updated})
         await this.update(manifest, current, updated, channel)
-        await this.tidy()
       }
 
       await this.config.runHook('update', {channel, version: updated})
       CliUx.ux.action.stop()
     }
 
+    await this.touch()
+    await this.tidy()
     CliUx.ux.debug('done')
   }
 
@@ -125,6 +124,19 @@ export class Updater {
       return body
     } catch {
       throw new Error(`No version indices exist for ${this.config.name}.`)
+    }
+  }
+
+  private async hard(preserveLinks: boolean): Promise<void> {
+    if (preserveLinks) {
+      const files = await ls(path.dirname(this.clientRoot))
+      const filtered = files.filter(f => !f.path.includes('package.json'))
+      for (const file of filtered) {
+        // eslint-disable-next-line no-await-in-loop
+        await rm(file.path)
+      }
+    } else {
+      await rm(path.dirname(this.clientRoot))
     }
   }
 
@@ -250,19 +262,16 @@ export class Updater {
       await this.downloadAndExtract(output, manifest, channel)
     }
 
+    await this.refreshConfig(updated)
     await this.setChannel(channel)
     await this.createBin(updated)
-    await this.touch()
-    this.updateRoot(current, updated)
-    CliUx.ux.action.stop()
   }
 
   private async updateToExistingVersion(current: string, updated: string): Promise<void> {
     CliUx.ux.action.start(`${this.config.name}: Updating CLI from ${color.green(current)} to ${color.green(updated)}`)
+    await this.ensureClientDir()
+    await this.refreshConfig(updated)
     await this.createBin(updated)
-    await this.touch()
-    this.updateRoot(current, updated)
-    CliUx.ux.action.stop()
   }
 
   private notUpdatable(): boolean {
@@ -384,12 +393,8 @@ export class Updater {
     }
   }
 
-  private updateRoot(current: string, updated: string): void {
-    this.config.root = path.join(this.config.root, updated)
-    const pattern = new RegExp(`${current.split('-')[0]}-.*?(?=\\${path.sep})`)
-    for (const plugin of this.config.plugins) {
-      plugin.root = plugin.root.replace(pattern, updated)
-    }
+  private async refreshConfig(version: string): Promise<void> {
+    this.config = await Config.load({root: path.join(this.clientRoot, version)}) as Config
   }
 
   private async createBin(version: string): Promise<void> {

@@ -34,17 +34,26 @@ export default class UpdateCommand extends Command {
 
   static flags = {
     autoupdate: Flags.boolean({hidden: true}),
-    available: Flags.boolean({hidden: true}),
+    available: Flags.boolean({
+      char: 'a',
+      description: 'Install a specific version.',
+    }),
     version: Flags.string({
+      char: 'v',
       description: 'Install a specific version.',
       exclusive: ['interactive'],
     }),
     interactive: Flags.boolean({
+      char: 'i',
       description: 'Interactively select version to install. This is ignored if a channel is provided.',
       exclusive: ['version'],
     }),
     hard: Flags.boolean({
       description: 'Remove all existing versions before updating to new version.',
+    }),
+    'preserve-links': Flags.boolean({
+      hidden: true,
+      dependsOn: ['hard'],
     }),
   }
 
@@ -73,6 +82,7 @@ export default class UpdateCommand extends Command {
       channel: args.channel,
       autoUpdate: flags.autoupdate,
       hard: flags.hard,
+      preserveLinks: flags['preserve-links'],
       version: flags.interactive ? await this.promptForVersion(updater) : flags.version,
     })
   }

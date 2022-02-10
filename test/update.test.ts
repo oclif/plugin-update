@@ -54,6 +54,9 @@ describe('update plugin', () => {
     sandbox.stub(CliUx.ux, 'warn').callsFake(line => collector.stderr.push(line ? `${line}` : ''))
     sandbox.stub(CliUx.ux.action, 'start').callsFake(line => collector.stdout.push(line || ''))
     sandbox.stub(CliUx.ux.action, 'stop').callsFake(line => collector.stdout.push(line || ''))
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    sandbox.stub(Updater.prototype, 'refreshConfig').resolves()
   })
 
   afterEach(() => {
@@ -170,12 +173,12 @@ describe('update plugin', () => {
     clientRoot = setupClientRoot({config})
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
-    const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.0\\/example-cli-v2.0.0-${config.platform}-${config.arch}gz`)
-    const newVersionPath = path.join(clientRoot, '2.0.0')
+    const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.0\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`)
+    const newVersionPath = path.join(clientRoot, '2.0.1')
     fs.mkdirpSync(path.join(newVersionPath, 'bin'))
     fs.mkdirpSync(path.join(`${newVersionPath}.partial.11111`, 'bin'))
-    fs.writeFileSync(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.0/bin', 'utf8')
-    fs.writeFileSync(path.join(newVersionPath, 'bin', 'example-cli'), '../2.0.0/bin', 'utf8')
+    fs.writeFileSync(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+    fs.writeFileSync(path.join(newVersionPath, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
     sandbox.stub(extract, 'extract').resolves()
     sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
 
@@ -183,9 +186,9 @@ describe('update plugin', () => {
 
     nock(/oclif-staging.s3.amazonaws.com/)
     .get(platformRegex)
-    .reply(200, {version: '2.0.0'})
+    .reply(200, {version: '2.0.1'})
     .get(manifestRegex)
-    .reply(200, {version: '2.0.0'})
+    .reply(200, {version: '2.0.1'})
     .get(tarballRegex)
     .reply(200, gzContents, {
       'X-Transfer-Length': String(gzContents.length),
@@ -194,7 +197,7 @@ describe('update plugin', () => {
     })
 
     updater = initUpdater(config)
-    await updater.runUpdate({autoUpdate: false, hard: false, version: '2.0.0'})
+    await updater.runUpdate({autoUpdate: false, hard: false, version: '2.0.1'})
     const stdout = stripAnsi(collector.stdout.join(' '))
     expect(stdout).to.matches(/Updating to a specific version will not update the channel/)
   })
