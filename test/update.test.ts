@@ -79,7 +79,7 @@ describe('update plugin', () => {
     .reply(200, {version: '2.0.0'})
 
     updater = initUpdater(config)
-    await updater.runUpdate({autoUpdate: false, hard: false})
+    await updater.runUpdate({autoUpdate: false})
     const stdout = collector.stdout.join(' ')
     expect(stdout).to.include('already on version 2.0.0')
   })
@@ -110,7 +110,7 @@ describe('update plugin', () => {
     })
 
     updater = initUpdater(config)
-    await updater.runUpdate({autoUpdate: false, hard: false})
+    await updater.runUpdate({autoUpdate: false})
     const stdout = stripAnsi(collector.stdout.join(' '))
     expect(stdout).to.matches(/Updating CLI from 2.0.0 to 2.0.1/)
   })
@@ -148,7 +148,7 @@ describe('update plugin', () => {
     })
 
     updater = initUpdater(config)
-    await updater.runUpdate({autoUpdate: false, hard: false, version: '2.0.1'})
+    await updater.runUpdate({autoUpdate: false, version: '2.0.1'})
     const stdout = stripAnsi(collector.stdout.join(' '))
     expect(stdout).to.matches(/Updating CLI from 2.0.0 to 2.0.1/)
   })
@@ -164,7 +164,7 @@ describe('update plugin', () => {
     .reply(200, {version: '2.0.0'})
 
     updater = initUpdater(config)
-    await updater.runUpdate({autoUpdate: false, hard: false})
+    await updater.runUpdate({autoUpdate: false})
     const stdout = collector.stdout.join(' ')
     expect(stdout).to.include('not updatable')
   })
@@ -197,7 +197,7 @@ describe('update plugin', () => {
     })
 
     updater = initUpdater(config)
-    await updater.runUpdate({autoUpdate: false, hard: false, version: '2.0.1'})
+    await updater.runUpdate({autoUpdate: false, version: '2.0.1'})
     const stdout = stripAnsi(collector.stdout.join(' '))
     expect(stdout).to.matches(/Updating to a specific version will not update the channel/)
   })

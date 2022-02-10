@@ -9,7 +9,7 @@ import throttle from 'lodash.throttle'
 import fileSize from 'filesize'
 
 import {extract} from './tar'
-import {ls, rm, wait} from './util'
+import {ls, wait} from './util'
 
 const filesize = (n: number): string => {
   const [num, suffix] = fileSize(n, {output: 'array'})
@@ -18,11 +18,10 @@ const filesize = (n: number): string => {
 
 export namespace Updater {
   export type Options = {
-    channel?: string | undefined;
     autoUpdate: boolean;
+    channel?: string | undefined;
     version?: string | undefined
-    hard: boolean;
-    preserveLinks?: boolean;
+    force?: boolean;
   }
 
   export type VersionIndex = Record<string, string>
@@ -38,7 +37,7 @@ export class Updater {
   }
 
   public async runUpdate(options: Updater.Options): Promise<void> {
-    const {autoUpdate, version, hard, preserveLinks = false} = options
+    const {autoUpdate, version, force = false} = options
     if (autoUpdate) await this.debounce()
 
     CliUx.ux.action.start(`${this.config.name}: Updating CLI`)
@@ -48,23 +47,18 @@ export class Updater {
       return
     }
 
-    if (hard) {
-      CliUx.ux.action.start(`${this.config.name}: Removing old installations`)
-      await this.hard(preserveLinks)
-    }
-
     const channel = options.channel || await this.determineChannel()
     const current = await this.determineCurrentVersion()
 
     if (version) {
-      const localVersion = await this.findLocalVersion(version)
+      const localVersion = force ? null : await this.findLocalVersion(version)
 
       if (this.alreadyOnVersion(current, localVersion || null)) {
         CliUx.ux.action.stop(this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE') ? 'done' : `already on version ${current}`)
         return
       }
 
-      if (!hard) await this.config.runHook('preupdate', {channel, version})
+      await this.config.runHook('preupdate', {channel, version})
 
       if (localVersion) {
         await this.updateToExistingVersion(current, localVersion)
@@ -77,7 +71,7 @@ export class Updater {
 
         const manifest = await this.fetchVersionManifest(version, url)
         const updated = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
-        await this.update(manifest, current, updated)
+        await this.update(manifest, current, updated, force, channel)
       }
 
       await this.config.runHook('update', {channel, version})
@@ -88,11 +82,11 @@ export class Updater {
       const manifest = await this.fetchChannelManifest(channel)
       const updated = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
 
-      if (!hard && this.alreadyOnVersion(current, updated)) {
+      if (!force && this.alreadyOnVersion(current, updated)) {
         CliUx.ux.action.stop(this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE') ? 'done' : `already on version ${current}`)
       } else {
-        if (!hard) await this.config.runHook('preupdate', {channel, version: updated})
-        await this.update(manifest, current, updated, channel)
+        await this.config.runHook('preupdate', {channel, version: updated})
+        await this.update(manifest, current, updated, force, channel)
       }
 
       await this.config.runHook('update', {channel, version: updated})
@@ -124,19 +118,6 @@ export class Updater {
       return body
     } catch {
       throw new Error(`No version indices exist for ${this.config.name}.`)
-    }
-  }
-
-  private async hard(preserveLinks: boolean): Promise<void> {
-    if (preserveLinks) {
-      const files = await ls(path.dirname(this.clientRoot))
-      const filtered = files.filter(f => !f.path.includes('package.json'))
-      for (const file of filtered) {
-        // eslint-disable-next-line no-await-in-loop
-        await rm(file.path)
-      }
-    } else {
-      await rm(path.dirname(this.clientRoot))
     }
   }
 
@@ -252,15 +233,14 @@ export class Updater {
     await extraction
   }
 
-  private async update(manifest: Interfaces.S3Manifest, current: string, updated: string, channel = 'stable') {
+  // eslint-disable-next-line max-params
+  private async update(manifest: Interfaces.S3Manifest, current: string, updated: string, force: boolean, channel: string) {
     CliUx.ux.action.start(`${this.config.name}: Updating CLI from ${color.green(current)} to ${color.green(updated)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
 
     await this.ensureClientDir()
     const output = path.join(this.clientRoot, updated)
 
-    if (!await fs.pathExists(output)) {
-      await this.downloadAndExtract(output, manifest, channel)
-    }
+    if (force || !await fs.pathExists(output)) await this.downloadAndExtract(output, manifest, channel)
 
     await this.refreshConfig(updated)
     await this.setChannel(channel)

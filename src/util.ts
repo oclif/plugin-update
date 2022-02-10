@@ -16,9 +16,8 @@ export async function ls(dir: string): Promise<Array<{path: string, stat: fs.Sta
 }
 
 export async function rm(dir: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    fs.rm(dir, {recursive: true}, (err: Error | null) => {
-      if (err) reject(err)
+  return new Promise(resolve => {
+    fs.rm(dir, {recursive: true, force: true}, () => {
       resolve()
     })
   })

@@ -63,9 +63,7 @@
     "commands": "./lib/commands",
     "bin": "oclif-example",
     "hooks": {
-      "init": "./lib/hooks/init",
-      "preupdate": "./lib/hooks/preupdate",
-      "update": "./lib/hooks/update"
+      "init": "./lib/hooks/init"
     },
     "devPlugins": [
       "@oclif/plugin-help"

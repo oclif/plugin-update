@@ -48,12 +48,8 @@ export default class UpdateCommand extends Command {
       description: 'Interactively select version to install. This is ignored if a channel is provided.',
       exclusive: ['version'],
     }),
-    hard: Flags.boolean({
-      description: 'Remove all existing versions before updating to new version.',
-    }),
-    'preserve-links': Flags.boolean({
-      hidden: true,
-      dependsOn: ['hard'],
+    force: Flags.boolean({
+      description: 'Force a re-download of the requested version.',
     }),
   }
 
@@ -81,8 +77,7 @@ export default class UpdateCommand extends Command {
     return updater.runUpdate({
       channel: args.channel,
       autoUpdate: flags.autoupdate,
-      hard: flags.hard,
-      preserveLinks: flags['preserve-links'],
+      force: flags.force,
       version: flags.interactive ? await this.promptForVersion(updater) : flags.version,
     })
   }
