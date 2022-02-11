@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/oclif/plugin-update/compare/v2.2.0...v3.0.0) (2022-02-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename --from-local to --local
+
+* chore: update examples
+
+* feat!: remove --local flag
+* remove --local flag
+
+* refactor: Updater
+
+* fix: handle non-existent version index
+
+* chore: code review
+
+* chore: update test
+
+* fix: skip preupdate hook if using --hard
+
+* fix: update root after hard update
+
+* fix: works with sf
+
+* fix: replace --hard with --force
+
+* chore: update examples
+
+* chore: bump to 3.0.0
+
+* BREAKING CHANGE: add new update features (#368) ([091c176](https://github.com/oclif/plugin-update/commit/091c176ef639a7a0c991ab1b726e832783670324)), closes [#368](https://github.com/oclif/plugin-update/issues/368)
+
 ## [2.2.0](https://github.com/oclif/plugin-update/compare/v2.1.5...v2.2.0) (2022-01-28)
 
 

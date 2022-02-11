@@ -24,14 +24,34 @@ update the oclif-example CLI
 
 ```
 USAGE
-  $ oclif-example update [CHANNEL] [--from-local]
+  $ oclif-example update [CHANNEL] [-a] [-v <value> | -i] [--force]
 
 FLAGS
-  --from-local  interactively choose an already installed version
+  -a, --available        Install a specific version.
+  -i, --interactive      Interactively select version to install. This is ignored if a channel is provided.
+  -v, --version=<value>  Install a specific version.
+  --force                Force a re-download of the requested version.
 
 DESCRIPTION
   update the oclif-example CLI
+
+EXAMPLES
+  Update to the stable channel:
+
+    $ oclif-example update stable
+
+  Update to a specific version:
+
+    $ oclif-example update --version 1.0.0
+
+  Interactively select version:
+
+    $ oclif-example update --interactive
+
+  See available versions:
+
+    $ oclif-example update --available
 ```
 
-_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v2.1.5/src/commands/update.ts)_
+_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v3.0.0/src/commands/update.ts)_
 <!-- commandsstop -->
