@@ -23,12 +23,8 @@ export default class UpdateCommand extends Command {
       command: '<%= config.bin %> <%= command.id %> --interactive',
     },
     {
-      description: 'Remove all existing versions and install stable channel version:',
-      command: '<%= config.bin %> <%= command.id %> stable --hard',
-    },
-    {
-      description: 'Remove all existing versions and install specific version:',
-      command: '<%= config.bin %> <%= command.id %> --version 1.0.0 --hard',
+      description: 'See available versions:',
+      command: '<%= config.bin %> <%= command.id %> --available',
     },
   ]
 
