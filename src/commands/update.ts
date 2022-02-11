@@ -1,30 +1,91 @@
-import {Command, Flags, Config, CliUx} from '@oclif/core'
+import {Command, Flags, CliUx} from '@oclif/core'
+import {prompt, Separator} from 'inquirer'
 import * as path from 'path'
-import UpdateCli from '../update'
-
-async function getPinToVersion(): Promise<string> {
-  return CliUx.ux.prompt('Enter a version to update to')
-}
+import {sort} from 'semver'
+import {Updater} from '../update'
 
 export default class UpdateCommand extends Command {
   static description = 'update the <%= config.bin %> CLI'
 
   static args = [{name: 'channel', optional: true}]
 
+  static examples = [
+    {
+      description: 'Update to the stable channel:',
+      command: '<%= config.bin %> <%= command.id %> stable',
+    },
+    {
+      description: 'Update to a specific version:',
+      command: '<%= config.bin %> <%= command.id %> --version 1.0.0',
+    },
+    {
+      description: 'Interactively select version:',
+      command: '<%= config.bin %> <%= command.id %> --interactive',
+    },
+    {
+      description: 'See available versions:',
+      command: '<%= config.bin %> <%= command.id %> --available',
+    },
+  ]
+
   static flags = {
     autoupdate: Flags.boolean({hidden: true}),
-    'from-local': Flags.boolean({description: 'interactively choose an already installed version'}),
+    available: Flags.boolean({
+      char: 'a',
+      description: 'Install a specific version.',
+    }),
+    version: Flags.string({
+      char: 'v',
+      description: 'Install a specific version.',
+      exclusive: ['interactive'],
+    }),
+    interactive: Flags.boolean({
+      char: 'i',
+      description: 'Interactively select version to install. This is ignored if a channel is provided.',
+      exclusive: ['version'],
+    }),
+    force: Flags.boolean({
+      description: 'Force a re-download of the requested version.',
+    }),
   }
-
-  private channel!: string
-
-  private readonly clientRoot = this.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.config.dataDir, 'client')
-
-  private readonly clientBin = path.join(this.clientRoot, 'bin', this.config.windows ? `${this.config.bin}.cmd` : this.config.bin)
 
   async run(): Promise<void> {
     const {args, flags} = await this.parse(UpdateCommand)
-    const updateCli = new UpdateCli({channel: args.channel, autoUpdate: flags.autoupdate, fromLocal: flags['from-local'], config: this.config as Config, exit: this.exit, getPinToVersion: getPinToVersion})
-    return updateCli.runUpdate()
+    const updater = new Updater(this.config)
+    if (flags.available) {
+      const index = await updater.fetchVersionIndex()
+      const allVersions = sort(Object.keys(index)).reverse()
+      const localVersions = await updater.findLocalVersions()
+
+      const table = allVersions.map(version => {
+        const location = localVersions.find(l => path.basename(l).startsWith(version)) || index[version]
+        return {version, location}
+      })
+
+      CliUx.ux.table(table, {version: {}, location: {}})
+      return
+    }
+
+    if (args.channel && flags.version) {
+      this.error('You cannot specifiy both a version and a channel.')
+    }
+
+    return updater.runUpdate({
+      channel: args.channel,
+      autoUpdate: flags.autoupdate,
+      force: flags.force,
+      version: flags.interactive ? await this.promptForVersion(updater) : flags.version,
+    })
+  }
+
+  private async promptForVersion(updater: Updater): Promise<string> {
+    const choices = sort(Object.keys(await updater.fetchVersionIndex())).reverse()
+    const {version} = await prompt<{version: string}>({
+      name: 'version',
+      message: 'Select a version to update to',
+      type: 'list',
+      choices: [...choices, new Separator()],
+    })
+    return version
   }
 }

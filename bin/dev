@@ -11,8 +11,7 @@ process.env.NODE_ENV = 'development'
 require('ts-node').register({project})
 
 // In dev mode, always show stack traces
-// Waiting for https://github.com/oclif/core/pull/147
-// oclif.settings.debug = true;
+oclif.settings.debug = true;
 
 // Start the CLI
 oclif.run().then(oclif.flush).catch(oclif.Errors.handle)

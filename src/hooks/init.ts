@@ -1,5 +1,5 @@
 import {CliUx, Interfaces} from '@oclif/core'
-import * as spawn from 'cross-spawn'
+import spawn from 'cross-spawn'
 import * as fs from 'fs-extra'
 import * as path from 'path'
 

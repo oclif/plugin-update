@@ -18,7 +18,7 @@ const ignore = (_: any, header: any) => {
   }
 }
 
-export async function extract(stream: NodeJS.ReadableStream, basename: string, output: string, sha?: string) {
+export async function extract(stream: NodeJS.ReadableStream, basename: string, output: string, sha?: string): Promise<void> {
   const getTmp = () => `${output}.partial.${Math.random().toString().split('.')[1].slice(0, 5)}`
   let tmp = getTmp()
   if (fs.pathExistsSync(tmp)) tmp = getTmp()
