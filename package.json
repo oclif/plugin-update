@@ -18,7 +18,7 @@
     "tar-fs": "^2.1.1"
   },
   "devDependencies": {
-    "@oclif/plugin-help": "^5.1.15",
+    "@oclif/plugin-help": "^5.1.16",
     "@oclif/test": "^2.2.3",
     "@types/chai": "^4.2.15",
     "@types/cross-spawn": "^6.0.2",
