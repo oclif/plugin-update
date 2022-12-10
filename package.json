@@ -5,7 +5,7 @@
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
     "@oclif/color": "^1.0.2",
-    "@oclif/core": "^1.18.0",
+    "@oclif/core": "^1.21.0",
     "cross-spawn": "^7.0.3",
     "debug": "^4.3.1",
     "filesize": "^6.1.0",
