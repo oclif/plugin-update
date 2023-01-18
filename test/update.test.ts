@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra'
 import * as path from 'path'
-import {Config, CliUx} from '@oclif/core'
+import {Config, ux} from '@oclif/core'
 import {Config as IConfig} from '@oclif/core/lib/interfaces'
 import {Updater} from '../src/update'
 import * as zlib from 'zlib'
@@ -50,10 +50,10 @@ describe('update plugin', () => {
     config.binPath = config.binPath || config.bin
     collector = {stdout: [], stderr: []}
     sandbox = sinon.createSandbox()
-    sandbox.stub(CliUx.ux, 'log').callsFake(line => collector.stdout.push(line || ''))
-    sandbox.stub(CliUx.ux, 'warn').callsFake(line => collector.stderr.push(line ? `${line}` : ''))
-    sandbox.stub(CliUx.ux.action, 'start').callsFake(line => collector.stdout.push(line || ''))
-    sandbox.stub(CliUx.ux.action, 'stop').callsFake(line => collector.stdout.push(line || ''))
+    sandbox.stub(ux, 'log').callsFake(line => collector.stdout.push(line || ''))
+    sandbox.stub(ux, 'warn').callsFake(line => collector.stderr.push(line ? `${line}` : ''))
+    sandbox.stub(ux.action, 'start').callsFake(line => collector.stdout.push(line || ''))
+    sandbox.stub(ux.action, 'stop').callsFake(line => collector.stdout.push(line || ''))
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     sandbox.stub(Updater.prototype, 'refreshConfig').resolves()

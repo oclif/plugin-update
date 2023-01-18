@@ -1,4 +1,4 @@
-import {Command, Flags, CliUx} from '@oclif/core'
+import {Command, Flags, ux, Args} from '@oclif/core'
 import {prompt, Separator} from 'inquirer'
 import * as path from 'path'
 import {sort} from 'semver'
@@ -7,7 +7,9 @@ import {Updater} from '../update'
 export default class UpdateCommand extends Command {
   static description = 'update the <%= config.bin %> CLI'
 
-  static args = [{name: 'channel', optional: true}]
+  static args = {
+    channel: Args.string({optional: true}),
+  }
 
   static examples = [
     {
@@ -62,12 +64,12 @@ export default class UpdateCommand extends Command {
         return {version, location}
       })
 
-      CliUx.ux.table(table, {version: {}, location: {}})
+      ux.table(table, {version: {}, location: {}})
       return
     }
 
     if (args.channel && flags.version) {
-      this.error('You cannot specifiy both a version and a channel.')
+      this.error('You cannot specify both a version and a channel.')
     }
 
     return updater.runUpdate({

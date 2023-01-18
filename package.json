@@ -5,7 +5,7 @@
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
     "@oclif/color": "^1.0.3",
-    "@oclif/core": "^1.23.1",
+    "@oclif/core": "^2.0.2-beta.6",
     "cross-spawn": "^7.0.3",
     "debug": "^4.3.1",
     "filesize": "^6.1.0",
@@ -39,7 +39,7 @@
     "globby": "^11.0.2",
     "mocha": "^9",
     "nock": "^13.3.0",
-    "oclif": "^2.4.2",
+    "oclif": "^3.5.0",
     "qqjs": "^0.3.11",
     "sinon": "^12.0.1",
     "ts-node": "^9.1.1",
