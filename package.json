@@ -1,11 +1,11 @@
 {
   "name": "@oclif/plugin-update",
-  "version": "3.0.12",
+  "version": "3.0.13",
   "author": "Salesforce",
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
     "@oclif/color": "^1.0.3",
-    "@oclif/core": "^2.0.2-beta.6",
+    "@oclif/core": "^2.0.3",
     "cross-spawn": "^7.0.3",
     "debug": "^4.3.1",
     "filesize": "^6.1.0",
@@ -18,8 +18,8 @@
     "tar-fs": "^2.1.1"
   },
   "devDependencies": {
-    "@oclif/plugin-help": "^5.1.23",
-    "@oclif/test": "^2.3.0",
+    "@oclif/plugin-help": "^5.2.0",
+    "@oclif/test": "^2.3.1",
     "@types/chai": "^4.3.4",
     "@types/cross-spawn": "^6.0.2",
     "@types/execa": "^0.9.0",
