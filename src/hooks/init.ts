@@ -1,4 +1,4 @@
-import {CliUx, Interfaces} from '@oclif/core'
+import {ux, Interfaces} from '@oclif/core'
 import spawn from 'cross-spawn'
 import * as fs from 'fs-extra'
 import * as path from 'path'
@@ -40,7 +40,7 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
       m.setHours(m.getHours() + (days * 24))
       return m < new Date()
     } catch (error: any) {
-      if (error.code !== 'ENOENT') CliUx.ux.error(error.stack)
+      if (error.code !== 'ENOENT') ux.error(error.stack)
       if ((global as any).testing) return false
       debug('autoupdate ENOENT')
       return true

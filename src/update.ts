@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/prefer-module */
 import color from '@oclif/color'
-import {Config, CliUx, Interfaces} from '@oclif/core'
+import {Config, ux, Interfaces} from '@oclif/core'
 
 import * as fs from 'fs-extra'
 import HTTP from 'http-call'
@@ -40,10 +40,10 @@ export class Updater {
     const {autoUpdate, version, force = false} = options
     if (autoUpdate) await this.debounce()
 
-    CliUx.ux.action.start(`${this.config.name}: Updating CLI`)
+    ux.action.start(`${this.config.name}: Updating CLI`)
 
     if (this.notUpdatable()) {
-      CliUx.ux.action.stop('not updatable')
+      ux.action.stop('not updatable')
       return
     }
 
@@ -54,7 +54,7 @@ export class Updater {
       const localVersion = force ? null : await this.findLocalVersion(version)
 
       if (this.alreadyOnVersion(current, localVersion || null)) {
-        CliUx.ux.action.stop(this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE') ? 'done' : `already on version ${current}`)
+        ux.action.stop(this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE') ? 'done' : `already on version ${current}`)
         return
       }
 
@@ -75,27 +75,27 @@ export class Updater {
       }
 
       await this.config.runHook('update', {channel, version})
-      CliUx.ux.action.stop()
-      CliUx.ux.log()
-      CliUx.ux.log(`Updating to a specific version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${channel}.`)
+      ux.action.stop()
+      ux.log()
+      ux.log(`Updating to a specific version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${channel}.`)
     } else {
       const manifest = await this.fetchChannelManifest(channel)
       const updated = manifest.sha ? `${manifest.version}-${manifest.sha}` : manifest.version
 
       if (!force && this.alreadyOnVersion(current, updated)) {
-        CliUx.ux.action.stop(this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE') ? 'done' : `already on version ${current}`)
+        ux.action.stop(this.config.scopedEnvVar('HIDE_UPDATED_MESSAGE') ? 'done' : `already on version ${current}`)
       } else {
         await this.config.runHook('preupdate', {channel, version: updated})
         await this.update(manifest, current, updated, force, channel)
       }
 
       await this.config.runHook('update', {channel, version: updated})
-      CliUx.ux.action.stop()
+      ux.action.stop()
     }
 
     await this.touch()
     await this.tidy()
-    CliUx.ux.debug('done')
+    ux.debug('done')
   }
 
   public async findLocalVersions(): Promise<string[]> {
@@ -107,7 +107,7 @@ export class Updater {
   }
 
   public async fetchVersionIndex(): Promise<Updater.VersionIndex> {
-    CliUx.ux.action.status = 'fetching version index'
+    ux.action.status = 'fetching version index'
     const newIndexUrl = this.config.s3Url(this.s3VersionIndexKey())
     try {
       const {body} = await HTTP.get<Updater.VersionIndex>(newIndexUrl)
@@ -179,7 +179,7 @@ export class Updater {
   }
 
   private async fetchManifest(s3Key: string): Promise<Interfaces.S3Manifest> {
-    CliUx.ux.action.status = 'fetching manifest'
+    ux.action.status = 'fetching manifest'
 
     const url = this.config.s3Url(s3Key)
     const {body} = await HTTP.get<Interfaces.S3Manifest | string>(url)
@@ -213,12 +213,12 @@ export class Updater {
     })
     const extraction = extract(stream, baseDir, output, sha256gz)
 
-    if (CliUx.ux.action.type === 'spinner') {
+    if (ux.action.type === 'spinner') {
       const total = Number.parseInt(stream.headers['content-length']!, 10)
       let current = 0
       const updateStatus = throttle(
         (newStatus: string) => {
-          CliUx.ux.action.status = newStatus
+          ux.action.status = newStatus
         },
         250,
         {leading: true, trailing: false},
@@ -235,7 +235,7 @@ export class Updater {
 
   // eslint-disable-next-line max-params
   private async update(manifest: Interfaces.S3Manifest, current: string, updated: string, force: boolean, channel: string) {
-    CliUx.ux.action.start(`${this.config.name}: Updating CLI from ${color.green(current)} to ${color.green(updated)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
+    ux.action.start(`${this.config.name}: Updating CLI from ${color.green(current)} to ${color.green(updated)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
 
     await this.ensureClientDir()
     const output = path.join(this.clientRoot, updated)
@@ -248,7 +248,7 @@ export class Updater {
   }
 
   private async updateToExistingVersion(current: string, updated: string): Promise<void> {
-    CliUx.ux.action.start(`${this.config.name}: Updating CLI from ${color.green(current)} to ${color.green(updated)}`)
+    ux.action.start(`${this.config.name}: Updating CLI from ${color.green(current)} to ${color.green(updated)}`)
     await this.ensureClientDir()
     await this.refreshConfig(updated)
     await this.createBin(updated)
@@ -257,7 +257,7 @@ export class Updater {
   private notUpdatable(): boolean {
     if (!this.config.binPath) {
       const instructions = this.config.scopedEnvVar('UPDATE_INSTRUCTIONS')
-      if (instructions) CliUx.ux.warn(instructions)
+      if (instructions) ux.warn(instructions)
       return true
     }
 
@@ -284,7 +284,7 @@ export class Updater {
       const matches = currentVersion.match(/\.\.[/\\|](.+)[/\\|]bin/)
       return matches ? matches[1] : this.config.version
     } catch (error: any) {
-      CliUx.ux.debug(error)
+      ux.debug(error)
     }
 
     return this.config.version
@@ -304,11 +304,11 @@ export class Updater {
 
   private async logChop(): Promise<void> {
     try {
-      CliUx.ux.debug('log chop')
+      ux.debug('log chop')
       const logChopper = require('log-chopper').default
       await logChopper.chop(this.config.errlog)
     } catch (error: any) {
-      CliUx.ux.debug(error.message)
+      ux.debug(error.message)
     }
   }
 
@@ -326,9 +326,9 @@ export class Updater {
     if (m > new Date()) {
       const msg = `waiting until ${m.toISOString()} to update`
       if (output) {
-        CliUx.ux.debug(msg)
+        ux.debug(msg)
       } else {
-        CliUx.ux.log(msg)
+        ux.log(msg)
         output = true
       }
 
@@ -336,12 +336,12 @@ export class Updater {
       return this.debounce()
     }
 
-    CliUx.ux.log('time to update')
+    ux.log('time to update')
   }
 
   // removes any unused CLIs
   private async tidy(): Promise<void> {
-    CliUx.ux.debug('tidy')
+    ux.debug('tidy')
     try {
       const root = this.clientRoot
       if (!await fs.pathExists(root)) return
@@ -357,7 +357,7 @@ export class Updater {
       for (const p of promises) await p // eslint-disable-line no-await-in-loop
       await this.logChop()
     } catch (error: any) {
-      CliUx.ux.warn(error)
+      ux.warn(error)
     }
   }
 
@@ -365,11 +365,11 @@ export class Updater {
     // touch the client so it won't be tidied up right away
     try {
       const p = path.join(this.clientRoot, this.config.version)
-      CliUx.ux.debug('touching client at', p)
+      ux.debug('touching client at', p)
       if (!await fs.pathExists(p)) return
       await fs.utimes(p, new Date(), new Date())
     } catch (error: any) {
-      CliUx.ux.warn(error)
+      ux.warn(error)
     }
   }
 
