@@ -421,10 +421,10 @@
     node-gyp "^8.2.0"
     read-package-json-fast "^2.0.1"
 
-"@oclif/color@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@oclif/color/-/color-1.0.3.tgz#1a303b533a832a0af563006eb9a6883ebe3b77ed"
-  integrity sha512-E+KKAE5CKhXRBZEoZLe5yNR0VHmba1m1fxz8HlpcWjHF5Pdhhf6W/0XMmed6vwQCmyzL/YLwdspCRfu0A1cgGA==
+"@oclif/color@^1.0.3", "@oclif/color@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@oclif/color/-/color-1.0.4.tgz#07e54e3bd76a29e77d6ad71aef33222fe4f728e7"
+  integrity sha512-HEcVnSzpQkjskqWJyVN3tGgR0H0F8GrBmDjgQ1N0ZwwktYa4y9kfV07P/5vt5BjPXNyslXHc4KAO8Bt7gmErCA==
   dependencies:
     ansi-styles "^4.2.1"
     chalk "^4.1.0"
