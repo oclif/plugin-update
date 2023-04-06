@@ -149,13 +149,13 @@ export class Updater {
   }
 
   private s3VersionManifestKey(version: string, hash: string): string {
-    const {bin, platform, arch} = this.config
+    const {bin, arch} = this.config
     const s3SubDir = this.composeS3SubDir()
     return path.join(s3SubDir, 'versions', version, hash, `${bin}-v${version}-${hash}-${this.determinePlatform()}-${arch}-buildmanifest`)
   }
 
   private s3VersionIndexKey(): string {
-    const {bin, platform, arch} = this.config
+    const {bin, arch} = this.config
     const s3SubDir = this.composeS3SubDir()
     return path.join(s3SubDir, 'versions', `${bin}-${this.determinePlatform()}-${arch}-tar-gz.json`)
   }
