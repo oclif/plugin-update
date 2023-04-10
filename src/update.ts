@@ -143,21 +143,21 @@ export class Updater {
   }
 
   private s3ChannelManifestKey(channel: string): string {
-    const {bin, platform, arch} = this.config
+    const {bin, arch} = this.config
     const s3SubDir = this.composeS3SubDir()
-    return path.join(s3SubDir, 'channels', channel, `${bin}-${platform}-${arch}-buildmanifest`)
+    return path.join(s3SubDir, 'channels', channel, `${bin}-${this.determinePlatform()}-${arch}-buildmanifest`)
   }
 
   private s3VersionManifestKey(version: string, hash: string): string {
-    const {bin, platform, arch} = this.config
+    const {bin, arch} = this.config
     const s3SubDir = this.composeS3SubDir()
-    return path.join(s3SubDir, 'versions', version, hash, `${bin}-v${version}-${hash}-${platform}-${arch}-buildmanifest`)
+    return path.join(s3SubDir, 'versions', version, hash, `${bin}-v${version}-${hash}-${this.determinePlatform()}-${arch}-buildmanifest`)
   }
 
   private s3VersionIndexKey(): string {
-    const {bin, platform, arch} = this.config
+    const {bin, arch} = this.config
     const s3SubDir = this.composeS3SubDir()
-    return path.join(s3SubDir, 'versions', `${bin}-${platform}-${arch}-tar-gz.json`)
+    return path.join(s3SubDir, 'versions', `${bin}-${this.determinePlatform()}-${arch}-tar-gz.json`)
   }
 
   private async fetchChannelManifest(channel: string): Promise<Interfaces.S3Manifest> {
@@ -197,7 +197,7 @@ export class Updater {
       version,
       channel,
       bin: this.config.bin,
-      platform: this.config.platform,
+      platform: this.determinePlatform(),
       arch: this.config.arch,
       ext: 'gz',
     }))
@@ -208,7 +208,7 @@ export class Updater {
       version,
       channel,
       bin: this.config.bin,
-      platform: this.config.platform,
+      platform: this.determinePlatform(),
       arch: this.config.arch,
     })
     const extraction = extract(stream, baseDir, output, sha256gz)
@@ -276,6 +276,10 @@ export class Updater {
     }
 
     return this.config.channel || 'stable'
+  }
+
+  private determinePlatform(): Interfaces.PlatformTypes {
+    return this.config.platform === 'wsl' ? 'linux' : this.config.platform
   }
 
   private async determineCurrentVersion(): Promise<string> {
