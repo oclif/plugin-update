@@ -1,3 +1,12 @@
+## [3.1.10](https://github.com/oclif/plugin-update/compare/3.1.9...3.1.10) (2023-04-10)
+
+
+### Bug Fixes
+
+* handle WSL when requesting version updates ([#540](https://github.com/oclif/plugin-update/issues/540)) ([6072a80](https://github.com/oclif/plugin-update/commit/6072a80428967ce92c4c238f1607946751169046))
+
+
+
 ## [3.1.9](https://github.com/oclif/plugin-update/compare/3.1.8...3.1.9) (2023-03-26)
 
 
