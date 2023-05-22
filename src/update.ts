@@ -272,7 +272,11 @@ export class Updater {
     try {
       const {body} = await HTTP.get(`https://registry.npmjs.org/${this.config.pjson.name}/`)
       const tags = (body as {'dist-tags': Record<string, string>})['dist-tags']
-      return Object.keys(tags).find(v => tags[v] === version) ?? 'stable'
+      const tag = Object.keys(tags).find(v => tags[v] === version) ?? 'stable'
+      // convert from npm style tag defaults to OCLIF style
+      if (tag === 'latest') return 'stable'
+      if (tag === 'latest-rc') return 'stable-rc'
+      return tag
     } catch {
       return 'stable'
     }
