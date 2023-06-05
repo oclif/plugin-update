@@ -274,7 +274,7 @@ export class Updater {
     const channel = fs.existsSync(channelPath) ? (await fs.readFile(channelPath, 'utf8')).trim() : 'stable'
 
     try {
-      const {body} = await HTTP.get<{'dist-tags':Record<string, string>}>(`https://registry.npmjs.org/${this.config.pjson.name}/`)
+      const {body} = await HTTP.get<{'dist-tags':Record<string, string>}>(`${this.config.npmRegistry ?? 'https://registry.npmjs.org'}/${this.config.pjson.name}`)
       const tags = body['dist-tags']
       const tag = Object.keys(tags).find(v => tags[v] === version) ?? channel
       // convert from npm style tag defaults to OCLIF style
