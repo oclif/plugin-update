@@ -47,7 +47,7 @@ export class Updater {
       return
     }
 
-    const channel = options.channel || await this.determineChannel()
+    const channel = options.channel || await this.determineChannel(version)
     const current = await this.determineCurrentVersion()
 
     if (version) {
@@ -268,14 +268,22 @@ export class Updater {
     return current === updated
   }
 
-  private async determineChannel(): Promise<string> {
+  private async determineChannel(version?:string): Promise<string> {
     const channelPath = path.join(this.config.dataDir, 'channel')
-    if (fs.existsSync(channelPath)) {
-      const channel = await fs.readFile(channelPath, 'utf8')
-      return String(channel).trim()
-    }
 
-    return this.config.channel || 'stable'
+    const channel = fs.existsSync(channelPath) ? (await fs.readFile(channelPath, 'utf8')).trim() : 'stable'
+
+    try {
+      const {body} = await HTTP.get<{'dist-tags':Record<string, string>}>(`${this.config.npmRegistry ?? 'https://registry.npmjs.org'}/${this.config.pjson.name}`)
+      const tags = body['dist-tags']
+      const tag = Object.keys(tags).find(v => tags[v] === version) ?? channel
+      // convert from npm style tag defaults to OCLIF style
+      if (tag === 'latest') return 'stable'
+      if (tag === 'latest-rc') return 'stable-rc'
+      return tag
+    } catch {
+      return channel
+    }
   }
 
   private determinePlatform(): Interfaces.PlatformTypes {
@@ -303,7 +311,7 @@ export class Updater {
 
   private async setChannel(channel: string): Promise<void> {
     const channelPath = path.join(this.config.dataDir, 'channel')
-    fs.writeFile(channelPath, channel, 'utf8')
+    await fs.writeFile(channelPath, channel, 'utf8')
   }
 
   private async logChop(): Promise<void> {

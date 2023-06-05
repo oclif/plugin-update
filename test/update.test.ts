@@ -9,6 +9,7 @@ import * as sinon from 'sinon'
 import stripAnsi = require('strip-ansi')
 import * as extract from '../src/tar'
 import {expect} from 'chai'
+import HTTP from 'http-call'
 
 type OutputCollectors = {
   stdout: string[];
@@ -151,6 +152,86 @@ describe('update plugin', () => {
     await updater.runUpdate({autoUpdate: false, version: '2.0.1'})
     const stdout = stripAnsi(collector.stdout.join(' '))
     expect(stdout).to.matches(/Updating CLI from 2.0.0 to 2.0.1/)
+  })
+
+  it('will get the correct channel and use default registry', async () => {
+    const request = sandbox.spy(HTTP,  'get')
+    const hash = 'f289627'
+    config.pjson.name = '@oclif/plugin-update'
+    clientRoot = setupClientRoot({config})
+    const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
+    const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
+    const versionManifestRegex = new RegExp(`example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`)
+    const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`)
+    const indexRegex = new RegExp(`example-cli-${config.platform}-${config.arch}-tar-gz.json`)
+
+    sandbox.stub(extract, 'extract').resolves()
+    sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
+
+    const gzContents = zlib.gzipSync(' ')
+
+    nock(/oclif-staging.s3.amazonaws.com/)
+    .get(platformRegex)
+    .reply(200, {version: '2.0.1'})
+    .get(manifestRegex)
+    .reply(200, {version: '2.0.1'})
+    .get(versionManifestRegex)
+    .reply(200, {version: '2.0.1'})
+    .get(tarballRegex)
+    .reply(200, gzContents, {
+      'X-Transfer-Length': String(gzContents.length),
+      'content-length': String(gzContents.length),
+      'Content-Encoding': 'gzip',
+    })
+    .get(indexRegex)
+    .reply(200, {
+      '2.0.1': `versions/example-cli/2.0.1/${hash}/example-cli-v2.0.1-${config.platform}-${config.arch}.gz`,
+    })
+
+    updater = initUpdater(config)
+    await updater.runUpdate({autoUpdate: false, version: '2.0.1'})
+    expect(request.callCount).to.equal(3)
+    expect(request.firstCall.args[0]).to.include('https://registry.npmjs.org/@oclif/plugin-update')
+  })
+  it('will get the correct channel and use a custom registry', async () => {
+    const request = sandbox.spy(HTTP,  'get')
+    const hash = 'f289627'
+    config.pjson.name = '@oclif/plugin-update'
+    config.npmRegistry = 'https://myCustomRegistry.com'
+    clientRoot = setupClientRoot({config})
+    const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
+    const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
+    const versionManifestRegex = new RegExp(`example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`)
+    const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`)
+    const indexRegex = new RegExp(`example-cli-${config.platform}-${config.arch}-tar-gz.json`)
+
+    sandbox.stub(extract, 'extract').resolves()
+    sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
+
+    const gzContents = zlib.gzipSync(' ')
+
+    nock(/oclif-staging.s3.amazonaws.com/)
+    .get(platformRegex)
+    .reply(200, {version: '2.0.1'})
+    .get(manifestRegex)
+    .reply(200, {version: '2.0.1'})
+    .get(versionManifestRegex)
+    .reply(200, {version: '2.0.1'})
+    .get(tarballRegex)
+    .reply(200, gzContents, {
+      'X-Transfer-Length': String(gzContents.length),
+      'content-length': String(gzContents.length),
+      'Content-Encoding': 'gzip',
+    })
+    .get(indexRegex)
+    .reply(200, {
+      '2.0.1': `versions/example-cli/2.0.1/${hash}/example-cli-v2.0.1-${config.platform}-${config.arch}.gz`,
+    })
+
+    updater = initUpdater(config)
+    await updater.runUpdate({autoUpdate: false, version: '2.0.1'})
+    expect(request.callCount).to.equal(3)
+    expect(request.firstCall.args[0]).to.include('https://myCustomRegistry.com/@oclif/plugin-update')
   })
 
   it('should not update - not updatable', async () => {
