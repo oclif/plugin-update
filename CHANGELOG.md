@@ -1,3 +1,12 @@
+## [3.1.16](https://github.com/oclif/plugin-update/compare/3.1.15...3.1.16) (2023-05-28)
+
+
+### Bug Fixes
+
+* **deps:** bump @oclif/color from 1.0.4 to 1.0.5 ([#564](https://github.com/oclif/plugin-update/issues/564)) ([011b539](https://github.com/oclif/plugin-update/commit/011b539defdc5034784859df3c6df059b746db0a))
+
+
+
 ## [3.1.15](https://github.com/oclif/plugin-update/compare/3.1.14...3.1.15) (2023-05-14)
 
 
