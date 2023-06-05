@@ -1,3 +1,12 @@
+## [3.1.17](https://github.com/oclif/plugin-update/compare/3.1.16...3.1.17) (2023-06-05)
+
+
+### Bug Fixes
+
+* add npm tag lookup to determineChannel correctly ([#563](https://github.com/oclif/plugin-update/issues/563)) ([2e5f943](https://github.com/oclif/plugin-update/commit/2e5f9437807f5914445ca19251cdc82c05bbeafa))
+
+
+
 ## [3.1.16](https://github.com/oclif/plugin-update/compare/3.1.15...3.1.16) (2023-05-28)
 
 
