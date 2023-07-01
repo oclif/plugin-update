@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@oclif/plugin-help": "^5.2.10",
-    "@oclif/test": "^2.3.23",
+    "@oclif/test": "^2.3.25",
     "@types/chai": "^4.3.5",
     "@types/cross-spawn": "^6.0.2",
     "@types/execa": "^0.9.0",
