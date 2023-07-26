@@ -28,8 +28,8 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
 
   const autoupdateEnv = {
     ...process.env,
-    [this.config.scopedEnvVarKey('TIMESTAMPS')]: '1',
-    [this.config.scopedEnvVarKey('SKIP_ANALYTICS')]: '1',
+    ...this.config.scopedEnvVarKeys('TIMESTAMPS').map(key => [key: '1']),
+    ...this.config.scopedEnvVarKeys('SKIP_ANALYTICS').map(key => [key: '1']),
   }
 
   async function autoupdateNeeded(): Promise<boolean> {
