@@ -457,7 +457,7 @@
     supports-color "^8.1.1"
     tslib "^2"
 
-"@oclif/core@^2.11.1", "@oclif/core@^2.8.11", "@oclif/core@^2.9.3", "@oclif/core@^2.9.4":
+"@oclif/core@^2.11.1", "@oclif/core@^2.9.3", "@oclif/core@^2.9.4":
   version "2.11.1"
   resolved "https://registry.yarnpkg.com/@oclif/core/-/core-2.11.1.tgz#69c3cfd3d9b2df9fe94c6d16a3c5da59706f078a"
   integrity sha512-/DHDtm/PoSNvWdJtTv1GUYnrCrlTsEQd1CsXKNfMSylpkeOjbDIbt1w4NYZ50BfAWxpCunf7RmbwxFBpDa5lHQ==
@@ -522,13 +522,13 @@
     lodash "^4.17.21"
     semver "^7.5.4"
 
-"@oclif/test@^2.3.28":
-  version "2.3.28"
-  resolved "https://registry.yarnpkg.com/@oclif/test/-/test-2.3.28.tgz#e5169994e31977368d204fb9546930b27afc81e4"
-  integrity sha512-Eee3efwfHHdgZIwOUGFEe8p4d8YEWFYKHoAezxdXzXVOtV4L9r7Oq6KH8dXGBy8yjYDleydwn0PqoZGhFeLxYQ==
+"@oclif/test@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@oclif/test/-/test-2.4.0.tgz#138cb846146295350fa38b2f7ee9b15f374b4f53"
+  integrity sha512-eC99f81IdAzJdRtOAH5x28vfTk4Nbuqe9nySq6Y8z8MwA6zkDbJFWNj/Zz5LdBGabtsbuTXBku8U+evFrYMTcw==
   dependencies:
-    "@oclif/core" "^2.8.11"
-    fancy-test "^2.0.28"
+    "@oclif/core" "^2.9.4"
+    fancy-test "^2.0.31"
 
 "@octokit/auth-token@^2.4.4":
   version "2.5.0"
@@ -2207,10 +2207,10 @@ external-editor@^3.0.3:
     iconv-lite "^0.4.24"
     tmp "^0.0.33"
 
-fancy-test@^2.0.28:
-  version "2.0.29"
-  resolved "https://registry.yarnpkg.com/fancy-test/-/fancy-test-2.0.29.tgz#4f7d48a04fc7dc85b0e4321c8a655320c1ca9c53"
-  integrity sha512-jyr991jVTf+JkoXVJtvN5kk9IuWhHjZrZTBgLwqtyupgvKbWCw1rmiiPX3BG922E2RcoRg1wY1rIxnVoRIRKQg==
+fancy-test@^2.0.31:
+  version "2.0.32"
+  resolved "https://registry.yarnpkg.com/fancy-test/-/fancy-test-2.0.32.tgz#3cbf7ea8a83f9912b02d9ee0782517cca71834f9"
+  integrity sha512-yN40FulpMlEDVp/3YbSxVzkdUR/u0ZAk2Wu30vVvv79Dni0LoSz90ZXtLsp6e813ED0SHkaW/zfgDEp8YqF9Lw==
   dependencies:
     "@types/chai" "*"
     "@types/lodash" "*"
@@ -2218,7 +2218,7 @@ fancy-test@^2.0.28:
     "@types/sinon" "*"
     lodash "^4.17.13"
     mock-stdin "^1.0.0"
-    nock "^13.3.1"
+    nock "^13.3.2"
     stdout-stderr "^0.1.9"
 
 fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
@@ -3689,7 +3689,7 @@ nise@^5.1.0:
     just-extend "^4.0.2"
     path-to-regexp "^1.7.0"
 
-nock@^13.3.1, nock@^13.3.2:
+nock@^13.3.2:
   version "13.3.2"
   resolved "https://registry.yarnpkg.com/nock/-/nock-13.3.2.tgz#bfa6be92d37f744b1b758ea89b1105cdaf5c8b3f"
   integrity sha512-CwbljitiWJhF1gL83NbanhoKs1l23TDlRioNraPTZrzZIEooPemrHRj5m0FZCPkB1ecdYCSWWGcHysJgX/ngnQ==
