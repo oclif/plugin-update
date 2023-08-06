@@ -1,6 +1,6 @@
 {
   "name": "@oclif/plugin-update",
-  "version": "3.1.28",
+  "version": "3.1.29",
   "author": "Salesforce",
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
