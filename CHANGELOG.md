@@ -1,3 +1,12 @@
+## [3.1.32](https://github.com/oclif/plugin-update/compare/3.1.31...3.1.32) (2023-08-13)
+
+
+### Bug Fixes
+
+* **deps:** bump inquirer from 8.2.5 to 8.2.6 ([#606](https://github.com/oclif/plugin-update/issues/606)) ([e2fb63c](https://github.com/oclif/plugin-update/commit/e2fb63c04853c6c8b8f50062653eba4574a948ae))
+
+
+
 ## [3.1.31](https://github.com/oclif/plugin-update/compare/3.1.30...3.1.31) (2023-08-13)
 
 
