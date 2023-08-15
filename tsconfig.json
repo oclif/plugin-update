@@ -3,13 +3,14 @@
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
+    "skipLibCheck": true,
     "module": "commonjs",
     "outDir": "./lib",
     "rootDirs": [
       "./src"
     ],
     "strict": true,
-    "target": "es2017",
+    "target": "ES2021",
     "esModuleInterop": true
   },
   "include": [

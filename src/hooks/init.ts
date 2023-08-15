@@ -1,6 +1,8 @@
 import {ux, Interfaces} from '@oclif/core'
-import spawn from 'cross-spawn'
-import * as fs from 'fs-extra'
+import {spawn} from 'child_process'
+import {existsSync} from 'node:fs'
+
+import {stat, open, writeFile} from 'node:fs/promises'
 import * as path from 'path'
 
 import {touch} from '../util'
@@ -13,7 +15,7 @@ function timestamp(msg: string): string {
 }
 
 async function mtime(f: string) {
-  const {mtime} = await fs.stat(f)
+  const {mtime} = await stat(f)
   return mtime
 }
 
@@ -49,23 +51,24 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
 
   await touch(lastrunfile)
   const clientDir = path.join(clientRoot, this.config.version)
-  if (await fs.pathExists(clientDir)) await touch(clientDir)
+  if (existsSync(clientDir)) await touch(clientDir)
   if (!await autoupdateNeeded()) return
 
   debug('autoupdate running')
-  await fs.outputFile(autoupdatefile, '')
+  await writeFile(autoupdatefile, '')
 
   debug(`spawning autoupdate on ${binPath}`)
 
-  const fd = await fs.open(autoupdatelogfile, 'a')
-  fs.write(
+  const fd = await open(autoupdatelogfile, 'a')
+  await writeFile(
     fd,
     timestamp(`starting \`${binPath} update --autoupdate\` from ${process.argv.slice(1, 3).join(' ')}\n`),
   )
 
+  const stream = fd.createWriteStream()
   spawn(binPath, ['update', '--autoupdate'], {
     detached: !this.config.windows,
-    stdio: ['ignore', fd, fd],
+    stdio: ['ignore', stream, stream],
     env: autoupdateEnv,
   })
   .on('error', (e: Error) => process.emitWarning(e))

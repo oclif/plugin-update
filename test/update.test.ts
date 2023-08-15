@@ -1,4 +1,7 @@
-import * as fs from 'fs-extra'
+import * as fse from 'fs-extra'
+import {existsSync} from 'node:fs'
+import {writeFile, rm, mkdir} from 'node:fs/promises'
+
 import * as path from 'path'
 import {Config, ux} from '@oclif/core'
 import {Config as IConfig} from '@oclif/core/lib/interfaces'
@@ -19,15 +22,15 @@ async function loadConfig(options: {root: string}): Promise<IConfig> {
   return Config.load(options.root)
 }
 
-function setupClientRoot(ctx: { config: IConfig }, createVersion?: string): string {
+const  setupClientRoot = async (ctx: { config: IConfig }, createVersion?: string): Promise<string> => {
   const clientRoot = ctx.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(ctx.config.dataDir, 'client')
   // Ensure installed version structure is present
-  fs.ensureDirSync(clientRoot)
+  await mkdir(clientRoot, {recursive: true})
   if (createVersion) {
-    fs.ensureDirSync(path.join(clientRoot, 'bin'))
-    fs.ensureFileSync(path.join(clientRoot, '2.0.0'))
-    fs.ensureSymlinkSync(path.join(clientRoot, '2.0.0'), path.join(clientRoot, 'current'))
-    fs.writeFileSync(path.join(clientRoot, 'bin', ctx.config.bin), '../2.0.0/bin', 'utf8')
+    await mkdir(path.join(clientRoot, 'bin'), {recursive: true})
+    fse.ensureFileSync(path.join(clientRoot, '2.0.0'))
+    fse.ensureSymlinkSync(path.join(clientRoot, '2.0.0'), path.join(clientRoot, 'current'))
+    await writeFile(path.join(clientRoot, 'bin', ctx.config.bin), '../2.0.0/bin', 'utf8')
   }
 
   return clientRoot
@@ -44,13 +47,13 @@ describe('update plugin', () => {
   let updater: Updater
   let collector: OutputCollectors
   let clientRoot: string
-  let sandbox: sinon.SinonSandbox
+
+  const sandbox = sinon.createSandbox()
 
   beforeEach(async () => {
     config = await loadConfig({root: path.join(process.cwd(), 'examples', 's3-update-example-cli')}) as Config
     config.binPath = config.binPath || config.bin
     collector = {stdout: [], stderr: []}
-    sandbox = sinon.createSandbox()
     sandbox.stub(ux, 'log').callsFake(line => collector.stdout.push(line || ''))
     sandbox.stub(ux, 'warn').callsFake(line => collector.stderr.push(line ? `${line}` : ''))
     sandbox.stub(ux.action, 'start').callsFake(line => collector.stdout.push(line || ''))
@@ -60,17 +63,17 @@ describe('update plugin', () => {
     sandbox.stub(Updater.prototype, 'refreshConfig').resolves()
   })
 
-  afterEach(() => {
+  afterEach(async () => {
     nock.cleanAll()
-    if (fs.pathExistsSync(clientRoot)) {
-      fs.removeSync(clientRoot)
+    if (existsSync(clientRoot)) {
+      await rm(clientRoot, {recursive: true, force: true})
     }
 
     sandbox.restore()
   })
 
   it('should not update - already on same version', async () => {
-    clientRoot = setupClientRoot({config}, '2.0.0')
+    clientRoot = await setupClientRoot({config}, '2.0.0')
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
     nock(/oclif-staging.s3.amazonaws.com/)
@@ -86,13 +89,15 @@ describe('update plugin', () => {
   })
 
   it('should update to channel', async () => {
-    clientRoot = setupClientRoot({config})
+    clientRoot = await setupClientRoot({config})
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
     const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`)
     const newVersionPath = path.join(clientRoot, '2.0.1')
-    fs.mkdirpSync(path.join(`${newVersionPath}.partial.11111`, 'bin'))
-    fs.writeFileSync(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+    await mkdir(path.join(`${newVersionPath}.partial.11111`, 'bin'), {recursive: true})
+    // await writeFile(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+    fse.writeFileSync(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+
     sandbox.stub(extract, 'extract').resolves()
     sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
 
@@ -118,7 +123,7 @@ describe('update plugin', () => {
 
   it('should update to version', async () => {
     const hash = 'f289627'
-    clientRoot = setupClientRoot({config})
+    clientRoot = await setupClientRoot({config})
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
     const versionManifestRegex = new RegExp(`example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`)
@@ -158,7 +163,7 @@ describe('update plugin', () => {
     const request = sandbox.spy(HTTP,  'get')
     const hash = 'f289627'
     config.pjson.name = '@oclif/plugin-update'
-    clientRoot = setupClientRoot({config})
+    clientRoot = await setupClientRoot({config})
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
     const versionManifestRegex = new RegExp(`example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`)
@@ -198,7 +203,7 @@ describe('update plugin', () => {
     const hash = 'f289627'
     config.pjson.name = '@oclif/plugin-update'
     config.npmRegistry = 'https://myCustomRegistry.com'
-    clientRoot = setupClientRoot({config})
+    clientRoot = await setupClientRoot({config})
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
     const versionManifestRegex = new RegExp(`example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`)
@@ -235,7 +240,7 @@ describe('update plugin', () => {
   })
 
   it('should not update - not updatable', async () => {
-    clientRoot = setupClientRoot({config})
+    clientRoot = await setupClientRoot({config})
     // unset binPath
     config.binPath = undefined
     nock(/oclif-staging.s3.amazonaws.com/)
@@ -251,15 +256,15 @@ describe('update plugin', () => {
   })
 
   it('should update from local file', async () => {
-    clientRoot = setupClientRoot({config})
+    clientRoot = await setupClientRoot({config})
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
     const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.0\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`)
     const newVersionPath = path.join(clientRoot, '2.0.1')
-    fs.mkdirpSync(path.join(newVersionPath, 'bin'))
-    fs.mkdirpSync(path.join(`${newVersionPath}.partial.11111`, 'bin'))
-    fs.writeFileSync(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
-    fs.writeFileSync(path.join(newVersionPath, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+    await mkdir(path.join(newVersionPath, 'bin'), {recursive: true})
+    await mkdir(path.join(`${newVersionPath}.partial.11111`, 'bin'), {recursive: true})
+    await writeFile(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+    await writeFile(path.join(newVersionPath, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
     sandbox.stub(extract, 'extract').resolves()
     sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
 

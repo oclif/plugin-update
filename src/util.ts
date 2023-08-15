@@ -15,14 +15,6 @@ export async function ls(dir: string): Promise<Array<{path: string, stat: fs.Sta
   return Promise.all(paths.map(path => fs.stat(path).then(stat => ({path, stat}))))
 }
 
-export async function rm(dir: string): Promise<void> {
-  return new Promise(resolve => {
-    fs.rm(dir, {recursive: true, force: true}, () => {
-      resolve()
-    })
-  })
-}
-
 export function wait(ms: number, unref = false): Promise<void> {
   return new Promise(resolve => {
     const t: any = setTimeout(() => resolve(), ms)

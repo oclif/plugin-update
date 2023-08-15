@@ -1,4 +1,5 @@
-import * as fs from 'fs-extra'
+import * as fs from 'node:fs/promises'
+import {existsSync} from 'node:fs'
 import * as path from 'path'
 
 import {touch} from './util'
@@ -21,7 +22,7 @@ const ignore = (_: any, header: any) => {
 export async function extract(stream: NodeJS.ReadableStream, basename: string, output: string, sha?: string): Promise<void> {
   const getTmp = () => `${output}.partial.${Math.random().toString().split('.')[1].slice(0, 5)}`
   let tmp = getTmp()
-  if (fs.pathExistsSync(tmp)) tmp = getTmp()
+  if (existsSync(tmp)) tmp = getTmp()
   debug(`extracting to ${tmp}`)
   try {
     await new Promise((resolve, reject) => {
@@ -60,25 +61,26 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
       stream.pipe(gunzip).pipe(extract)
     })
 
-    if (await fs.pathExists(output)) {
+    if (existsSync(output)) {
       try {
         const tmp = getTmp()
-        await fs.move(output, tmp)
-        await fs.remove(tmp).catch(debug)
+        const {move} = await import('fs-extra')
+        await move(output, tmp)
+        await fs.rm(tmp, {recursive: true, force: true}).catch(debug)
       } catch (error: any) {
         debug(error)
-        await fs.remove(output)
+        await fs.rm(tmp, {recursive: true, force: true}).catch(debug)
       }
     }
 
     const from = path.join(tmp, basename)
     debug('moving %s to %s', from, output)
     await fs.rename(from, output)
-    await fs.remove(tmp).catch(debug)
+    await fs.rm(tmp, {recursive: true, force: true}).catch(debug)
     await touch(output)
     debug('done extracting')
   } catch (error: any) {
-    await fs.remove(tmp).catch(process.emitWarning)
+    await fs.rm(tmp, {recursive: true, force: true}).catch(process.emitWarning)
     throw error
   }
 }

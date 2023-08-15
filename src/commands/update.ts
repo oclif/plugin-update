@@ -91,3 +91,4 @@ export default class UpdateCommand extends Command {
     return version
   }
 }
+
