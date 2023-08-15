@@ -7,8 +7,11 @@
     "source-map-support/register"
   ],
   "timeout": 0,
+  "watch-files": [
+    "test/**/*.ts",
+    "src/**/*.ts"
+  ],
   "watch-extensions": [
     "ts"
   ]
 }
-
