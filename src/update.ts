@@ -207,6 +207,8 @@ export class Updater {
     const {bin, windows} = this.config
     const binPathEnvVar = this.config.scopedEnvVarKey('BINPATH')
     const redirectedEnvVar = this.config.scopedEnvVarKey('REDIRECTED')
+    await mkdir(path.dirname(dst), {recursive: true})
+
     if (windows) {
       const body = `@echo off
 setlocal enableextensions
@@ -235,7 +237,6 @@ DIR=$(get_script_dir)
 ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${bin}" "$@"
 `
       /* eslint-enable no-useless-escape */
-      await mkdir(path.dirname(dst), {recursive: true})
       await writeFile(dst, body, {mode: 0o755})
       await rm(path.join(this.clientRoot, 'current'), {recursive: true, force: true})
       await symlink(`./${version}`, path.join(this.clientRoot, 'current'))
