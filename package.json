@@ -4,8 +4,8 @@
   "author": "Salesforce",
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
-    "@oclif/color": "^1.0.10",
     "@oclif/core": "^2.11.8",
+    "chalk": "^4",
     "cross-spawn": "^7.0.3",
     "debug": "^4.3.1",
     "filesize": "^6.1.0",
