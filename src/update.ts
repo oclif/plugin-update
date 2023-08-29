@@ -1,5 +1,4 @@
-/* eslint-disable unicorn/prefer-module */
-import color from '@oclif/color'
+import * as chalk from 'chalk'
 import {Config, ux, Interfaces} from '@oclif/core'
 
 import * as fs from 'fs-extra'
@@ -235,7 +234,7 @@ export class Updater {
 
   // eslint-disable-next-line max-params
   private async update(manifest: Interfaces.S3Manifest, current: string, updated: string, force: boolean, channel: string) {
-    ux.action.start(`${this.config.name}: Updating CLI from ${color.green(current)} to ${color.green(updated)}${channel === 'stable' ? '' : ' (' + color.yellow(channel) + ')'}`)
+    ux.action.start(`${this.config.name}: Updating CLI from ${chalk.green(current)} to ${chalk.green(updated)}${channel === 'stable' ? '' : ' (' + chalk.yellow(channel) + ')'}`)
 
     await this.ensureClientDir()
     const output = path.join(this.clientRoot, updated)
@@ -248,7 +247,7 @@ export class Updater {
   }
 
   private async updateToExistingVersion(current: string, updated: string): Promise<void> {
-    ux.action.start(`${this.config.name}: Updating CLI from ${color.green(current)} to ${color.green(updated)}`)
+    ux.action.start(`${this.config.name}: Updating CLI from ${chalk.green(current)} to ${chalk.green(updated)}`)
     await this.ensureClientDir()
     await this.refreshConfig(updated)
     await this.createBin(updated)
