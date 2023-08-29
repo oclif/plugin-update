@@ -1,4 +1,4 @@
-import * as chalk from 'chalk'
+import chalk from 'chalk'
 import {Config, ux, Interfaces} from '@oclif/core'
 
 import * as fs from 'fs-extra'
