@@ -1,3 +1,12 @@
+# [3.2.0](https://github.com/oclif/plugin-update/compare/3.1.32...3.2.0) (2023-08-29)
+
+
+### Features
+
+* remove @oclif/color ([#617](https://github.com/oclif/plugin-update/issues/617)) ([c2708ea](https://github.com/oclif/plugin-update/commit/c2708ea06c39f9d50abefe2951b1daefc51164a5))
+
+
+
 ## [3.1.32](https://github.com/oclif/plugin-update/compare/3.1.31...3.1.32) (2023-08-13)
 
 
