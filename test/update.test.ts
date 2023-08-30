@@ -1,6 +1,5 @@
-import * as fse from 'fs-extra'
 import {existsSync} from 'node:fs'
-import {writeFile, rm, mkdir} from 'node:fs/promises'
+import {writeFile, rm, mkdir, symlink} from 'node:fs/promises'
 
 import * as path from 'path'
 import {Config, ux} from '@oclif/core'
@@ -28,8 +27,10 @@ const  setupClientRoot = async (ctx: { config: IConfig }, createVersion?: string
   await mkdir(clientRoot, {recursive: true})
   if (createVersion) {
     await mkdir(path.join(clientRoot, 'bin'), {recursive: true})
-    fse.ensureFileSync(path.join(clientRoot, '2.0.0'))
-    fse.ensureSymlinkSync(path.join(clientRoot, '2.0.0'), path.join(clientRoot, 'current'))
+    if (!existsSync(path.join(clientRoot, '2.0.0'))) {
+      await symlink(path.join(clientRoot, '2.0.0'), path.join(clientRoot, 'current'))
+    }
+
     await writeFile(path.join(clientRoot, 'bin', ctx.config.bin), '../2.0.0/bin', 'utf8')
   }
 
@@ -96,7 +97,7 @@ describe('update plugin', () => {
     const newVersionPath = path.join(clientRoot, '2.0.1')
     await mkdir(path.join(`${newVersionPath}.partial.11111`, 'bin'), {recursive: true})
     // await writeFile(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
-    fse.writeFileSync(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+    await writeFile(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
 
     sandbox.stub(extract, 'extract').resolves()
     sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))

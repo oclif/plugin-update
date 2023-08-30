@@ -64,8 +64,7 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
     if (existsSync(output)) {
       try {
         const tmp = getTmp()
-        const {move} = await import('fs-extra')
-        await move(output, tmp)
+        await fs.cp(output, tmp, {recursive: true, force: true})
         await fs.rm(tmp, {recursive: true, force: true}).catch(debug)
       } catch (error: any) {
         debug(error)
