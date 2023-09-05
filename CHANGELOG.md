@@ -1,3 +1,12 @@
+## [3.2.1](https://github.com/oclif/plugin-update/compare/3.2.0...3.2.1) (2023-09-05)
+
+
+### Bug Fixes
+
+* clis don't delete themselves ([#621](https://github.com/oclif/plugin-update/issues/621)) ([ca57247](https://github.com/oclif/plugin-update/commit/ca5724795520357a28e5ceb34657141cd1eb731e))
+
+
+
 # [3.2.0](https://github.com/oclif/plugin-update/compare/3.1.32...3.2.0) (2023-08-29)
 
 
