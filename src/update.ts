@@ -358,7 +358,9 @@ export class Updater {
       if (!await fs.pathExists(root)) return
       const files = await ls(root)
       const promises = files.map(async (f: any) => {
-        if (['bin', 'current', this.config.version].includes(path.basename(f.path))) return
+        if (['bin', 'current'].includes(path.basename(f.path))) return
+        // if 1.2.3-shasha7 starts with 1.2.3
+        if (path.basename(f.path).startsWith(this.config.version)) return
         const mtime = f.stat.mtime
         mtime.setHours(mtime.getHours() + (42 * 24))
         if (mtime < new Date()) {
