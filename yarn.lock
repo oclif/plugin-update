@@ -447,9 +447,9 @@
     read-package-json-fast "^2.0.1"
 
 "@oclif/color@^1.0.8":
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/@oclif/color/-/color-1.0.10.tgz#e83e3a30fffc93076281398cbeaa4f761c4df09e"
-  integrity sha512-INWEDAL3SzzR3pIhkrqk22HV6JravLUeRZXAIpoQqIeLReauaibCVcNTzOlt0z0S8YrqRhksc54ZxZC4Oa8xBw==
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@oclif/color/-/color-1.0.11.tgz#306f09953440a49b47c4c86cabe5fad0ef0f0381"
+  integrity sha512-2hOJFJoaJdeEH/0D9Ek5B7Q3bV6jFVRIc7AUimqV8HiA6HGynvCcV0jb1kDK7O2h+WT3j6MO6S4IdjipwqOP4Q==
   dependencies:
     ansi-styles "^4.2.1"
     chalk "^4.1.0"
