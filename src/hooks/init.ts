@@ -1,14 +1,12 @@
-import {ux, Interfaces} from '@oclif/core'
-import {spawn} from 'child_process'
+import {Interfaces} from '@oclif/core'
+import {spawn} from 'node:child_process'
 import {existsSync} from 'node:fs'
-
 import {stat, open, writeFile} from 'node:fs/promises'
-import * as path from 'path'
+import {join} from 'node:path'
+import {touch} from '../util.js'
 
-import {touch} from '../util'
-
-// eslint-disable-next-line unicorn/prefer-module
-const debug = require('debug')('cli:updater')
+import makeDebug from 'debug'
+const debug = makeDebug('cli:updater')
 
 function timestamp(msg: string): string {
   return `[${new Date().toISOString()}] ${msg}`
@@ -22,16 +20,18 @@ async function mtime(f: string) {
 export const init: Interfaces.Hook<'init'> = async function (opts) {
   if (opts.id === 'update') return
   if (opts.config.scopedEnvVarTrue('DISABLE_AUTOUPDATE')) return
-  const binPath = this.config.binPath || this.config.bin
-  const lastrunfile = path.join(this.config.cacheDir, 'lastrun')
-  const autoupdatefile = path.join(this.config.cacheDir, 'autoupdate')
-  const autoupdatelogfile = path.join(this.config.cacheDir, 'autoupdate.log')
-  const clientRoot = this.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(this.config.dataDir, 'client')
+
+  const {error, config} = this
+  const binPath = config.binPath || config.bin
+  const lastrunfile = join(config.cacheDir, 'lastrun')
+  const autoupdatefile = join(config.cacheDir, 'autoupdate')
+  const autoupdatelogfile = join(config.cacheDir, 'autoupdate.log')
+  const clientRoot = config.scopedEnvVar('OCLIF_CLIENT_HOME') || join(config.dataDir, 'client')
 
   const autoupdateEnv = {
     ...process.env,
-    [this.config.scopedEnvVarKey('TIMESTAMPS')]: '1',
-    [this.config.scopedEnvVarKey('SKIP_ANALYTICS')]: '1',
+    [config.scopedEnvVarKey('TIMESTAMPS')]: '1',
+    [config.scopedEnvVarKey('SKIP_ANALYTICS')]: '1',
   }
 
   async function autoupdateNeeded(): Promise<boolean> {
@@ -41,8 +41,8 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
       if (opts.config.channel === 'stable') days = 14
       m.setHours(m.getHours() + (days * 24))
       return m < new Date()
-    } catch (error: any) {
-      if (error.code !== 'ENOENT') ux.error(error.stack)
+    } catch (error_: any) {
+      if (error_.code !== 'ENOENT') error(error_.stack)
       if ((global as any).testing) return false
       debug('autoupdate ENOENT')
       return true
@@ -50,7 +50,7 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
   }
 
   await touch(lastrunfile)
-  const clientDir = path.join(clientRoot, this.config.version)
+  const clientDir = join(clientRoot, config.version)
   if (existsSync(clientDir)) await touch(clientDir)
   if (!await autoupdateNeeded()) return
 
@@ -67,7 +67,7 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
 
   const stream = fd.createWriteStream()
   spawn(binPath, ['update', '--autoupdate'], {
-    detached: !this.config.windows,
+    detached: !config.windows,
     stdio: ['ignore', stream, stream],
     env: autoupdateEnv,
   })

@@ -2,27 +2,26 @@ import * as fse from 'fs-extra'
 import {existsSync} from 'node:fs'
 import {writeFile, rm, mkdir} from 'node:fs/promises'
 
-import * as path from 'path'
-import {Config, ux} from '@oclif/core'
-import {Config as IConfig} from '@oclif/core/lib/interfaces'
-import {Updater} from '../src/update'
-import * as zlib from 'zlib'
-import nock from 'nock'
-import * as sinon from 'sinon'
+import * as path from 'node:path'
+import {Config, Interfaces, ux} from '@oclif/core'
+import {Updater} from '../src/update.js'
+import * as zlib from 'node:zlib'
+import nock, {cleanAll} from 'nock'
+import {createSandbox} from 'sinon'
 import stripAnsi = require('strip-ansi')
-import * as extract from '../src/tar'
+import * as extract from '../src/tar.js'
 import {expect} from 'chai'
-import HTTP from 'http-call'
+import {HTTP} from 'http-call'
 
 type OutputCollectors = {
   stdout: string[];
   stderr: string[];
 }
-async function loadConfig(options: {root: string}): Promise<IConfig> {
+async function loadConfig(options: {root: string}): Promise<Interfaces.Config> {
   return Config.load(options.root)
 }
 
-const  setupClientRoot = async (ctx: { config: IConfig }, createVersion?: string): Promise<string> => {
+const  setupClientRoot = async (ctx: { config: Interfaces.Config }, createVersion?: string): Promise<string> => {
   const clientRoot = ctx.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(ctx.config.dataDir, 'client')
   // Ensure installed version structure is present
   await mkdir(clientRoot, {recursive: true})
@@ -48,7 +47,7 @@ describe('update plugin', () => {
   let collector: OutputCollectors
   let clientRoot: string
 
-  const sandbox = sinon.createSandbox()
+  const sandbox = createSandbox()
 
   beforeEach(async () => {
     config = await loadConfig({root: path.join(process.cwd(), 'examples', 's3-update-example-cli')}) as Config
@@ -64,7 +63,7 @@ describe('update plugin', () => {
   })
 
   afterEach(async () => {
-    nock.cleanAll()
+    cleanAll()
     if (existsSync(clientRoot)) {
       await rm(clientRoot, {recursive: true, force: true})
     }
@@ -95,8 +94,7 @@ describe('update plugin', () => {
     const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`)
     const newVersionPath = path.join(clientRoot, '2.0.1')
     await mkdir(path.join(`${newVersionPath}.partial.11111`, 'bin'), {recursive: true})
-    // await writeFile(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
-    fse.writeFileSync(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+    await writeFile(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
 
     sandbox.stub(extract, 'extract').resolves()
     sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))

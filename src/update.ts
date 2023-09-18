@@ -1,15 +1,15 @@
-/* eslint-disable unicorn/prefer-module */
+
 import {Config, ux, Interfaces} from '@oclif/core'
 import {green, yellow} from 'chalk'
 import {Stats, existsSync} from 'node:fs'
 import {readdir, writeFile, rm, symlink, mkdir, readFile, stat, utimes} from 'node:fs/promises'
-import HTTP from 'http-call'
-import * as path from 'path'
+import {HTTP} from 'http-call'
+import * as path from 'node:path'
 import throttle from 'lodash.throttle'
 import fileSize from 'filesize'
 
-import {extract} from './tar'
-import {ls, wait} from './util'
+import {extract} from './tar.js'
+import {ls, wait} from './util.js'
 
 const filesize = (n: number): string => {
   const [num, suffix] = fileSize(n, {output: 'array'})
@@ -102,7 +102,8 @@ export class Updater {
 
   public async findLocalVersions(): Promise<string[]> {
     await ensureClientDir(this.clientRoot)
-    return (await readdir(this.clientRoot))
+    const dirOrFiles = await readdir(this.clientRoot)
+    return dirOrFiles
     .filter(dirOrFile => dirOrFile !== 'bin' && dirOrFile !== 'current')
     .map(f => path.join(this.clientRoot, f))
   }
@@ -170,7 +171,7 @@ export class Updater {
         !(['bin', 'current', version].includes(path.basename(fPath)))
 
       const isOld = (fStat: Stats): boolean => {
-        const mtime = fStat.mtime
+        const {mtime} = fStat
         mtime.setHours(mtime.getHours() + (42 * 24))
         return mtime < new Date()
       }
@@ -262,7 +263,8 @@ const ensureClientDir = async (clientRoot: string): Promise<void> => {
   }
 }
 
-const mtime = async (f: string): Promise<Date> =>  (await stat(f)).mtime
+// eslint-disable-next-line unicorn/no-await-expression-member
+const mtime = async (f: string): Promise<Date> => (await stat(f)).mtime
 
 const notUpdatable = (config: Config): boolean => {
   if (!config.binPath) {
@@ -393,6 +395,7 @@ const downloadAndExtract = async (output: string, manifest: Interfaces.S3Manifes
 const determineChannel = async ({version, config}: { version?: string; config: Config }): Promise<string> => {
   const channelPath = path.join(config.dataDir, 'channel')
 
+  // eslint-disable-next-line unicorn/no-await-expression-member
   const channel = existsSync(channelPath) ? (await readFile(channelPath, 'utf8')).trim() : 'stable'
 
   try {

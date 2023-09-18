@@ -1,6 +1,7 @@
 *-debug.log
 *-error.log
 .oclif.manifest.json
+oclif.manifest.json
 /dist
 /lib
 /node_modules
@@ -9,3 +10,5 @@
 /oclif-plugin-update-*.tgz
 /.vscode
 /.idea
+
+oclif.lock

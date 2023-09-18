@@ -4,16 +4,21 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "skipLibCheck": true,
-    "module": "commonjs",
+    "module": "es2020",
     "outDir": "./lib",
     "rootDirs": [
       "./src"
     ],
     "strict": true,
     "target": "ES2021",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "moduleResolution": "node16"
   },
   "include": [
     "./src/**/*"
-  ]
+  ],
+  "ts-node": {
+    "esm": true,
+    "scope": true
+  }
 }

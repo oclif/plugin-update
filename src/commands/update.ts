@@ -1,8 +1,8 @@
 import {Command, Flags, ux, Args} from '@oclif/core'
 import {prompt, Separator} from 'inquirer'
-import * as path from 'path'
+import * as path from 'node:path'
 import {sort} from 'semver'
-import {Updater} from '../update'
+import {Updater} from '../update.js'
 
 export default class UpdateCommand extends Command {
   static description = 'update the <%= config.bin %> CLI'

@@ -1,21 +1,26 @@
 import * as fs from 'node:fs/promises'
 import {existsSync} from 'node:fs'
-import * as path from 'path'
+import * as path from 'node:path'
 
-import {touch} from './util'
+import {touch} from './util.js'
 
 const debug = require('debug')('oclif-update')
 
 const ignore = (_: any, header: any) => {
   switch (header.type) {
   case 'directory':
-  case 'file':
+  case 'file': {
     if (process.env.OCLIF_DEBUG_UPDATE_FILES) debug(header.name)
     return false
-  case 'symlink':
+  }
+
+  case 'symlink': {
     return true
-  default:
+  }
+
+  default: {
     throw new Error(header.type)
+  }
   }
 }
 
@@ -26,9 +31,9 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
   debug(`extracting to ${tmp}`)
   try {
     await new Promise((resolve, reject) => {
-      const zlib = require('zlib')
+      const zlib = require('node:zlib')
       const tar = require('tar-fs')
-      const crypto = require('crypto')
+      const crypto = require('node:crypto')
       let shaValidated = false
       let extracted = false
       const check = () => shaValidated && extracted && resolve(null)
