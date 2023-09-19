@@ -1,6 +1,6 @@
 import {Command, Flags, ux, Args} from '@oclif/core'
-import {prompt, Separator} from 'inquirer'
-import * as path from 'node:path'
+import inquirer from 'inquirer'
+import {basename} from 'node:path'
 import {sort} from 'semver'
 import {Updater} from '../update.js'
 
@@ -60,7 +60,7 @@ export default class UpdateCommand extends Command {
       const localVersions = await updater.findLocalVersions()
 
       const table = allVersions.map(version => {
-        const location = localVersions.find(l => path.basename(l).startsWith(version)) || index[version]
+        const location = localVersions.find(l => basename(l).startsWith(version)) || index[version]
         return {version, location}
       })
 
@@ -82,11 +82,11 @@ export default class UpdateCommand extends Command {
 
   private async promptForVersion(updater: Updater): Promise<string> {
     const choices = sort(Object.keys(await updater.fetchVersionIndex())).reverse()
-    const {version} = await prompt<{version: string}>({
+    const {version} = await inquirer.prompt<{version: string}>({
       name: 'version',
       message: 'Select a version to update to',
       type: 'list',
-      choices: [...choices, new Separator()],
+      choices: [...choices, new inquirer.Separator()],
     })
     return version
   }

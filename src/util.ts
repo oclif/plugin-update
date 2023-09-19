@@ -1,18 +1,19 @@
-import * as fs from 'fs-extra'
-import * as path from 'node:path'
+import {readdir, stat, writeFile, utimes} from 'node:fs/promises'
+import {Stats} from 'node:fs'
+import {join} from 'node:path'
 
 export async function touch(p: string): Promise<void> {
   try {
-    await fs.utimes(p, new Date(), new Date())
+    await utimes(p, new Date(), new Date())
   } catch {
-    await fs.outputFile(p, '')
+    await writeFile(p, '')
   }
 }
 
-export async function ls(dir: string): Promise<Array<{path: string, stat: fs.Stats}>> {
-  const files = await fs.readdir(dir)
-  const paths = files.map(f => path.join(dir, f))
-  return Promise.all(paths.map(path => fs.stat(path).then(stat => ({path, stat}))))
+export async function ls(dir: string): Promise<Array<{path: string, stat: Stats}>> {
+  const files = await readdir(dir)
+  const paths = files.map(f => join(dir, f))
+  return Promise.all(paths.map(path => stat(path).then(s => ({path, stat: s}))))
 }
 
 export function wait(ms: number, unref = false): Promise<void> {

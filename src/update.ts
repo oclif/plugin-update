@@ -1,6 +1,6 @@
 
 import {Config, ux, Interfaces} from '@oclif/core'
-import {green, yellow} from 'chalk'
+import chalk from 'chalk'
 import {Stats, existsSync} from 'node:fs'
 import {readdir, writeFile, rm, symlink, mkdir, readFile, stat, utimes} from 'node:fs/promises'
 import {HTTP} from 'http-call'
@@ -133,7 +133,7 @@ export class Updater {
 
   // eslint-disable-next-line max-params
   private async update(manifest: Interfaces.S3Manifest, current: string, updated: string, force: boolean, channel: string) {
-    ux.action.start(`${this.config.name}: Updating CLI from ${green(current)} to ${green(updated)}${channel === 'stable' ? '' : ' (' + yellow(channel) + ')'}`)
+    ux.action.start(`${this.config.name}: Updating CLI from ${chalk.green(current)} to ${chalk.green(updated)}${channel === 'stable' ? '' : ' (' + chalk.yellow(channel) + ')'}`)
 
     await ensureClientDir(this.clientRoot)
     const output = path.join(this.clientRoot, updated)
@@ -146,7 +146,7 @@ export class Updater {
   }
 
   private async updateToExistingVersion(current: string, updated: string): Promise<void> {
-    ux.action.start(`${this.config.name}: Updating CLI from ${green(current)} to ${green(updated)}`)
+    ux.action.start(`${this.config.name}: Updating CLI from ${chalk.green(current)} to ${chalk.green(updated)}`)
     await ensureClientDir(this.clientRoot)
     await this.refreshConfig(updated)
     await this.createBin(updated)

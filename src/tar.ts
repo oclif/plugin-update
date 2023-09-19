@@ -1,10 +1,11 @@
-import * as fs from 'node:fs/promises'
+import {copyFile, rename, rm} from 'node:fs/promises'
 import {existsSync} from 'node:fs'
-import * as path from 'node:path'
+import {join} from 'node:path'
 
 import {touch} from './util.js'
 
-const debug = require('debug')('oclif-update')
+import makeDebug from 'debug'
+const debug = makeDebug('oclif-update')
 
 const ignore = (_: any, header: any) => {
   switch (header.type) {
@@ -69,23 +70,24 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
     if (existsSync(output)) {
       try {
         const tmp = getTmp()
-        const {move} = await import('fs-extra')
-        await move(output, tmp)
-        await fs.rm(tmp, {recursive: true, force: true}).catch(debug)
+        // const {move} = await import('fs-extra')
+        // await move(output, tmp)
+        await copyFile(output, tmp)
+        await rm(tmp, {recursive: true, force: true}).catch(debug)
       } catch (error: any) {
         debug(error)
-        await fs.rm(tmp, {recursive: true, force: true}).catch(debug)
+        await rm(tmp, {recursive: true, force: true}).catch(debug)
       }
     }
 
-    const from = path.join(tmp, basename)
+    const from = join(tmp, basename)
     debug('moving %s to %s', from, output)
-    await fs.rename(from, output)
-    await fs.rm(tmp, {recursive: true, force: true}).catch(debug)
+    await rename(from, output)
+    await rm(tmp, {recursive: true, force: true}).catch(debug)
     await touch(output)
     debug('done extracting')
   } catch (error: any) {
-    await fs.rm(tmp, {recursive: true, force: true}).catch(process.emitWarning)
+    await rm(tmp, {recursive: true, force: true}).catch(process.emitWarning)
     throw error
   }
 }
