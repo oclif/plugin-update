@@ -32,7 +32,7 @@
     "@types/semver": "^7.5.2",
     "@types/supports-color": "^7.2.0",
     "@types/write-json-file": "^3.2.1",
-    "chai": "^4.3.8",
+    "chai": "^4.3.10",
     "eslint": "^7.32.0",
     "eslint-config-oclif": "^4",
     "eslint-config-oclif-typescript": "^1.0.3",
