@@ -1,6 +1,6 @@
 import makeDebug from 'debug'
 import {existsSync} from 'node:fs'
-import {copyFile, rename, rm} from 'node:fs/promises'
+import {cp, rename, rm} from 'node:fs/promises'
 import {join} from 'node:path'
 
 import {touch} from './util.js'
@@ -69,10 +69,7 @@ async function extract(stream: NodeJS.ReadableStream, basename: string, output: 
     if (existsSync(output)) {
       try {
         const tmp = getTmp()
-        // TODO: is it safe to use copyFile instead?
-        // const {move} = await import('fs-extra')
-        // await move(output, tmp)
-        await copyFile(output, tmp)
+        await cp(output, tmp)
         await rm(tmp, {force: true, recursive: true}).catch(debug)
       } catch (error: any) {
         debug(error)
