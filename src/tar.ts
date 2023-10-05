@@ -1,31 +1,35 @@
-import {copyFile, rename, rm} from 'node:fs/promises'
+import makeDebug from 'debug'
 import {existsSync} from 'node:fs'
+import {copyFile, rename, rm} from 'node:fs/promises'
 import {join} from 'node:path'
 
 import {touch} from './util.js'
-
-import makeDebug from 'debug'
 const debug = makeDebug('oclif-update')
 
 const ignore = (_: any, header: any) => {
   switch (header.type) {
-  case 'directory':
-  case 'file': {
-    if (process.env.OCLIF_DEBUG_UPDATE_FILES) debug(header.name)
-    return false
-  }
+    case 'directory':
+    case 'file': {
+      if (process.env.OCLIF_DEBUG_UPDATE_FILES) debug(header.name)
+      return false
+    }
 
-  case 'symlink': {
-    return true
-  }
+    case 'symlink': {
+      return true
+    }
 
-  default: {
-    throw new Error(header.type)
-  }
+    default: {
+      throw new Error(header.type)
+    }
   }
 }
 
-export async function extract(stream: NodeJS.ReadableStream, basename: string, output: string, sha?: string): Promise<void> {
+export async function extract(
+  stream: NodeJS.ReadableStream,
+  basename: string,
+  output: string,
+  sha?: string,
+): Promise<void> {
   const getTmp = () => `${output}.partial.${Math.random().toString().split('.')[1].slice(0, 5)}`
   let tmp = getTmp()
   if (existsSync(tmp)) tmp = getTmp()
@@ -42,7 +46,7 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
       if (sha) {
         const hasher = crypto.createHash('sha256')
         stream.on('error', reject)
-        stream.on('data', d => hasher.update(d))
+        stream.on('data', (d) => hasher.update(d))
         stream.on('end', () => {
           const shasum = hasher.digest('hex')
           if (sha === shasum) {
@@ -70,24 +74,25 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
     if (existsSync(output)) {
       try {
         const tmp = getTmp()
+        // TODO: is it sage to use copyFile instead?
         // const {move} = await import('fs-extra')
         // await move(output, tmp)
         await copyFile(output, tmp)
-        await rm(tmp, {recursive: true, force: true}).catch(debug)
+        await rm(tmp, {force: true, recursive: true}).catch(debug)
       } catch (error: any) {
         debug(error)
-        await rm(tmp, {recursive: true, force: true}).catch(debug)
+        await rm(tmp, {force: true, recursive: true}).catch(debug)
       }
     }
 
     const from = join(tmp, basename)
     debug('moving %s to %s', from, output)
     await rename(from, output)
-    await rm(tmp, {recursive: true, force: true}).catch(debug)
+    await rm(tmp, {force: true, recursive: true}).catch(debug)
     await touch(output)
     debug('done extracting')
   } catch (error: any) {
-    await rm(tmp, {recursive: true, force: true}).catch(process.emitWarning)
+    await rm(tmp, {force: true, recursive: true}).catch(process.emitWarning)
     throw error
   }
 }
