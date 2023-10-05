@@ -1,10 +1,9 @@
 import {Config, Interfaces, ux} from '@oclif/core'
 import {expect} from 'chai'
-import * as fse from 'fs-extra'
 import {HTTP} from 'http-call'
 import nock from 'nock'
 import {existsSync} from 'node:fs'
-import {mkdir, rm, writeFile} from 'node:fs/promises'
+import {mkdir, rm, symlink, writeFile} from 'node:fs/promises'
 import * as path from 'node:path'
 import zlib from 'node:zlib'
 import {createSandbox} from 'sinon'
@@ -27,8 +26,10 @@ const setupClientRoot = async (ctx: {config: Interfaces.Config}, createVersion?:
   await mkdir(clientRoot, {recursive: true})
   if (createVersion) {
     await mkdir(path.join(clientRoot, 'bin'), {recursive: true})
-    fse.ensureFileSync(path.join(clientRoot, '2.0.0'))
-    fse.ensureSymlinkSync(path.join(clientRoot, '2.0.0'), path.join(clientRoot, 'current'))
+    if (!existsSync(path.join(clientRoot, '2.0.0'))) {
+      await symlink(path.join(clientRoot, '2.0.0'), path.join(clientRoot, 'current'))
+    }
+
     await writeFile(path.join(clientRoot, 'bin', ctx.config.bin), '../2.0.0/bin', 'utf8')
   }
 
