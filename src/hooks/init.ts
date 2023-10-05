@@ -1,11 +1,11 @@
 import {Interfaces} from '@oclif/core'
+import makeDebug from 'debug'
 import {spawn} from 'node:child_process'
 import {existsSync} from 'node:fs'
-import {stat, open, writeFile} from 'node:fs/promises'
+import {open, stat, writeFile} from 'node:fs/promises'
 import {join} from 'node:path'
-import {touch} from '../util.js'
 
-import makeDebug from 'debug'
+import {touch} from '../util.js'
 const debug = makeDebug('cli:updater')
 
 function timestamp(msg: string): string {
@@ -21,7 +21,7 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
   if (opts.id === 'update') return
   if (opts.config.scopedEnvVarTrue('DISABLE_AUTOUPDATE')) return
 
-  const {error, config} = this
+  const {config, error} = this
   const binPath = config.binPath || config.bin
   const lastrunfile = join(config.cacheDir, 'lastrun')
   const autoupdatefile = join(config.cacheDir, 'autoupdate')
@@ -30,8 +30,8 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
 
   const autoupdateEnv = {
     ...process.env,
-    [config.scopedEnvVarKey('TIMESTAMPS')]: '1',
     [config.scopedEnvVarKey('SKIP_ANALYTICS')]: '1',
+    [config.scopedEnvVarKey('TIMESTAMPS')]: '1',
   }
 
   async function autoupdateNeeded(): Promise<boolean> {
@@ -39,7 +39,7 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
       const m = await mtime(autoupdatefile)
       let days = 1
       if (opts.config.channel === 'stable') days = 14
-      m.setHours(m.getHours() + (days * 24))
+      m.setHours(m.getHours() + days * 24)
       return m < new Date()
     } catch (error_: any) {
       if (error_.code !== 'ENOENT') error(error_.stack)
@@ -52,7 +52,7 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
   await touch(lastrunfile)
   const clientDir = join(clientRoot, config.version)
   if (existsSync(clientDir)) await touch(clientDir)
-  if (!await autoupdateNeeded()) return
+  if (!(await autoupdateNeeded())) return
 
   debug('autoupdate running')
   await writeFile(autoupdatefile, '')
@@ -68,9 +68,9 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
   const stream = fd.createWriteStream()
   spawn(binPath, ['update', '--autoupdate'], {
     detached: !config.windows,
-    stdio: ['ignore', stream, stream],
     env: autoupdateEnv,
+    stdio: ['ignore', stream, stream],
   })
-  .on('error', (e: Error) => process.emitWarning(e))
-  .unref()
+    .on('error', (e: Error) => process.emitWarning(e))
+    .unref()
 }

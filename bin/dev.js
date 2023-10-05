@@ -1,6 +1,8 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 // eslint-disable-next-line node/shebang
-void (async () => {
-  const oclif = await import('@oclif/core')
-  await oclif.execute({development: true, dir: import.meta.url})
-})()
+async function main() {
+  const {execute} = await import('@oclif/core')
+  await execute({development: true, dir: import.meta.url})
+}
+
+await main()

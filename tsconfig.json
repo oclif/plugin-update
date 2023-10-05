@@ -2,21 +2,15 @@
   "compilerOptions": {
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
-    "importHelpers": true,
-    "module": "es2020",
+    "module": "Node16",
     "outDir": "./dist",
-    "rootDirs": [
-      "./src"
-    ],
+    "rootDirs": ["./src"],
     "strict": true,
-    "target": "ES2021",
+    "target": "ES2022",
     "moduleResolution": "node16"
   },
-  "include": [
-    "./src/**/*"
-  ],
+  "include": ["./src/**/*"],
   "ts-node": {
-    "esm": true,
-    "scope": true
+    "esm": true
   }
 }

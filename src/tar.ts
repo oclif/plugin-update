@@ -24,12 +24,7 @@ const ignore = (_: any, header: any) => {
   }
 }
 
-export async function extract(
-  stream: NodeJS.ReadableStream,
-  basename: string,
-  output: string,
-  sha?: string,
-): Promise<void> {
+async function extract(stream: NodeJS.ReadableStream, basename: string, output: string, sha?: string): Promise<void> {
   const getTmp = () => `${output}.partial.${Math.random().toString().split('.')[1].slice(0, 5)}`
   let tmp = getTmp()
   if (existsSync(tmp)) tmp = getTmp()
@@ -74,7 +69,7 @@ export async function extract(
     if (existsSync(output)) {
       try {
         const tmp = getTmp()
-        // TODO: is it sage to use copyFile instead?
+        // TODO: is it safe to use copyFile instead?
         // const {move} = await import('fs-extra')
         // await move(output, tmp)
         await copyFile(output, tmp)
@@ -95,4 +90,9 @@ export async function extract(
     await rm(tmp, {force: true, recursive: true}).catch(process.emitWarning)
     throw error
   }
+}
+
+// This is done so that we can stub it in tests
+export const Extractor = {
+  extract,
 }

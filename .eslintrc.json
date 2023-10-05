@@ -4,7 +4,25 @@
     "unicorn/prefer-module": "off",
     "unicorn/no-array-reduce": "off",
     "no-useless-constructor": "off",
-    "perfectionist/sort-object-types": "off",
-    "perfectionist/sort-union-types": "off"
+    "perfectionist/sort-classes": [
+      "error",
+      {
+        "order": "asc",
+        "type": "alphabetical",
+        "groups": [
+          "index-signature",
+          "static-property",
+          "property",
+          "private-property",
+          "constructor",
+          "static-method",
+          "static-private-method",
+          "method",
+          "private-method",
+          ["get-method", "set-method"],
+          "unknown"
+        ]
+      }
+    ]
   }
 }
