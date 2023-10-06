@@ -3,7 +3,7 @@ import {expect} from 'chai'
 import {default as got} from 'got'
 import {ExecOptions, exec as cpExec} from 'node:child_process'
 import {createWriteStream} from 'node:fs'
-import {mkdir, readFile, readdir, rm} from 'node:fs/promises'
+import {mkdir, readFile, readdir, rm, writeFile} from 'node:fs/promises'
 import {tmpdir} from 'node:os'
 import {join} from 'node:path'
 
@@ -58,8 +58,9 @@ const exec = async (
   })
 }
 
-const readPJSON = async (path: string): Promise<Interfaces.PJSON> =>
-  JSON.parse(await readFile(path, 'utf8')) as Interfaces.PJSON
+async function readJSON<T>(path: string): Promise<T> {
+  return JSON.parse(await readFile(path, 'utf8')) as T
+}
 
 describe('sf integration', () => {
   let testDir: string
@@ -135,9 +136,17 @@ describe('sf integration', () => {
     console.log('Success!')
 
     console.log('Linking plugin-update...')
-    const linkResult = await exec(`${sf} plugins link ${process.cwd()}`, {cwd: testDir})
-    console.log(linkResult.stdout)
-    expect(linkResult.code).to.equal(0)
+    // Running `plugins link` is very slow on github-action's windows runners. Writing this file
+    // directly is much faster and accomplishes the same thing (except for re-installing deps)
+    const userPjson = {
+      dependencies: {},
+      oclif: {
+        plugins: [{name: '@oclif/plugin-update', root: process.cwd(), type: 'link'}],
+      },
+      private: true,
+    }
+    await writeFile(join(dataDir, 'package.json'), JSON.stringify(userPjson, null, 2))
+
     const pluginsResults = await exec(`${sf} plugins`, {cwd: testDir})
     console.log(pluginsResults.stdout)
     expect(pluginsResults.code).to.equal(0)
@@ -158,7 +167,7 @@ describe('sf integration', () => {
       'new version to be added to client directory',
     ).to.be.true
 
-    const {version} = await readPJSON(join(dataDir, 'client', 'current', 'package.json'))
+    const {version} = await readJSON<Interfaces.PJSON>(join(dataDir, 'client', 'current', 'package.json'))
     expect(version, 'version in SF_DATA_DIR/client/current to be the updated version').to.equal(versionToUpdateTo)
     expect(version).to.not.equal(initialVersion)
   })
@@ -174,7 +183,7 @@ describe('sf integration', () => {
       'new version to be added to client directory',
     ).to.be.true
 
-    const {version} = await readPJSON(join(dataDir, 'client', 'current', 'package.json'))
+    const {version} = await readJSON<Interfaces.PJSON>(join(dataDir, 'client', 'current', 'package.json'))
     expect(version, 'version in SF_DATA_DIR/client/current to be the updated version').to.equal(stableVersion)
   })
 })
