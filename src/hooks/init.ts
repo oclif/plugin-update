@@ -1,5 +1,5 @@
 import {Interfaces} from '@oclif/core'
-import spawn from 'cross-spawn'
+import {spawn} from 'cross-spawn'
 import makeDebug from 'debug'
 import {existsSync} from 'node:fs'
 import {open, stat, writeFile} from 'node:fs/promises'
