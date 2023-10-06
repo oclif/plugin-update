@@ -76,8 +76,8 @@ describe('sf integration', () => {
 
   const tarball =
     process.platform === 'win32'
-      ? `https://developer.salesforce.com/media/salesforce-cli/sf/channels/${channel}/sf-win32-x64.tar.xz`
-      : `https://developer.salesforce.com/media/salesforce-cli/sf/channels/${channel}/sf-linux-x64.tar.xz`
+      ? `https://developer.salesforce.com/media/salesforce-cli/sf/channels/${channel}/sf-win32-x64.tar.gz`
+      : `https://developer.salesforce.com/media/salesforce-cli/sf/channels/${channel}/sf-linux-x64.tar.gz`
 
   before(async () => {
     console.log('Setting up test environment...')
