@@ -5,6 +5,9 @@ import {join} from 'node:path'
 
 import {touch} from './util.js'
 const debug = makeDebug('oclif-update')
+import crypto from 'node:crypto'
+import zlib from 'node:zlib'
+import {extract as tarExtract} from 'tar-fs'
 
 const ignore = (_: any, header: any) => {
   switch (header.type) {
@@ -31,9 +34,6 @@ async function extract(stream: NodeJS.ReadableStream, basename: string, output: 
   debug(`extracting to ${tmp}`)
   try {
     await new Promise((resolve, reject) => {
-      const zlib = require('node:zlib')
-      const tar = require('tar-fs')
-      const crypto = require('node:crypto')
       let shaValidated = false
       let extracted = false
       const check = () => shaValidated && extracted && resolve(null)
@@ -53,7 +53,7 @@ async function extract(stream: NodeJS.ReadableStream, basename: string, output: 
         })
       } else shaValidated = true
 
-      const extract = tar.extract(tmp, {ignore})
+      const extract = tarExtract(tmp, {ignore})
       extract.on('error', reject)
       extract.on('finish', () => {
         extracted = true

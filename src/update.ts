@@ -5,7 +5,7 @@ import {HTTP} from 'http-call'
 import throttle from 'lodash.throttle'
 import {Stats, existsSync} from 'node:fs'
 import {mkdir, readFile, readdir, rm, stat, symlink, utimes, writeFile} from 'node:fs/promises'
-import * as path from 'node:path'
+import {basename, dirname, join} from 'node:path'
 
 import {Extractor} from './tar.js'
 import {ls, wait} from './util.js'
@@ -31,8 +31,8 @@ export class Updater {
   private readonly clientRoot: string
 
   constructor(private config: Config) {
-    this.clientRoot = config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(config.dataDir, 'client')
-    this.clientBin = path.join(this.clientRoot, 'bin', config.windows ? `${config.bin}.cmd` : config.bin)
+    this.clientRoot = config.scopedEnvVar('OCLIF_CLIENT_HOME') || join(config.dataDir, 'client')
+    this.clientBin = join(this.clientRoot, 'bin', config.windows ? `${config.bin}.cmd` : config.bin)
   }
 
   public async fetchVersionIndex(): Promise<Updater.VersionIndex> {
@@ -55,7 +55,7 @@ export class Updater {
     const dirOrFiles = await readdir(this.clientRoot)
     return dirOrFiles
       .filter((dirOrFile) => dirOrFile !== 'bin' && dirOrFile !== 'current')
-      .map((f) => path.join(this.clientRoot, f))
+      .map((f) => join(this.clientRoot, f))
   }
 
   public async runUpdate(options: Updater.Options): Promise<void> {
@@ -129,7 +129,7 @@ export class Updater {
     const {bin, windows} = this.config
     const binPathEnvVar = this.config.scopedEnvVarKey('BINPATH')
     const redirectedEnvVar = this.config.scopedEnvVarKey('REDIRECTED')
-    await mkdir(path.dirname(dst), {recursive: true})
+    await mkdir(dirname(dst), {recursive: true})
 
     if (windows) {
       const body = `@echo off
@@ -160,8 +160,8 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
 `
       /* eslint-enable no-useless-escape */
       await writeFile(dst, body, {mode: 0o755})
-      await rm(path.join(this.clientRoot, 'current'), {force: true, recursive: true})
-      await symlink(`./${version}`, path.join(this.clientRoot, 'current'))
+      await rm(join(this.clientRoot, 'current'), {force: true, recursive: true})
+      await symlink(`./${version}`, join(this.clientRoot, 'current'))
     }
   }
 
@@ -175,11 +175,11 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
 
   private async findLocalVersion(version: string): Promise<string | undefined> {
     const versions = await this.findLocalVersions()
-    return versions.map((file) => path.basename(file)).find((file) => file.startsWith(version))
+    return versions.map((file) => basename(file)).find((file) => file.startsWith(version))
   }
 
   private async refreshConfig(version: string): Promise<void> {
-    this.config = (await Config.load({root: path.join(this.clientRoot, version)})) as Config
+    this.config = (await Config.load({root: join(this.clientRoot, version)})) as Config
   }
 
   // removes any unused CLIs
@@ -191,7 +191,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
       const files = await ls(root)
 
       const isNotSpecial = (fPath: string, version: string): boolean =>
-        !['bin', 'current', version].includes(path.basename(fPath))
+        !['bin', 'current', version].includes(basename(fPath))
 
       const isOld = (fStat: Stats): boolean => {
         const {mtime} = fStat
@@ -204,8 +204,6 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
           .filter((f) => isNotSpecial(this.config.version, f.path) && isOld(f.stat))
           .map((f) => rm(f.path, {force: true, recursive: true})),
       )
-
-      await logChop(this.config.errlog)
     } catch (error: any) {
       ux.warn(error)
     }
@@ -214,7 +212,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
   private async touch(): Promise<void> {
     // touch the client so it won't be tidied up right away
     try {
-      const p = path.join(this.clientRoot, this.config.version)
+      const p = join(this.clientRoot, this.config.version)
       ux.debug('touching client at', p)
       if (!existsSync(p)) return
       return utimes(p, new Date(), new Date())
@@ -238,7 +236,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
     )
 
     await ensureClientDir(this.clientRoot)
-    const output = path.join(this.clientRoot, updated)
+    const output = join(this.clientRoot, updated)
 
     if (force || !existsSync(output)) await downloadAndExtract(output, manifest, channel, this.config)
 
@@ -306,7 +304,7 @@ const fetchManifest = async (s3Key: string, config: Config): Promise<Interfaces.
 const s3VersionIndexKey = (config: Config): string => {
   const {arch, bin} = config
   const s3SubDir = composeS3SubDir(config)
-  return path.join(s3SubDir, 'versions', `${bin}-${determinePlatform(config)}-${arch}-tar-gz.json`)
+  return join(s3SubDir, 'versions', `${bin}-${determinePlatform(config)}-${arch}-tar-gz.json`)
 }
 
 const determinePlatform = (config: Config): Interfaces.PlatformTypes =>
@@ -315,13 +313,13 @@ const determinePlatform = (config: Config): Interfaces.PlatformTypes =>
 const s3ChannelManifestKey = (channel: string, config: Config): string => {
   const {arch, bin} = config
   const s3SubDir = composeS3SubDir(config)
-  return path.join(s3SubDir, 'channels', channel, `${bin}-${determinePlatform(config)}-${arch}-buildmanifest`)
+  return join(s3SubDir, 'channels', channel, `${bin}-${determinePlatform(config)}-${arch}-buildmanifest`)
 }
 
 const s3VersionManifestKey = ({config, hash, version}: {config: Config; hash: string; version: string}): string => {
   const {arch, bin} = config
   const s3SubDir = composeS3SubDir(config)
-  return path.join(
+  return join(
     s3SubDir,
     'versions',
     version,
@@ -333,7 +331,7 @@ const s3VersionManifestKey = ({config, hash, version}: {config: Config; hash: st
 // when autoupdating, wait until the CLI isn't active
 const debounce = async (cacheDir: string): Promise<void> => {
   let output = false
-  const lastrunfile = path.join(cacheDir, 'lastrun')
+  const lastrunfile = join(cacheDir, 'lastrun')
   const m = await mtime(lastrunfile)
   m.setHours(m.getHours() + 1)
   if (m > new Date()) {
@@ -353,7 +351,7 @@ const debounce = async (cacheDir: string): Promise<void> => {
 }
 
 const setChannel = async (channel: string, dataDir: string): Promise<void> =>
-  writeFile(path.join(dataDir, 'channel'), channel, 'utf8')
+  writeFile(join(dataDir, 'channel'), channel, 'utf8')
 
 const fetchChannelManifest = async (channel: string, config: Config): Promise<Interfaces.S3Manifest> => {
   const s3Key = s3ChannelManifestKey(channel, config)
@@ -420,7 +418,7 @@ const downloadAndExtract = async (
 }
 
 const determineChannel = async ({config, version}: {config: Config; version?: string}): Promise<string> => {
-  const channelPath = path.join(config.dataDir, 'channel')
+  const channelPath = join(config.dataDir, 'channel')
 
   // eslint-disable-next-line unicorn/no-await-expression-member
   const channel = existsSync(channelPath) ? (await readFile(channelPath, 'utf8')).trim() : 'stable'
@@ -450,14 +448,4 @@ const determineCurrentVersion = async (clientBin: string, version: string): Prom
   }
 
   return version
-}
-
-const logChop = async (errlogPath: string): Promise<void> => {
-  try {
-    ux.debug('log chop')
-    const logChopper = require('log-chopper').default
-    await logChopper.chop(errlogPath)
-  } catch (error: any) {
-    ux.debug(error.message)
-  }
 }
