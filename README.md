@@ -1,5 +1,4 @@
-@oclif/plugin-update
-====================
+# @oclif/plugin-update
 
 [![Version](https://img.shields.io/npm/v/@oclif/plugin-update.svg)](https://npmjs.org/package/@oclif/plugin-update)
 [![CircleCI](https://circleci.com/gh/oclif/plugin-update/tree/main.svg?style=shield)](https://circleci.com/gh/oclif/plugin-update/tree/main)
@@ -8,15 +7,20 @@
 [![License](https://img.shields.io/npm/l/@oclif/plugin-update.svg)](https://github.com/oclif/plugin-update/blob/main/package.json)
 
 <!-- toc -->
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
+
 # Usage
+
 See https://oclif.io/docs/releasing.html#autoupdater
 
 # Commands
+
 <!-- commands -->
-* [`oclif-example update [CHANNEL]`](#oclif-example-update-channel)
+
+- [`oclif-example update [CHANNEL]`](#oclif-example-update-channel)
 
 ## `oclif-example update [CHANNEL]`
 
@@ -53,5 +57,6 @@ EXAMPLES
     $ oclif-example update --available
 ```
 
-_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/v3.0.0/src/commands/update.ts)_
+_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/3.2.4/src/commands/update.ts)_
+
 <!-- commandsstop -->
