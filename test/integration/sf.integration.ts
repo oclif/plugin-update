@@ -129,6 +129,12 @@ describe('sf integration', () => {
     // This would typically be set by the sf executable that's included in the tarball
     // but since we're using bin/run.js to avoid the global sf, we need to set it manually
     process.env.SF_BINPATH = sf
+
+    if (process.platform === 'win32') {
+      // append cmd /c to the command so that it can run on windows
+      sf = `cmd /c "${sf}"`
+    }
+
     const versionResult = await exec(`${sf} version --json`)
     console.log(versionResult.stdout)
     expect(versionResult.code).to.equal(0)
