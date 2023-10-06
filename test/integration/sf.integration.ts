@@ -124,7 +124,7 @@ describe('sf integration', () => {
 
     console.log('Testing that installation was successful...')
     // It's important to use run.js instead of sf - otherwise it will resolve to the global version of sf
-    sf = join(extractedLocation, 'bin', process.platform === 'win32' ? 'run.cmd' : 'run.js')
+    sf = join(extractedLocation, 'bin', 'run.js')
     // set the bin path so that plugin-update thinks this is updatable
     // This would typically be set by the sf executable that's included in the tarball
     // but since we're using bin/run.js to avoid the global sf, we need to set it manually
@@ -132,7 +132,7 @@ describe('sf integration', () => {
 
     if (process.platform === 'win32') {
       // append cmd /c to the command so that it can run on windows
-      sf = `cmd /c "${sf}"`
+      sf = `cmd /c "node ${sf}"`
     }
 
     const versionResult = await exec(`${sf} version --json`)
