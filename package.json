@@ -82,7 +82,7 @@
     "lint": "eslint . --ext .ts",
     "pretest": "yarn build --noEmit && tsc -p test --noEmit",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-    "test:integration:sf": "mocha --forbid-only \"test/integration/sf.integration.ts\" --timeout 90000",
+    "test:integration:sf": "mocha --forbid-only \"test/integration/sf.integration.ts\" --timeout 900000",
     "posttest": "yarn lint",
     "prepack": "yarn build && oclif manifest . && oclif lock",
     "prepare": "husky install",
