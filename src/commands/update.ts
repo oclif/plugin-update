@@ -35,7 +35,7 @@ export default class UpdateCommand extends Command {
     autoupdate: Flags.boolean({hidden: true}),
     available: Flags.boolean({
       char: 'a',
-      description: 'Install a specific version.',
+      description: 'See available versions.',
     }),
     force: Flags.boolean({
       description: 'Force a re-download of the requested version.',
