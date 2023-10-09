@@ -7,10 +7,10 @@ import {touch} from './util.js'
 const debug = makeDebug('oclif-update')
 import crypto from 'node:crypto'
 import zlib from 'node:zlib'
-import {extract as tarExtract} from 'tar-fs'
+import {Headers, extract as tarExtract} from 'tar-fs'
 
-const ignore = (_: any, header: any) => {
-  switch (header.type) {
+const ignore = (_name: string, header?: Headers) => {
+  switch (header?.type) {
     case 'directory':
     case 'file': {
       if (process.env.OCLIF_DEBUG_UPDATE_FILES) debug(header.name)
@@ -22,7 +22,7 @@ const ignore = (_: any, header: any) => {
     }
 
     default: {
-      throw new Error(header.type)
+      throw new Error(header?.type)
     }
   }
 }
@@ -71,7 +71,7 @@ async function extract(stream: NodeJS.ReadableStream, basename: string, output: 
         const tmp = getTmp()
         await cp(output, tmp)
         await rm(tmp, {force: true, recursive: true}).catch(debug)
-      } catch (error: any) {
+      } catch (error: unknown) {
         debug(error)
         await rm(tmp, {force: true, recursive: true}).catch(debug)
       }
@@ -83,7 +83,7 @@ async function extract(stream: NodeJS.ReadableStream, basename: string, output: 
     await rm(tmp, {force: true, recursive: true}).catch(debug)
     await touch(output)
     debug('done extracting')
-  } catch (error: any) {
+  } catch (error: unknown) {
     await rm(tmp, {force: true, recursive: true}).catch(process.emitWarning)
     throw error
   }

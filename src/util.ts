@@ -18,7 +18,7 @@ export async function ls(dir: string): Promise<Array<{path: string; stat: Stats}
 
 export function wait(ms: number, unref = false): Promise<void> {
   return new Promise((resolve) => {
-    const t: any = setTimeout(() => resolve(), ms)
+    const t = setTimeout(() => resolve(), ms)
     if (unref) t.unref()
   })
 }

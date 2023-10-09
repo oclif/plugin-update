@@ -15,16 +15,14 @@ const filesize = (n: number): string => {
   return Number.parseFloat(num).toFixed(1) + ` ${suffix}`
 }
 
-export namespace Updater {
-  export type Options = {
-    autoUpdate: boolean
-    channel?: string | undefined
-    force?: boolean
-    version?: string | undefined
-  }
-
-  export type VersionIndex = Record<string, string>
+type Options = {
+  autoUpdate: boolean
+  channel?: string | undefined
+  force?: boolean
+  version?: string | undefined
 }
+
+type VersionIndex = Record<string, string>
 
 export class Updater {
   private readonly clientBin: string
@@ -35,11 +33,11 @@ export class Updater {
     this.clientBin = join(this.clientRoot, 'bin', config.windows ? `${config.bin}.cmd` : config.bin)
   }
 
-  public async fetchVersionIndex(): Promise<Updater.VersionIndex> {
+  public async fetchVersionIndex(): Promise<VersionIndex> {
     ux.action.status = 'fetching version index'
     const newIndexUrl = this.config.s3Url(s3VersionIndexKey(this.config))
     try {
-      const {body} = await HTTP.get<Updater.VersionIndex>(newIndexUrl)
+      const {body} = await HTTP.get<VersionIndex>(newIndexUrl)
       if (typeof body === 'string') {
         return JSON.parse(body)
       }
@@ -58,7 +56,7 @@ export class Updater {
       .map((f) => join(this.clientRoot, f))
   }
 
-  public async runUpdate(options: Updater.Options): Promise<void> {
+  public async runUpdate(options: Options): Promise<void> {
     const {autoUpdate, force = false, version} = options
     if (autoUpdate) await debounce(this.config.cacheDir)
 
@@ -204,8 +202,8 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
           .filter((f) => isNotSpecial(this.config.version, f.path) && isOld(f.stat))
           .map((f) => rm(f.path, {force: true, recursive: true})),
       )
-    } catch (error: any) {
-      ux.warn(error)
+    } catch (error: unknown) {
+      ux.warn(error as Error | string)
     }
   }
 
@@ -216,8 +214,8 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
       ux.debug('touching client at', p)
       if (!existsSync(p)) return
       return utimes(p, new Date(), new Date())
-    } catch (error: any) {
-      ux.warn(error)
+    } catch (error: unknown) {
+      ux.warn(error as Error | string)
     }
   }
 
@@ -258,8 +256,9 @@ const alreadyOnVersion = (current: string, updated: null | string): boolean => c
 const ensureClientDir = async (clientRoot: string): Promise<void> => {
   try {
     await mkdir(clientRoot, {recursive: true})
-  } catch (error: any) {
-    if (error.code === 'EEXIST') {
+  } catch (error: unknown) {
+    const {code} = error as {code: string}
+    if (code === 'EEXIST') {
       // for some reason the client directory is sometimes a file
       // if so, this happens. Delete it and recreate
       await rm(clientRoot, {force: true, recursive: true})
@@ -284,7 +283,7 @@ const notUpdatable = (config: Config): boolean => {
 }
 
 const composeS3SubDir = (config: Config): string => {
-  let s3SubDir = (config.pjson.oclif.update.s3 as any).folder || ''
+  let s3SubDir = config.pjson.oclif.update.s3.folder || ''
   if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
   return s3SubDir
 }
@@ -357,8 +356,9 @@ const fetchChannelManifest = async (channel: string, config: Config): Promise<In
   const s3Key = s3ChannelManifestKey(channel, config)
   try {
     return await fetchManifest(s3Key, config)
-  } catch (error: any) {
-    if (error.statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${channel}`)
+  } catch (error: unknown) {
+    const {statusCode} = error as {statusCode: number}
+    if (statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${channel}`)
     throw error
   }
 }
@@ -443,8 +443,8 @@ const determineCurrentVersion = async (clientBin: string, version: string): Prom
     const currentVersion = await readFile(clientBin, 'utf8')
     const matches = currentVersion.match(/\.\.[/\\|](.+)[/\\|]bin/)
     return matches ? matches[1] : version
-  } catch (error: any) {
-    ux.debug(error)
+  } catch (error: unknown) {
+    ux.warn(error as Error | string)
   }
 
   return version

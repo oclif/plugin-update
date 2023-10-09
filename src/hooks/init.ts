@@ -41,9 +41,10 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
       if (opts.config.channel === 'stable') days = 14
       m.setHours(m.getHours() + days * 24)
       return m < new Date()
-    } catch (error: any) {
-      if (error.code !== 'ENOENT') throwError(error.stack)
-      if ((global as any).testing) return false
+    } catch (error: unknown) {
+      const err = error as {code: string; stack: string}
+      if (err.code !== 'ENOENT') throwError(err.stack)
+      if ((global as unknown as {testing: boolean}).testing) return false
       debug('autoupdate ENOENT')
       return true
     }

@@ -1,28 +1,8 @@
 {
-  "extends": ["oclif", "oclif-typescript", "prettier", "plugin:perfectionist/recommended-natural"],
+  "extends": ["oclif", "oclif-typescript", "prettier"],
   "rules": {
     "unicorn/prefer-module": "off",
     "unicorn/no-array-reduce": "off",
-    "no-useless-constructor": "off",
-    "perfectionist/sort-classes": [
-      "error",
-      {
-        "order": "asc",
-        "type": "alphabetical",
-        "groups": [
-          "index-signature",
-          "static-property",
-          "property",
-          "private-property",
-          "constructor",
-          "static-method",
-          "static-private-method",
-          "method",
-          "private-method",
-          ["get-method", "set-method"],
-          "unknown"
-        ]
-      }
-    ]
+    "no-useless-constructor": "off"
   }
 }
