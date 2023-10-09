@@ -173,9 +173,16 @@ describe('sf integration', () => {
       'new version to be added to client directory',
     ).to.be.true
 
-    const {version} = await readJSON<Interfaces.PJSON>(join(dataDir, 'client', 'current', 'package.json'))
-    expect(version, 'version in SF_DATA_DIR/client/current to be the updated version').to.equal(versionToUpdateTo)
-    expect(version).to.not.equal(initialVersion)
+    if (process.platform === 'win32') {
+      const {stdout} = await exec(`${join(clientDir, 'bin', 'sf.cmd')} version --json`)
+      const version = JSON.parse(stdout).cliVersion
+      expect(version, 'version in SF_DATA_DIR\\bin\\sf.cmd to be the updated version').to.equal(versionToUpdateTo)
+      expect(version).to.not.equal(initialVersion)
+    } else {
+      const {version} = await readJSON<Interfaces.PJSON>(join(dataDir, 'client', 'current', 'package.json'))
+      expect(version, 'version in SF_DATA_DIR/client/current to be the updated version').to.equal(versionToUpdateTo)
+      expect(version).to.not.equal(initialVersion)
+    }
   })
 
   it('should update sf to the latest version of a channel', async () => {
@@ -189,7 +196,14 @@ describe('sf integration', () => {
       'new version to be added to client directory',
     ).to.be.true
 
-    const {version} = await readJSON<Interfaces.PJSON>(join(dataDir, 'client', 'current', 'package.json'))
-    expect(version, 'version in SF_DATA_DIR/client/current to be the updated version').to.equal(stableVersion)
+    if (process.platform === 'win32') {
+      const {stdout} = await exec(`${join(clientDir, 'bin', 'sf.cmd')} version --json`)
+      const version = JSON.parse(stdout).cliVersion
+      expect(version, 'version in SF_DATA_DIR\\bin\\sf.cmd to be the updated version').to.equal(versionToUpdateTo)
+      expect(version).to.not.equal(initialVersion)
+    } else {
+      const {version} = await readJSON<Interfaces.PJSON>(join(dataDir, 'client', 'current', 'package.json'))
+      expect(version, 'version in SF_DATA_DIR/client/current to be the updated version').to.equal(stableVersion)
+    }
   })
 })
