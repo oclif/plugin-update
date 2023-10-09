@@ -21,7 +21,7 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
   if (opts.id === 'update') return
   if (opts.config.scopedEnvVarTrue('DISABLE_AUTOUPDATE')) return
 
-  const {config, error} = this
+  const {config, error: throwError} = this
   const binPath = config.binPath || config.bin
   const lastrunfile = join(config.cacheDir, 'lastrun')
   const autoupdatefile = join(config.cacheDir, 'autoupdate')
@@ -41,8 +41,8 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
       if (opts.config.channel === 'stable') days = 14
       m.setHours(m.getHours() + days * 24)
       return m < new Date()
-    } catch (error_: any) {
-      if (error_.code !== 'ENOENT') error(error_.stack)
+    } catch (error: any) {
+      if (error.code !== 'ENOENT') throwError(error.stack)
       if ((global as any).testing) return false
       debug('autoupdate ENOENT')
       return true
