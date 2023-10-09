@@ -175,7 +175,7 @@ describe('sf integration', () => {
 
     if (process.platform === 'win32') {
       const {stdout} = await exec(`${join(clientDir, 'bin', 'sf.cmd')} version --json`)
-      const version = JSON.parse(stdout).cliVersion
+      const version = JSON.parse(stdout).cliVersion.replace('@salesforce/cli/', '')
       expect(version, 'version in SF_DATA_DIR\\bin\\sf.cmd to be the updated version').to.equal(versionToUpdateTo)
       expect(version).to.not.equal(initialVersion)
     } else {
@@ -198,8 +198,8 @@ describe('sf integration', () => {
 
     if (process.platform === 'win32') {
       const {stdout} = await exec(`${join(clientDir, 'bin', 'sf.cmd')} version --json`)
-      const version = JSON.parse(stdout).cliVersion
-      expect(version, 'version in SF_DATA_DIR\\bin\\sf.cmd to be the updated version').to.equal(versionToUpdateTo)
+      const version = JSON.parse(stdout).cliVersion.replace('@salesforce/cli/', '')
+      expect(version, 'version in SF_DATA_DIR\\bin\\sf.cmd to be the updated version').to.equal(stableVersion)
       expect(version).to.not.equal(initialVersion)
     } else {
       const {version} = await readJSON<Interfaces.PJSON>(join(dataDir, 'client', 'current', 'package.json'))
