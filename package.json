@@ -44,7 +44,7 @@
     "lint-staged": "^14.0.1",
     "mocha": "^10.2.0",
     "nock": "^13.3.2",
-    "oclif": "^3.11.3",
+    "oclif": "^4",
     "prettier": "^3.0.3",
     "qqjs": "^0.3.11",
     "quibble": "^0.8.0",
@@ -80,16 +80,16 @@
   },
   "repository": "oclif/plugin-update",
   "scripts": {
+    "build": "rm -rf lib && tsc",
     "lint": "eslint . --ext .ts",
-    "pretest": "yarn build --noEmit && tsc -p test --noEmit",
-    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-    "test:integration:sf": "mocha --forbid-only \"test/integration/sf.integration.ts\" --timeout 900000",
-    "posttest": "yarn lint",
-    "prepack": "yarn build && oclif manifest . && oclif lock",
-    "prepare": "husky install",
     "postpack": "rm -f oclif.manifest.json",
-    "version": "oclif readme && git add README.md",
-    "build": "rm -rf lib && tsc"
+    "posttest": "yarn lint",
+    "prepack": "yarn build && oclif lock && oclif manifest . && oclif lock",
+    "prepare": "husky install",
+    "pretest": "yarn build --noEmit && tsc -p test --noEmit",
+    "test:integration:sf": "mocha --forbid-only \"test/integration/sf.integration.ts\" --timeout 900000",
+    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
+    "version": "oclif readme && git add README.md"
   },
   "exports": "./dist/index.js",
   "type": "module"

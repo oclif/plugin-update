@@ -3,9 +3,10 @@ import {expect} from 'chai'
 import {default as got} from 'got'
 import {ExecOptions, exec as cpExec} from 'node:child_process'
 import {createWriteStream} from 'node:fs'
-import {mkdir, readFile, readdir, rm, writeFile} from 'node:fs/promises'
+import {mkdir, readFile, readdir, rm} from 'node:fs/promises'
 import {tmpdir} from 'node:os'
 import {join} from 'node:path'
+import {rsort} from 'semver'
 
 const makeTestDir = async (): Promise<string> => {
   const tmpDir = join(tmpdir(), 'sf-update-test')
@@ -71,21 +72,28 @@ describe('sf integration', () => {
   let stableVersion: string
   let sf: string
 
-  const versionToUpdateTo = '2.12.7-esm.0'
+  let versionToUpdateTo: string
   const channel = 'nightly'
 
-  const tarball =
-    process.platform === 'win32'
-      ? `https://developer.salesforce.com/media/salesforce-cli/sf/channels/${channel}/sf-win32-x64.tar.gz`
-      : `https://developer.salesforce.com/media/salesforce-cli/sf/channels/${channel}/sf-linux-x64.tar.gz`
+  const platform = process.platform === 'win32' ? 'win32' : 'linux'
+  const tarball = `https://developer.salesforce.com/media/salesforce-cli/sf/channels/${channel}/sf-${platform}-x64.tar.gz`
 
   before(async () => {
     console.log('Setting up test environment...')
 
     const {stdout} = await exec('npm view @salesforce/cli --json')
-    const distTags = JSON.parse(stdout)['dist-tags']
+    const result = JSON.parse(stdout)
+    const distTags = result['dist-tags']
+    const sortedVersions = rsort(result.versions)
+    const channelIndex = sortedVersions.indexOf(distTags[channel])
 
+    versionToUpdateTo = sortedVersions[channelIndex + 1].toString()
     stableVersion = distTags.latest
+
+    console.log('Testing with:')
+    console.log(`• channel: ${channel} (${distTags[channel]})`)
+    console.log(`• version to update to: ${versionToUpdateTo}`)
+    console.log(`• stable version: ${stableVersion}`)
 
     testDir = await makeTestDir()
     console.log(`Test directory: ${testDir}`)
@@ -112,7 +120,7 @@ describe('sf integration', () => {
 
     await download(tarball, tarLocation)
     const cmd =
-      process.platform === 'win32'
+      platform === 'win32'
         ? `tar -xf ${tarLocation} -C ${extractedLocation} --strip-components 1 --exclude node_modules/.bin`
         : `tar -xf ${tarLocation} -C ${extractedLocation} --strip-components 1`
 
@@ -130,7 +138,7 @@ describe('sf integration', () => {
     // but since we're using bin/run.js to avoid the global sf, we need to set it manually
     process.env.SF_BINPATH = sf
 
-    if (process.platform === 'win32') {
+    if (platform === 'win32') {
       // append cmd /c to the command so that it can run on windows
       sf = `cmd /c "node ${sf}"`
     }
@@ -142,17 +150,7 @@ describe('sf integration', () => {
     console.log('Success!')
 
     console.log('Linking plugin-update...')
-    // Running `plugins link` is very slow on github-action's windows runners. Writing this file
-    // directly is much faster and accomplishes the same thing (except for re-installing deps)
-    const userPjson = {
-      dependencies: {},
-      oclif: {
-        plugins: [{name: '@oclif/plugin-update', root: process.cwd(), type: 'link'}],
-      },
-      private: true,
-    }
-    await writeFile(join(dataDir, 'package.json'), JSON.stringify(userPjson, null, 2))
-
+    await exec(`${sf} plugins link ${process.cwd()} --no-install`, {cwd: testDir})
     const pluginsResults = await exec(`${sf} plugins`, {cwd: testDir})
     console.log(pluginsResults.stdout)
     expect(pluginsResults.code).to.equal(0)
@@ -173,7 +171,7 @@ describe('sf integration', () => {
       'new version to be added to client directory',
     ).to.be.true
 
-    if (process.platform === 'win32') {
+    if (platform === 'win32') {
       const {stdout} = await exec(`${join(clientDir, 'bin', 'sf.cmd')} version --json`)
       const version = JSON.parse(stdout).cliVersion.replace('@salesforce/cli/', '')
       expect(version, 'version in SF_DATA_DIR\\bin\\sf.cmd to be the updated version').to.equal(versionToUpdateTo)
@@ -196,7 +194,7 @@ describe('sf integration', () => {
       'new version to be added to client directory',
     ).to.be.true
 
-    if (process.platform === 'win32') {
+    if (platform === 'win32') {
       const {stdout} = await exec(`${join(clientDir, 'bin', 'sf.cmd')} version --json`)
       const version = JSON.parse(stdout).cliVersion.replace('@salesforce/cli/', '')
       expect(version, 'version in SF_DATA_DIR\\bin\\sf.cmd to be the updated version').to.equal(stableVersion)

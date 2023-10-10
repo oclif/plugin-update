@@ -29,7 +29,7 @@ export class Updater {
   private readonly clientRoot: string
 
   constructor(private config: Config) {
-    this.clientRoot = config.scopedEnvVar('OCLIF_CLIENT_HOME') || join(config.dataDir, 'client')
+    this.clientRoot = config.scopedEnvVar('OCLIF_CLIENT_HOME') ?? join(config.dataDir, 'client')
     this.clientBin = join(this.clientRoot, 'bin', config.windows ? `${config.bin}.cmd` : config.bin)
   }
 
@@ -38,11 +38,7 @@ export class Updater {
     const newIndexUrl = this.config.s3Url(s3VersionIndexKey(this.config))
     try {
       const {body} = await HTTP.get<VersionIndex>(newIndexUrl)
-      if (typeof body === 'string') {
-        return JSON.parse(body)
-      }
-
-      return body
+      return typeof body === 'string' ? JSON.parse(body) : body
     } catch {
       throw new Error(`No version indices exist for ${this.config.name}.`)
     }

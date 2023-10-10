@@ -22,11 +22,11 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
   if (opts.config.scopedEnvVarTrue('DISABLE_AUTOUPDATE')) return
 
   const {config, error: throwError} = this
-  const binPath = config.binPath || config.bin
+  const binPath = config.binPath ?? config.bin
   const lastrunfile = join(config.cacheDir, 'lastrun')
   const autoupdatefile = join(config.cacheDir, 'autoupdate')
   const autoupdatelogfile = join(config.cacheDir, 'autoupdate.log')
-  const clientRoot = config.scopedEnvVar('OCLIF_CLIENT_HOME') || join(config.dataDir, 'client')
+  const clientRoot = config.scopedEnvVar('OCLIF_CLIENT_HOME') ?? join(config.dataDir, 'client')
 
   const autoupdateEnv = {
     ...process.env,
@@ -44,7 +44,6 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
     } catch (error: unknown) {
       const err = error as {code: string; stack: string}
       if (err.code !== 'ENOENT') throwError(err.stack)
-      if ((global as unknown as {testing: boolean}).testing) return false
       debug('autoupdate ENOENT')
       return true
     }
