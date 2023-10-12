@@ -6,6 +6,7 @@
 
 <!-- toc -->
 
+- [@oclif/plugin-update](#oclifplugin-update)
 - [Usage](#usage)
 - [Commands](#commands)
 <!-- tocstop -->
@@ -18,10 +19,7 @@ See https://oclif.io/docs/releasing.html#autoupdater
 
 <!-- commands -->
 
-- [@oclif/plugin-update](#oclifplugin-update)
-- [Usage](#usage)
-- [Commands](#commands)
-  - [`oclif-example update [CHANNEL]`](#oclif-example-update-channel)
+- [`oclif-example update [CHANNEL]`](#oclif-example-update-channel)
 
 ## `oclif-example update [CHANNEL]`
 
@@ -29,10 +27,10 @@ update the oclif-example CLI
 
 ```
 USAGE
-  $ oclif-example update [CHANNEL] [-a] [-v <value> | -i] [--force]
+  $ oclif-example update [CHANNEL] [-a] [--force] [-i | -v <value>]
 
 FLAGS
-  -a, --available        Install a specific version.
+  -a, --available        See available versions.
   -i, --interactive      Interactively select version to install. This is ignored if a channel is provided.
   -v, --version=<value>  Install a specific version.
   --force                Force a re-download of the requested version.
@@ -58,6 +56,6 @@ EXAMPLES
     $ oclif-example update --available
 ```
 
-_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/3.2.4/src/commands/update.ts)_
+_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/3.2.5-qa.0/src/commands/update.ts)_
 
 <!-- commandsstop -->
