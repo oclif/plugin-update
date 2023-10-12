@@ -1,3 +1,9 @@
+# [4.1.0](https://github.com/oclif/plugin-update/compare/3.2.4...4.1.0) (2023-10-12)
+
+### Features
+
+- major version release for ESM ([e90e1a8](https://github.com/oclif/plugin-update/commit/e90e1a86fa760d6205352bf4ac81ed040d9f2b35))
+
 ## [3.2.4](https://github.com/oclif/plugin-update/compare/3.2.3...3.2.4) (2023-09-28)
 
 ### Bug Fixes
