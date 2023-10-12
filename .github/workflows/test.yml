@@ -5,5 +5,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  unit-tests:
-    uses: oclif/github-workflows/.github/workflows/unitTest.yml@main
+  yarn-lockfile-check:
+    uses: salesforcecli/github-workflows/.github/workflows/lockFileCheck.yml@main
+  linux-unit-tests:
+    needs: yarn-lockfile-check
+    uses: salesforcecli/github-workflows/.github/workflows/unitTestsLinux.yml@main
+  windows-unit-tests:
+    needs: linux-unit-tests
+    uses: salesforcecli/github-workflows/.github/workflows/unitTestsWindows.yml@main
+  sf-integration:
+    needs: linux-unit-tests
+    strategy:
+      matrix:
+        node_version: [lts/*, latest]
+        os: [ubuntu-latest, windows-latest]
+        exclude:
+          - node_version: lts/*
+            os: windows-latest
+
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+          cache: yarn
+      - uses: salesforcecli/github-workflows/.github/actions/yarnInstallWithRetries@main
+      - run: yarn build
+      - run: yarn test:integration:sf

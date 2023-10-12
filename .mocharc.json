@@ -1,14 +1,9 @@
 {
   "recursive": true,
   "reporter": "spec",
-  "require": [
-    "test/helpers/init.js",
-    "ts-node/register",
-    "source-map-support/register"
-  ],
+  "require": ["ts-node/register"],
   "timeout": 0,
-  "watch-extensions": [
-    "ts"
-  ]
+  "watch-files": ["test/**/*.ts", "src/**/*.ts"],
+  "watch-extensions": ["ts"],
+  "node-option": ["loader=ts-node/esm"]
 }
-

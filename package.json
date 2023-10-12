@@ -1,57 +1,65 @@
 {
   "name": "@oclif/plugin-update",
-  "version": "3.2.4",
+  "version": "3.2.4-qa.0",
   "author": "Salesforce",
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
-    "@oclif/core": "^2.11.8",
-    "chalk": "^4",
+    "@oclif/core": "^3.0.4",
+    "chalk": "^5",
     "cross-spawn": "^7.0.3",
     "debug": "^4.3.1",
     "filesize": "^6.1.0",
-    "fs-extra": "^9.0.1",
     "http-call": "^5.3.0",
-    "inquirer": "^8.2.6",
+    "inquirer": "^9.2.11",
     "lodash.throttle": "^4.1.1",
     "log-chopper": "^1.0.2",
     "semver": "^7.5.4",
     "tar-fs": "^2.1.1"
   },
   "devDependencies": {
-    "@oclif/plugin-help": "^5.2.20",
-    "@oclif/test": "^2.5.6",
-    "@types/chai": "^4.3.6",
+    "@commitlint/config-conventional": "^17.7.0",
+    "@oclif/plugin-help": "^5.2.17",
+    "@oclif/prettier-config": "^0.2.1",
+    "@oclif/test": "^3",
+    "@types/chai": "^4.3.5",
     "@types/cross-spawn": "^6.0.3",
+    "@types/debug": "^4.1.8",
     "@types/execa": "^0.9.0",
-    "@types/fs-extra": "^8.0.1",
     "@types/glob": "^7.1.3",
-    "@types/inquirer": "^8.2.0",
+    "@types/inquirer": "^9.0.3",
     "@types/lodash.throttle": "^4.1.6",
-    "@types/mocha": "^9",
-    "@types/node": "^14.18.63",
+    "@types/mocha": "^10",
+    "@types/node": "^18",
     "@types/semver": "^7.5.3",
     "@types/supports-color": "^7.2.0",
-    "@types/write-json-file": "^3.2.1",
-    "chai": "^4.3.10",
-    "eslint": "^7.32.0",
-    "eslint-config-oclif": "^4",
-    "eslint-config-oclif-typescript": "^1.0.3",
-    "globby": "^11.0.2",
-    "mocha": "^9",
-    "nock": "^13.3.3",
-    "oclif": "^3.17.2",
+    "@types/tar-fs": "^2.0.2",
+    "chai": "^4.3.7",
+    "commitlint": "^17.7.2",
+    "eslint": "^8.49.0",
+    "eslint-config-oclif": "^5.0.0",
+    "eslint-config-oclif-typescript": "^3.0.1",
+    "eslint-config-prettier": "^9.0.0",
+    "got": "^13.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.1",
+    "mocha": "^10.2.0",
+    "nock": "^13.3.2",
+    "oclif": "^4",
+    "prettier": "^3.0.3",
     "qqjs": "^0.3.11",
-    "sinon": "^12.0.1",
-    "ts-node": "^9.1.1",
-    "tslib": "^2.6.2",
-    "typescript": "4.4.3"
+    "quibble": "^0.8.0",
+    "sinon": "^16.1.0",
+    "strip-ansi": "^7.1.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
   },
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=18.0.0"
   },
   "files": [
     "oclif.manifest.json",
-    "/lib"
+    "/dist",
+    "/oclif.lock"
   ],
   "homepage": "https://github.com/oclif/plugin-update",
   "keywords": [
@@ -60,25 +68,29 @@
   "license": "MIT",
   "oclif": {
     "autoupdate": "github",
-    "commands": "./lib/commands",
+    "commands": "./dist/commands",
     "bin": "oclif-example",
     "hooks": {
-      "init": "./lib/hooks/init"
+      "init": "./dist/hooks/init.js"
     },
     "devPlugins": [
       "@oclif/plugin-help"
-    ]
+    ],
+    "flexibleTaxonomy": true
   },
   "repository": "oclif/plugin-update",
   "scripts": {
-    "lint": "eslint . --ext .ts --config .eslintrc",
-    "pretest": "yarn build --noEmit && tsc -p test --noEmit",
-    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-    "posttest": "yarn lint",
-    "prepack": "yarn build && oclif manifest .",
+    "build": "rm -rf lib && tsc",
+    "lint": "eslint . --ext .ts",
     "postpack": "rm -f oclif.manifest.json",
-    "version": "oclif readme && git add README.md",
-    "build": "rm -rf lib && tsc"
+    "posttest": "yarn lint",
+    "prepack": "yarn build && oclif lock && oclif manifest . && oclif lock",
+    "prepare": "husky install",
+    "pretest": "yarn build --noEmit && tsc -p test --noEmit",
+    "test:integration:sf": "mocha --forbid-only \"test/integration/sf.integration.ts\" --timeout 900000",
+    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
+    "version": "oclif readme && git add README.md"
   },
-  "main": "lib/index.js"
+  "exports": "./dist/index.js",
+  "type": "module"
 }

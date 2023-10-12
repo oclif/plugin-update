@@ -1,33 +1,36 @@
-import * as fs from 'fs-extra'
-import * as path from 'path'
-import {Config, ux} from '@oclif/core'
-import {Config as IConfig} from '@oclif/core/lib/interfaces'
-import {Updater} from '../src/update'
-import * as zlib from 'zlib'
-import nock from 'nock'
-import * as sinon from 'sinon'
-import stripAnsi = require('strip-ansi')
-import * as extract from '../src/tar'
+import {Config, Interfaces, ux} from '@oclif/core'
 import {expect} from 'chai'
-import HTTP from 'http-call'
+import {HTTP} from 'http-call'
+import nock from 'nock'
+import {existsSync} from 'node:fs'
+import {mkdir, rm, symlink, writeFile} from 'node:fs/promises'
+import * as path from 'node:path'
+import zlib from 'node:zlib'
+import {createSandbox} from 'sinon'
+import stripAnsi from 'strip-ansi'
+
+import {Extractor} from '../src/tar.js'
+import {Updater} from '../src/update.js'
 
 type OutputCollectors = {
-  stdout: string[];
-  stderr: string[];
+  stderr: string[]
+  stdout: string[]
 }
-async function loadConfig(options: {root: string}): Promise<IConfig> {
+async function loadConfig(options: {root: string}): Promise<Interfaces.Config> {
   return Config.load(options.root)
 }
 
-function setupClientRoot(ctx: { config: IConfig }, createVersion?: string): string {
+const setupClientRoot = async (ctx: {config: Interfaces.Config}, createVersion?: string): Promise<string> => {
   const clientRoot = ctx.config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(ctx.config.dataDir, 'client')
   // Ensure installed version structure is present
-  fs.ensureDirSync(clientRoot)
+  await mkdir(clientRoot, {recursive: true})
   if (createVersion) {
-    fs.ensureDirSync(path.join(clientRoot, 'bin'))
-    fs.ensureFileSync(path.join(clientRoot, '2.0.0'))
-    fs.ensureSymlinkSync(path.join(clientRoot, '2.0.0'), path.join(clientRoot, 'current'))
-    fs.writeFileSync(path.join(clientRoot, 'bin', ctx.config.bin), '../2.0.0/bin', 'utf8')
+    await mkdir(path.join(clientRoot, 'bin'), {recursive: true})
+    if (!existsSync(path.join(clientRoot, '2.0.0'))) {
+      await symlink(path.join(clientRoot, '2.0.0'), path.join(clientRoot, 'current'))
+    }
+
+    await writeFile(path.join(clientRoot, 'bin', ctx.config.bin), '../2.0.0/bin', 'utf8')
   }
 
   return clientRoot
@@ -44,40 +47,40 @@ describe('update plugin', () => {
   let updater: Updater
   let collector: OutputCollectors
   let clientRoot: string
-  let sandbox: sinon.SinonSandbox
+
+  const sandbox = createSandbox()
 
   beforeEach(async () => {
-    config = await loadConfig({root: path.join(process.cwd(), 'examples', 's3-update-example-cli')}) as Config
+    config = (await loadConfig({root: path.join(process.cwd(), 'examples', 's3-update-example-cli')})) as Config
     config.binPath = config.binPath || config.bin
-    collector = {stdout: [], stderr: []}
-    sandbox = sinon.createSandbox()
-    sandbox.stub(ux, 'log').callsFake(line => collector.stdout.push(line || ''))
-    sandbox.stub(ux, 'warn').callsFake(line => collector.stderr.push(line ? `${line}` : ''))
-    sandbox.stub(ux.action, 'start').callsFake(line => collector.stdout.push(line || ''))
-    sandbox.stub(ux.action, 'stop').callsFake(line => collector.stdout.push(line || ''))
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
+    collector = {stderr: [], stdout: []}
+    sandbox.stub(ux, 'log').callsFake((line) => collector.stdout.push(line || ''))
+    sandbox.stub(ux, 'warn').callsFake((line) => collector.stderr.push(line ? `${line}` : ''))
+    sandbox.stub(ux.action, 'start').callsFake((line) => collector.stdout.push(line || ''))
+    sandbox.stub(ux.action, 'stop').callsFake((line) => collector.stdout.push(line || ''))
+    // @ts-expect-error because private method
     sandbox.stub(Updater.prototype, 'refreshConfig').resolves()
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    // eslint-disable-next-line import/no-named-as-default-member
     nock.cleanAll()
-    if (fs.pathExistsSync(clientRoot)) {
-      fs.removeSync(clientRoot)
+    if (existsSync(clientRoot)) {
+      await rm(clientRoot, {force: true, recursive: true})
     }
 
     sandbox.restore()
   })
 
   it('should not update - already on same version', async () => {
-    clientRoot = setupClientRoot({config}, '2.0.0')
+    clientRoot = await setupClientRoot({config}, '2.0.0')
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
     nock(/oclif-staging.s3.amazonaws.com/)
-    .get(platformRegex)
-    .reply(200, {version: '2.0.0'})
-    .get(manifestRegex)
-    .reply(200, {version: '2.0.0'})
+      .get(platformRegex)
+      .reply(200, {version: '2.0.0'})
+      .get(manifestRegex)
+      .reply(200, {version: '2.0.0'})
 
     updater = initUpdater(config)
     await updater.runUpdate({autoUpdate: false})
@@ -86,29 +89,32 @@ describe('update plugin', () => {
   })
 
   it('should update to channel', async () => {
-    clientRoot = setupClientRoot({config})
+    clientRoot = await setupClientRoot({config})
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
-    const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`)
+    const tarballRegex = new RegExp(
+      `tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
+    )
     const newVersionPath = path.join(clientRoot, '2.0.1')
-    fs.mkdirpSync(path.join(`${newVersionPath}.partial.11111`, 'bin'))
-    fs.writeFileSync(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
-    sandbox.stub(extract, 'extract').resolves()
+    await mkdir(path.join(`${newVersionPath}.partial.11111`, 'bin'), {recursive: true})
+    await writeFile(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+
+    sandbox.stub(Extractor, 'extract').resolves()
     sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
 
     const gzContents = zlib.gzipSync(' ')
 
     nock(/oclif-staging.s3.amazonaws.com/)
-    .get(platformRegex)
-    .reply(200, {version: '2.0.1'})
-    .get(manifestRegex)
-    .reply(200, {version: '2.0.1'})
-    .get(tarballRegex)
-    .reply(200, gzContents, {
-      'X-Transfer-Length': String(gzContents.length),
-      'content-length': String(gzContents.length),
-      'Content-Encoding': 'gzip',
-    })
+      .get(platformRegex)
+      .reply(200, {version: '2.0.1'})
+      .get(manifestRegex)
+      .reply(200, {version: '2.0.1'})
+      .get(tarballRegex)
+      .reply(200, gzContents, {
+        'Content-Encoding': 'gzip',
+        'X-Transfer-Length': String(gzContents.length),
+        'content-length': String(gzContents.length),
+      })
 
     updater = initUpdater(config)
     await updater.runUpdate({autoUpdate: false})
@@ -118,35 +124,39 @@ describe('update plugin', () => {
 
   it('should update to version', async () => {
     const hash = 'f289627'
-    clientRoot = setupClientRoot({config})
+    clientRoot = await setupClientRoot({config})
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
-    const versionManifestRegex = new RegExp(`example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`)
-    const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`)
+    const versionManifestRegex = new RegExp(
+      `example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`,
+    )
+    const tarballRegex = new RegExp(
+      `tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
+    )
     const indexRegex = new RegExp(`example-cli-${config.platform}-${config.arch}-tar-gz.json`)
 
-    sandbox.stub(extract, 'extract').resolves()
+    sandbox.stub(Extractor, 'extract').resolves()
     sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
 
     const gzContents = zlib.gzipSync(' ')
 
     nock(/oclif-staging.s3.amazonaws.com/)
-    .get(platformRegex)
-    .reply(200, {version: '2.0.1'})
-    .get(manifestRegex)
-    .reply(200, {version: '2.0.1'})
-    .get(versionManifestRegex)
-    .reply(200, {version: '2.0.1'})
-    .get(tarballRegex)
-    .reply(200, gzContents, {
-      'X-Transfer-Length': String(gzContents.length),
-      'content-length': String(gzContents.length),
-      'Content-Encoding': 'gzip',
-    })
-    .get(indexRegex)
-    .reply(200, {
-      '2.0.1': `versions/example-cli/2.0.1/${hash}/example-cli-v2.0.1-${config.platform}-${config.arch}.gz`,
-    })
+      .get(platformRegex)
+      .reply(200, {version: '2.0.1'})
+      .get(manifestRegex)
+      .reply(200, {version: '2.0.1'})
+      .get(versionManifestRegex)
+      .reply(200, {version: '2.0.1'})
+      .get(tarballRegex)
+      .reply(200, gzContents, {
+        'Content-Encoding': 'gzip',
+        'X-Transfer-Length': String(gzContents.length),
+        'content-length': String(gzContents.length),
+      })
+      .get(indexRegex)
+      .reply(200, {
+        '2.0.1': `versions/example-cli/2.0.1/${hash}/example-cli-v2.0.1-${config.platform}-${config.arch}.gz`,
+      })
 
     updater = initUpdater(config)
     await updater.runUpdate({autoUpdate: false, version: '2.0.1'})
@@ -155,38 +165,42 @@ describe('update plugin', () => {
   })
 
   it('will get the correct channel and use default registry', async () => {
-    const request = sandbox.spy(HTTP,  'get')
+    const request = sandbox.spy(HTTP, 'get')
     const hash = 'f289627'
     config.pjson.name = '@oclif/plugin-update'
-    clientRoot = setupClientRoot({config})
+    clientRoot = await setupClientRoot({config})
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
-    const versionManifestRegex = new RegExp(`example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`)
-    const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`)
+    const versionManifestRegex = new RegExp(
+      `example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`,
+    )
+    const tarballRegex = new RegExp(
+      `tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
+    )
     const indexRegex = new RegExp(`example-cli-${config.platform}-${config.arch}-tar-gz.json`)
 
-    sandbox.stub(extract, 'extract').resolves()
+    sandbox.stub(Extractor, 'extract').resolves()
     sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
 
     const gzContents = zlib.gzipSync(' ')
 
     nock(/oclif-staging.s3.amazonaws.com/)
-    .get(platformRegex)
-    .reply(200, {version: '2.0.1'})
-    .get(manifestRegex)
-    .reply(200, {version: '2.0.1'})
-    .get(versionManifestRegex)
-    .reply(200, {version: '2.0.1'})
-    .get(tarballRegex)
-    .reply(200, gzContents, {
-      'X-Transfer-Length': String(gzContents.length),
-      'content-length': String(gzContents.length),
-      'Content-Encoding': 'gzip',
-    })
-    .get(indexRegex)
-    .reply(200, {
-      '2.0.1': `versions/example-cli/2.0.1/${hash}/example-cli-v2.0.1-${config.platform}-${config.arch}.gz`,
-    })
+      .get(platformRegex)
+      .reply(200, {version: '2.0.1'})
+      .get(manifestRegex)
+      .reply(200, {version: '2.0.1'})
+      .get(versionManifestRegex)
+      .reply(200, {version: '2.0.1'})
+      .get(tarballRegex)
+      .reply(200, gzContents, {
+        'Content-Encoding': 'gzip',
+        'X-Transfer-Length': String(gzContents.length),
+        'content-length': String(gzContents.length),
+      })
+      .get(indexRegex)
+      .reply(200, {
+        '2.0.1': `versions/example-cli/2.0.1/${hash}/example-cli-v2.0.1-${config.platform}-${config.arch}.gz`,
+      })
 
     updater = initUpdater(config)
     await updater.runUpdate({autoUpdate: false, version: '2.0.1'})
@@ -194,39 +208,43 @@ describe('update plugin', () => {
     expect(request.firstCall.args[0]).to.include('https://registry.npmjs.org/@oclif/plugin-update')
   })
   it('will get the correct channel and use a custom registry', async () => {
-    const request = sandbox.spy(HTTP,  'get')
+    const request = sandbox.spy(HTTP, 'get')
     const hash = 'f289627'
     config.pjson.name = '@oclif/plugin-update'
     config.npmRegistry = 'https://myCustomRegistry.com'
-    clientRoot = setupClientRoot({config})
+    clientRoot = await setupClientRoot({config})
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
-    const versionManifestRegex = new RegExp(`example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`)
-    const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`)
+    const versionManifestRegex = new RegExp(
+      `example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`,
+    )
+    const tarballRegex = new RegExp(
+      `tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
+    )
     const indexRegex = new RegExp(`example-cli-${config.platform}-${config.arch}-tar-gz.json`)
 
-    sandbox.stub(extract, 'extract').resolves()
+    sandbox.stub(Extractor, 'extract').resolves()
     sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
 
     const gzContents = zlib.gzipSync(' ')
 
     nock(/oclif-staging.s3.amazonaws.com/)
-    .get(platformRegex)
-    .reply(200, {version: '2.0.1'})
-    .get(manifestRegex)
-    .reply(200, {version: '2.0.1'})
-    .get(versionManifestRegex)
-    .reply(200, {version: '2.0.1'})
-    .get(tarballRegex)
-    .reply(200, gzContents, {
-      'X-Transfer-Length': String(gzContents.length),
-      'content-length': String(gzContents.length),
-      'Content-Encoding': 'gzip',
-    })
-    .get(indexRegex)
-    .reply(200, {
-      '2.0.1': `versions/example-cli/2.0.1/${hash}/example-cli-v2.0.1-${config.platform}-${config.arch}.gz`,
-    })
+      .get(platformRegex)
+      .reply(200, {version: '2.0.1'})
+      .get(manifestRegex)
+      .reply(200, {version: '2.0.1'})
+      .get(versionManifestRegex)
+      .reply(200, {version: '2.0.1'})
+      .get(tarballRegex)
+      .reply(200, gzContents, {
+        'Content-Encoding': 'gzip',
+        'X-Transfer-Length': String(gzContents.length),
+        'content-length': String(gzContents.length),
+      })
+      .get(indexRegex)
+      .reply(200, {
+        '2.0.1': `versions/example-cli/2.0.1/${hash}/example-cli-v2.0.1-${config.platform}-${config.arch}.gz`,
+      })
 
     updater = initUpdater(config)
     await updater.runUpdate({autoUpdate: false, version: '2.0.1'})
@@ -235,14 +253,14 @@ describe('update plugin', () => {
   })
 
   it('should not update - not updatable', async () => {
-    clientRoot = setupClientRoot({config})
+    clientRoot = await setupClientRoot({config})
     // unset binPath
     config.binPath = undefined
     nock(/oclif-staging.s3.amazonaws.com/)
-    .get(/tarballs\/example-cli\/.+?/)
-    .reply(200, {version: '2.0.0'})
-    .get(/channels\/stable\/example-cli-.+?-buildmanifest/)
-    .reply(200, {version: '2.0.0'})
+      .get(/tarballs\/example-cli\/.+?/)
+      .reply(200, {version: '2.0.0'})
+      .get(/channels\/stable\/example-cli-.+?-buildmanifest/)
+      .reply(200, {version: '2.0.0'})
 
     updater = initUpdater(config)
     await updater.runUpdate({autoUpdate: false})
@@ -251,31 +269,33 @@ describe('update plugin', () => {
   })
 
   it('should update from local file', async () => {
-    clientRoot = setupClientRoot({config})
+    clientRoot = await setupClientRoot({config})
     const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
-    const tarballRegex = new RegExp(`tarballs\\/example-cli\\/example-cli-v2.0.0\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`)
+    const tarballRegex = new RegExp(
+      `tarballs\\/example-cli\\/example-cli-v2.0.0\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
+    )
     const newVersionPath = path.join(clientRoot, '2.0.1')
-    fs.mkdirpSync(path.join(newVersionPath, 'bin'))
-    fs.mkdirpSync(path.join(`${newVersionPath}.partial.11111`, 'bin'))
-    fs.writeFileSync(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
-    fs.writeFileSync(path.join(newVersionPath, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
-    sandbox.stub(extract, 'extract').resolves()
+    await mkdir(path.join(newVersionPath, 'bin'), {recursive: true})
+    await mkdir(path.join(`${newVersionPath}.partial.11111`, 'bin'), {recursive: true})
+    await writeFile(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+    await writeFile(path.join(newVersionPath, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
+    sandbox.stub(Extractor, 'extract').resolves()
     sandbox.stub(zlib, 'gzipSync').returns(Buffer.alloc(1, ' '))
 
     const gzContents = zlib.gzipSync(' ')
 
     nock(/oclif-staging.s3.amazonaws.com/)
-    .get(platformRegex)
-    .reply(200, {version: '2.0.1'})
-    .get(manifestRegex)
-    .reply(200, {version: '2.0.1'})
-    .get(tarballRegex)
-    .reply(200, gzContents, {
-      'X-Transfer-Length': String(gzContents.length),
-      'content-length': String(gzContents.length),
-      'Content-Encoding': 'gzip',
-    })
+      .get(platformRegex)
+      .reply(200, {version: '2.0.1'})
+      .get(manifestRegex)
+      .reply(200, {version: '2.0.1'})
+      .get(tarballRegex)
+      .reply(200, gzContents, {
+        'Content-Encoding': 'gzip',
+        'X-Transfer-Length': String(gzContents.length),
+        'content-length': String(gzContents.length),
+      })
 
     updater = initUpdater(config)
     await updater.runUpdate({autoUpdate: false, version: '2.0.1'})

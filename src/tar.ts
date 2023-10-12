@@ -1,33 +1,39 @@
-import * as fs from 'fs-extra'
-import * as path from 'path'
+import makeDebug from 'debug'
+import {existsSync} from 'node:fs'
+import {cp, rename, rm} from 'node:fs/promises'
+import {join} from 'node:path'
 
-import {touch} from './util'
+import {touch} from './util.js'
+const debug = makeDebug('oclif-update')
+import crypto from 'node:crypto'
+import zlib from 'node:zlib'
+import {Headers, extract as tarExtract} from 'tar-fs'
 
-const debug = require('debug')('oclif-update')
+const ignore = (_name: string, header?: Headers) => {
+  switch (header?.type) {
+    case 'directory':
+    case 'file': {
+      if (process.env.OCLIF_DEBUG_UPDATE_FILES) debug(header.name)
+      return false
+    }
 
-const ignore = (_: any, header: any) => {
-  switch (header.type) {
-  case 'directory':
-  case 'file':
-    if (process.env.OCLIF_DEBUG_UPDATE_FILES) debug(header.name)
-    return false
-  case 'symlink':
-    return true
-  default:
-    throw new Error(header.type)
+    case 'symlink': {
+      return true
+    }
+
+    default: {
+      throw new Error(header?.type)
+    }
   }
 }
 
-export async function extract(stream: NodeJS.ReadableStream, basename: string, output: string, sha?: string): Promise<void> {
+async function extract(stream: NodeJS.ReadableStream, basename: string, output: string, sha?: string): Promise<void> {
   const getTmp = () => `${output}.partial.${Math.random().toString().split('.')[1].slice(0, 5)}`
   let tmp = getTmp()
-  if (fs.pathExistsSync(tmp)) tmp = getTmp()
+  if (existsSync(tmp)) tmp = getTmp()
   debug(`extracting to ${tmp}`)
   try {
     await new Promise((resolve, reject) => {
-      const zlib = require('zlib')
-      const tar = require('tar-fs')
-      const crypto = require('crypto')
       let shaValidated = false
       let extracted = false
       const check = () => shaValidated && extracted && resolve(null)
@@ -35,7 +41,7 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
       if (sha) {
         const hasher = crypto.createHash('sha256')
         stream.on('error', reject)
-        stream.on('data', d => hasher.update(d))
+        stream.on('data', (d) => hasher.update(d))
         stream.on('end', () => {
           const shasum = hasher.digest('hex')
           if (sha === shasum) {
@@ -47,7 +53,7 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
         })
       } else shaValidated = true
 
-      const extract = tar.extract(tmp, {ignore})
+      const extract = tarExtract(tmp, {ignore})
       extract.on('error', reject)
       extract.on('finish', () => {
         extracted = true
@@ -60,25 +66,30 @@ export async function extract(stream: NodeJS.ReadableStream, basename: string, o
       stream.pipe(gunzip).pipe(extract)
     })
 
-    if (await fs.pathExists(output)) {
+    if (existsSync(output)) {
       try {
         const tmp = getTmp()
-        await fs.move(output, tmp)
-        await fs.remove(tmp).catch(debug)
-      } catch (error: any) {
+        await cp(output, tmp)
+        await rm(tmp, {force: true, recursive: true}).catch(debug)
+      } catch (error: unknown) {
         debug(error)
-        await fs.remove(output)
+        await rm(tmp, {force: true, recursive: true}).catch(debug)
       }
     }
 
-    const from = path.join(tmp, basename)
+    const from = join(tmp, basename)
     debug('moving %s to %s', from, output)
-    await fs.rename(from, output)
-    await fs.remove(tmp).catch(debug)
+    await rename(from, output)
+    await rm(tmp, {force: true, recursive: true}).catch(debug)
     await touch(output)
     debug('done extracting')
-  } catch (error: any) {
-    await fs.remove(tmp).catch(process.emitWarning)
+  } catch (error: unknown) {
+    await rm(tmp, {force: true, recursive: true}).catch(process.emitWarning)
     throw error
   }
+}
+
+// This is done so that we can stub it in tests
+export const Extractor = {
+  extract,
 }

@@ -1,32 +1,33 @@
-import {Command, Flags, ux, Args} from '@oclif/core'
-import {prompt, Separator} from 'inquirer'
-import * as path from 'path'
+import {Args, Command, Flags, ux} from '@oclif/core'
+import inquirer from 'inquirer'
+import {basename} from 'node:path'
 import {sort} from 'semver'
-import {Updater} from '../update'
+
+import {Updater} from '../update.js'
 
 export default class UpdateCommand extends Command {
-  static description = 'update the <%= config.bin %> CLI'
-
   static args = {
     channel: Args.string({optional: true}),
   }
 
+  static description = 'update the <%= config.bin %> CLI'
+
   static examples = [
     {
-      description: 'Update to the stable channel:',
       command: '<%= config.bin %> <%= command.id %> stable',
+      description: 'Update to the stable channel:',
     },
     {
-      description: 'Update to a specific version:',
       command: '<%= config.bin %> <%= command.id %> --version 1.0.0',
+      description: 'Update to a specific version:',
     },
     {
-      description: 'Interactively select version:',
       command: '<%= config.bin %> <%= command.id %> --interactive',
+      description: 'Interactively select version:',
     },
     {
-      description: 'See available versions:',
       command: '<%= config.bin %> <%= command.id %> --available',
+      description: 'See available versions:',
     },
   ]
 
@@ -36,18 +37,18 @@ export default class UpdateCommand extends Command {
       char: 'a',
       description: 'See available versions.',
     }),
-    version: Flags.string({
-      char: 'v',
-      description: 'Install a specific version.',
-      exclusive: ['interactive'],
+    force: Flags.boolean({
+      description: 'Force a re-download of the requested version.',
     }),
     interactive: Flags.boolean({
       char: 'i',
       description: 'Interactively select version to install. This is ignored if a channel is provided.',
       exclusive: ['version'],
     }),
-    force: Flags.boolean({
-      description: 'Force a re-download of the requested version.',
+    version: Flags.string({
+      char: 'v',
+      description: 'Install a specific version.',
+      exclusive: ['interactive'],
     }),
   }
 
@@ -59,12 +60,12 @@ export default class UpdateCommand extends Command {
       const allVersions = sort(Object.keys(index)).reverse()
       const localVersions = await updater.findLocalVersions()
 
-      const table = allVersions.map(version => {
-        const location = localVersions.find(l => path.basename(l).startsWith(version)) || index[version]
-        return {version, location}
+      const table = allVersions.map((version) => {
+        const location = localVersions.find((l) => basename(l).startsWith(version)) || index[version]
+        return {location, version}
       })
 
-      ux.table(table, {version: {}, location: {}})
+      ux.table(table, {location: {}, version: {}})
       return
     }
 
@@ -73,8 +74,8 @@ export default class UpdateCommand extends Command {
     }
 
     return updater.runUpdate({
-      channel: args.channel,
       autoUpdate: flags.autoupdate,
+      channel: args.channel,
       force: flags.force,
       version: flags.interactive ? await this.promptForVersion(updater) : flags.version,
     })
@@ -82,11 +83,11 @@ export default class UpdateCommand extends Command {
 
   private async promptForVersion(updater: Updater): Promise<string> {
     const choices = sort(Object.keys(await updater.fetchVersionIndex())).reverse()
-    const {version} = await prompt<{version: string}>({
-      name: 'version',
+    const {version} = await inquirer.prompt<{version: string}>({
+      choices: [...choices, new inquirer.Separator()],
       message: 'Select a version to update to',
+      name: 'version',
       type: 'list',
-      choices: [...choices, new Separator()],
     })
     return version
   }
