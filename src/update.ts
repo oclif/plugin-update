@@ -271,7 +271,13 @@ const mtime = async (f: string): Promise<Date> => (await stat(f)).mtime
 const notUpdatable = (config: Config): boolean => {
   if (!config.binPath) {
     const instructions = config.scopedEnvVar('UPDATE_INSTRUCTIONS')
-    if (instructions) ux.warn(instructions)
+    if (instructions) {
+      ux.warn(instructions)
+      // once the spinner stops, it'll eat this blank line
+      // https://github.com/oclif/core/issues/799
+      ux.log()
+    }
+
     return true
   }
 
