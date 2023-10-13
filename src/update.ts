@@ -274,6 +274,7 @@ const notUpdatable = (config: Config): boolean => {
     if (instructions) {
       ux.warn(instructions)
       // once the spinner stops, it'll eat this blank line
+      // https://github.com/oclif/core/issues/799
       ux.log()
     }
 
