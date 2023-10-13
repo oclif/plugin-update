@@ -1,3 +1,9 @@
+## [4.1.2](https://github.com/oclif/plugin-update/compare/4.1.1...4.1.2) (2023-10-13)
+
+### Bug Fixes
+
+- add a blank line to be swallowed by the spinner ([#646](https://github.com/oclif/plugin-update/issues/646)) ([2caf5c7](https://github.com/oclif/plugin-update/commit/2caf5c722e467507f9bef55df4be915472e60be7))
+
 ## [4.1.1](https://github.com/oclif/plugin-update/compare/4.1.0...4.1.1) (2023-10-12)
 
 ### Bug Fixes
