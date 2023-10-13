@@ -271,7 +271,12 @@ const mtime = async (f: string): Promise<Date> => (await stat(f)).mtime
 const notUpdatable = (config: Config): boolean => {
   if (!config.binPath) {
     const instructions = config.scopedEnvVar('UPDATE_INSTRUCTIONS')
-    if (instructions) ux.warn(instructions)
+    if (instructions) {
+      ux.warn(instructions)
+      // once the spinner stops, it'll eat this blank line
+      ux.log()
+    }
+
     return true
   }
 
