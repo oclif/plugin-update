@@ -29,7 +29,7 @@
     "@types/lodash.throttle": "^4.1.8",
     "@types/mocha": "^10",
     "@types/node": "^18",
-    "@types/semver": "^7.5.3",
+    "@types/semver": "^7.5.4",
     "@types/supports-color": "^7.2.0",
     "@types/tar-fs": "^2.0.2",
     "chai": "^4.3.7",
