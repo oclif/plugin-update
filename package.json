@@ -46,7 +46,7 @@
     "oclif": "^4",
     "prettier": "^3.0.3",
     "qqjs": "^0.3.11",
-    "quibble": "^0.8.0",
+    "quibble": "^0.9.0",
     "sinon": "^16.1.3",
     "strip-ansi": "^7.1.0",
     "ts-node": "^10.9.1",
