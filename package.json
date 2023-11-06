@@ -84,7 +84,7 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "yarn lint",
     "prepack": "yarn build && oclif lock && oclif manifest . && oclif lock",
-    "prepare": "husky install",
+    "prepare": "husky install && yarn build && oclif manifest",
     "pretest": "yarn build --noEmit && tsc -p test --noEmit",
     "test:integration:sf": "mocha --forbid-only \"test/integration/sf.integration.ts\" --timeout 900000",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
