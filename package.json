@@ -33,7 +33,7 @@
     "@types/supports-color": "^7.2.0",
     "@types/tar-fs": "^2.0.2",
     "chai": "^4.3.10",
-    "commitlint": "^17.7.2",
+    "commitlint": "^17.8.1",
     "eslint": "^8.53.0",
     "eslint-config-oclif": "^5.0.0",
     "eslint-config-oclif-typescript": "^3.0.1",
