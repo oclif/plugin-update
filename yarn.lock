@@ -486,10 +486,10 @@
     wordwrap "^1.0.0"
     wrap-ansi "^7.0.0"
 
-"@oclif/core@^3.0.4", "@oclif/core@^3.12.0", "@oclif/core@^3.14.1", "@oclif/core@^3.3.1":
-  version "3.15.0"
-  resolved "https://registry.yarnpkg.com/@oclif/core/-/core-3.15.0.tgz#28405012137fa92efcc5a2c4d61336dd64c697cb"
-  integrity sha512-A1EVh4gv7mqAJ9OGVxLugaLcHvQnGwvOnPToP8OT9AldJ0LwVExOwhhlnOstYca33MIpGH00twYxWMS5nxMuDQ==
+"@oclif/core@^3.0.4", "@oclif/core@^3.12.0", "@oclif/core@^3.15.1", "@oclif/core@^3.3.1":
+  version "3.15.1"
+  resolved "https://registry.yarnpkg.com/@oclif/core/-/core-3.15.1.tgz#e03fa775d658e76056150ac0c7b8097b6f51ab9c"
+  integrity sha512-d4457zVo2agLoJG97CmdY6M3BeP5sogBP3BtP65hUvJH6wA6Us1hdY3UiPPtD/ZzZImq7cATVMABuCF9tM+rWA==
   dependencies:
     ansi-escapes "^4.3.2"
     ansi-styles "^4.3.0"
@@ -508,7 +508,7 @@
     js-yaml "^3.14.1"
     natural-orderby "^2.0.3"
     object-treeify "^1.1.33"
-    password-prompt "^1.1.2"
+    password-prompt "^1.1.3"
     slice-ansi "^4.0.0"
     string-width "^4.2.3"
     strip-ansi "^6.0.1"
@@ -1177,11 +1177,6 @@ ansi-colors@4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/ansi-colors/-/ansi-colors-4.1.1.tgz#cbb9ae256bf750af1eab344f229aa27fe94ba348"
   integrity sha512-JoX0apGbHaUJBNl6yF+p6JAFYZ666/hhCGKN5t9QFjbJQKUU/g8MNbFDbvfrgKXvI1QpZplPOnwIo99lX/AAmA==
-
-ansi-escapes@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-3.1.0.tgz#f73207bb81207d75fd6c83f125af26eea378ca30"
-  integrity sha512-UgAb8H9D41AQnu/PbWlCofQVcnV4Gs2bBJi9eZPxfU/hgglFh3SMDMENRIqdr7H6XFnXdoknctFByVsCOotTVw==
 
 ansi-escapes@^4.2.1, ansi-escapes@^4.3.2:
   version "4.3.2"
@@ -2031,7 +2026,7 @@ create-require@^1.1.0:
   resolved "https://registry.yarnpkg.com/create-require/-/create-require-1.1.1.tgz#c1d7e8f1e5f6cfc9ff65f9cd352d37348756c333"
   integrity sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==
 
-cross-spawn@^6.0.0, cross-spawn@^6.0.5:
+cross-spawn@^6.0.0:
   version "6.0.5"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-6.0.5.tgz#4a5ec7c64dfae22c3a14124dbacdee846d80cbc4"
   integrity sha512-eTVLrBSt7fjbDygz805pMnstIs2VTBNkRm0qxZd+M7A5XDdxVRWO5MxGBXZhjY4cqLYLdtrGqRf8mBPmzwSpWQ==
@@ -5214,13 +5209,13 @@ pascal-case@^3.1.2:
     no-case "^3.0.4"
     tslib "^2.0.3"
 
-password-prompt@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/password-prompt/-/password-prompt-1.1.2.tgz#85b2f93896c5bd9e9f2d6ff0627fa5af3dc00923"
-  integrity sha512-bpuBhROdrhuN3E7G/koAju0WjVw9/uQOG5Co5mokNj0MiOSBVZS1JTwM4zl55hu0WFmIEFvO9cU9sJQiBIYeIA==
+password-prompt@^1.1.2, password-prompt@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/password-prompt/-/password-prompt-1.1.3.tgz#05e539f4e7ca4d6c865d479313f10eb9db63ee5f"
+  integrity sha512-HkrjG2aJlvF0t2BMH0e2LB/EHf3Lcq3fNMzy4GYHcQblAvOl+QQji1Lx7WRBMqpVK8p+KR7bCg7oqAMXtdgqyw==
   dependencies:
-    ansi-escapes "^3.1.0"
-    cross-spawn "^6.0.5"
+    ansi-escapes "^4.3.2"
+    cross-spawn "^7.0.3"
 
 path-case@^3.0.4:
   version "3.0.4"
