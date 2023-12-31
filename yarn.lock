@@ -488,7 +488,7 @@
     wordwrap "^1.0.0"
     wrap-ansi "^7.0.0"
 
-"@oclif/core@^3.0.4", "@oclif/core@^3.12.0", "@oclif/core@^3.15.1", "@oclif/core@^3.3.1":
+"@oclif/core@^3.0.4", "@oclif/core@^3.15.1", "@oclif/core@^3.3.1":
   version "3.15.1"
   resolved "https://registry.yarnpkg.com/@oclif/core/-/core-3.15.1.tgz#e03fa775d658e76056150ac0c7b8097b6f51ab9c"
   integrity sha512-d4457zVo2agLoJG97CmdY6M3BeP5sogBP3BtP65hUvJH6wA6Us1hdY3UiPPtD/ZzZImq7cATVMABuCF9tM+rWA==
@@ -554,13 +554,13 @@
   integrity sha512-XB8kwQj8zynXjIIWRm+6gO/r8Qft2xKtwBMSmq1JRqtA6TpwpqECqiu8LosBCyg2JBXuUy2lU23/L98KIR7FrQ==
 
 "@oclif/test@^3":
-  version "3.1.3"
-  resolved "https://registry.yarnpkg.com/@oclif/test/-/test-3.1.3.tgz#42d98e3e2c29a3340dedd7eab7c0a7e392c2f3cf"
-  integrity sha512-p4Z+SpGSW6pw/QQrQwVuG8eOuZtUl/hxh2rgaOkDfxWipb6FVNa08kzuE70rYaIDIq/9SFglcOb9YQmOXv2MEA==
+  version "3.1.7"
+  resolved "https://registry.yarnpkg.com/@oclif/test/-/test-3.1.7.tgz#614a101a880b6a8f7ef7439686495a5a6d64b051"
+  integrity sha512-lEKq/VKqxwSribfvxXu112KTrgo/WsHzoFnUZRv9YJe7Ho6FCkmKs6n362KHWJgSnBMc4rXMJNJQe62HzHbeoA==
   dependencies:
-    "@oclif/core" "^3.12.0"
+    "@oclif/core" "^3.15.1"
     chai "^4.3.10"
-    fancy-test "^3.0.1"
+    fancy-test "^3.0.7"
 
 "@octokit/auth-token@^2.4.4":
   version "2.5.0"
@@ -2735,10 +2735,10 @@ external-editor@^3.0.3, external-editor@^3.1.0:
     iconv-lite "^0.4.24"
     tmp "^0.0.33"
 
-fancy-test@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/fancy-test/-/fancy-test-3.0.1.tgz#8b19ed4ccc8b0625475eabf36fd743e1d0168abb"
-  integrity sha512-Ke1IFOGEBxP2dNg0X7ZYPUSwKSRr5GNn3xM/2DpHkP86riF3MFDpesXJuD1TGm7gcfwBtYpuSzuw3m704bThVg==
+fancy-test@^3.0.7:
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/fancy-test/-/fancy-test-3.0.8.tgz#ca3919ebb07c1c0e5fb8e8953e02e2ed48600ef8"
+  integrity sha512-vHkT59Kf0Byiqzwc2My1fD9VDYsAPkT+jVqdMqqtwtdLwz19x+hHI2oAxNwfyfEDSK+VrLB4+B96sZbOLVEHdA==
   dependencies:
     "@types/chai" "*"
     "@types/lodash" "*"
@@ -2746,8 +2746,8 @@ fancy-test@^3.0.1:
     "@types/sinon" "*"
     lodash "^4.17.13"
     mock-stdin "^1.0.0"
-    nock "^13.3.3"
-    sinon "^16.0.0"
+    nock "^13.4.0"
+    sinon "^16.1.3"
     stdout-stderr "^0.1.9"
 
 fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
@@ -4726,7 +4726,7 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
-nock@^13.3.3, nock@^13.4.0:
+nock@^13.4.0:
   version "13.4.0"
   resolved "https://registry.yarnpkg.com/nock/-/nock-13.4.0.tgz#60aa3f7a4afa9c12052e74d8fb7550f682ef0115"
   integrity sha512-W8NVHjO/LCTNA64yxAPHV/K47LpGYcVzgKd3Q0n6owhwvD0Dgoterc25R4rnZbckJEb6Loxz1f5QMuJpJnbSyQ==
@@ -5876,7 +5876,7 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-sinon@^16.0.0, sinon@^16.1.3:
+sinon@^16.1.3:
   version "16.1.3"
   resolved "https://registry.yarnpkg.com/sinon/-/sinon-16.1.3.tgz#b760ddafe785356e2847502657b4a0da5501fba8"
   integrity sha512-mjnWWeyxcAf9nC0bXcPmiDut+oE8HYridTNzBbF98AYVLmWwGRp2ISEpyhYflG1ifILT+eNn3BmKUJPxjXUPlA==
