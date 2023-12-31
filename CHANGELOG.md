@@ -1,3 +1,9 @@
+## [4.1.7](https://github.com/oclif/plugin-update/compare/4.1.6...4.1.7) (2023-12-31)
+
+### Bug Fixes
+
+- **deps:** bump inquirer and @types/inquirer ([#701](https://github.com/oclif/plugin-update/issues/701)) ([b54de89](https://github.com/oclif/plugin-update/commit/b54de89cd48eab9394ebe33b0de8441e0968d448))
+
 ## [4.1.6](https://github.com/oclif/plugin-update/compare/4.1.5...4.1.6) (2023-12-24)
 
 ### Bug Fixes
