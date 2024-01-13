@@ -36,7 +36,7 @@
     "commitlint": "^17.8.1",
     "eslint": "^8.56.0",
     "eslint-config-oclif": "^5.0.0",
-    "eslint-config-oclif-typescript": "^3.0.33",
+    "eslint-config-oclif-typescript": "^3.0.35",
     "eslint-config-prettier": "^9.1.0",
     "got": "^13.0.0",
     "husky": "^8.0.3",
