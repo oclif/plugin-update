@@ -550,13 +550,13 @@
   integrity sha512-XB8kwQj8zynXjIIWRm+6gO/r8Qft2xKtwBMSmq1JRqtA6TpwpqECqiu8LosBCyg2JBXuUy2lU23/L98KIR7FrQ==
 
 "@oclif/test@^3":
-  version "3.1.7"
-  resolved "https://registry.yarnpkg.com/@oclif/test/-/test-3.1.7.tgz#614a101a880b6a8f7ef7439686495a5a6d64b051"
-  integrity sha512-lEKq/VKqxwSribfvxXu112KTrgo/WsHzoFnUZRv9YJe7Ho6FCkmKs6n362KHWJgSnBMc4rXMJNJQe62HzHbeoA==
+  version "3.1.10"
+  resolved "https://registry.yarnpkg.com/@oclif/test/-/test-3.1.10.tgz#8168c7643a393cb5d2a52f0b7133afc4564e5111"
+  integrity sha512-Jv91n9M9V8z/WheKFSQQ65Pc6mlackg4kO8XbXrIiK3kd/Z2xVojCB3Fq6dN19Ow3OZB0Uc0J+8H62XOR0Pblw==
   dependencies:
-    "@oclif/core" "^3.15.1"
-    chai "^4.3.10"
-    fancy-test "^3.0.7"
+    "@oclif/core" "^3.16.0"
+    chai "^4.4.0"
+    fancy-test "^3.0.8"
 
 "@octokit/auth-token@^2.4.4":
   version "2.5.0"
@@ -1625,7 +1625,7 @@ cardinal@^2.1.1:
     ansicolors "~0.3.2"
     redeyed "~2.1.0"
 
-chai@^4.3.10, chai@^4.4.0:
+chai@^4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/chai/-/chai-4.4.0.tgz#f9ac79f26726a867ac9d90a9b382120479d5f55b"
   integrity sha512-x9cHNq1uvkCdU+5xTkNh5WtgD4e4yDFCsp9jVc7N7qVeKeftv3gO/ZrviX5d+3ZfxdYnZXZYujjRInu1RogU6A==
@@ -2727,7 +2727,7 @@ external-editor@^3.0.3, external-editor@^3.1.0:
     iconv-lite "^0.4.24"
     tmp "^0.0.33"
 
-fancy-test@^3.0.7:
+fancy-test@^3.0.8:
   version "3.0.8"
   resolved "https://registry.yarnpkg.com/fancy-test/-/fancy-test-3.0.8.tgz#ca3919ebb07c1c0e5fb8e8953e02e2ed48600ef8"
   integrity sha512-vHkT59Kf0Byiqzwc2My1fD9VDYsAPkT+jVqdMqqtwtdLwz19x+hHI2oAxNwfyfEDSK+VrLB4+B96sZbOLVEHdA==
