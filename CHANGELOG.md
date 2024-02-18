@@ -1,3 +1,9 @@
+## [4.1.12](https://github.com/oclif/plugin-update/compare/4.1.11...4.1.12) (2024-02-18)
+
+### Bug Fixes
+
+- **deps:** bump semver and @types/semver ([#739](https://github.com/oclif/plugin-update/issues/739)) ([71637d9](https://github.com/oclif/plugin-update/commit/71637d9f2557d2e743ce382972a9a86c4e32d309))
+
 ## [4.1.11](https://github.com/oclif/plugin-update/compare/4.1.10...4.1.11) (2024-02-12)
 
 ### Bug Fixes
