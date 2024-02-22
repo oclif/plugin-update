@@ -1,3 +1,9 @@
+## [4.1.14](https://github.com/oclif/plugin-update/compare/4.1.13...4.1.14) (2024-02-22)
+
+### Bug Fixes
+
+- **deps:** bump ip from 1.1.5 to 1.1.9 ([#741](https://github.com/oclif/plugin-update/issues/741)) ([bac9e2b](https://github.com/oclif/plugin-update/commit/bac9e2b9b269cc28059a325b18e65b37e3cd683a))
+
 ## [4.1.13](https://github.com/oclif/plugin-update/compare/4.1.12...4.1.13) (2024-02-18)
 
 ### Bug Fixes
