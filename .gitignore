@@ -12,3 +12,4 @@ oclif.manifest.json
 /.idea
 
 oclif.lock
+npm-shrinkwrap.json
