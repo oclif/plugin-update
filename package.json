@@ -4,7 +4,7 @@
   "author": "Salesforce",
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
-    "@oclif/core": "^3.20.0",
+    "@oclif/core": "^3.21.0",
     "chalk": "^5",
     "cross-spawn": "^7.0.3",
     "debug": "^4.3.1",
@@ -55,7 +55,8 @@
   "files": [
     "oclif.manifest.json",
     "/dist",
-    "npm-shrinkwrap.json"
+    "npm-shrinkwrap.json",
+    "oclif.lock"
   ],
   "homepage": "https://github.com/oclif/plugin-update",
   "keywords": [
@@ -77,12 +78,12 @@
   "repository": "oclif/plugin-update",
   "scripts": {
     "build": "shx rm -rf lib && tsc",
-    "clean": "shx rm -f oclif.manifest.json npm-shrinkwrap.json",
+    "clean": "shx rm -f oclif.manifest.json npm-shrinkwrap.json oclif.lock",
     "compile": "tsc",
     "lint": "eslint . --ext .ts",
     "postpack": "yarn run clean",
     "posttest": "yarn lint",
-    "prepack": "yarn build && oclif manifest && oclif readme && npm shrinkwrap",
+    "prepack": "yarn build && oclif manifest && oclif readme && npm shrinkwrap && oclif lock",
     "prepare": "husky && yarn build",
     "pretest": "yarn build --noEmit && tsc -p test --noEmit",
     "test:integration:sf": "mocha --forbid-only \"test/integration/sf.integration.ts\" --timeout 900000",
