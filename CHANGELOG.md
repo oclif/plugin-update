@@ -1,3 +1,9 @@
+# [4.2.0](https://github.com/oclif/plugin-update/compare/4.1.16...4.2.0) (2024-03-06)
+
+### Features
+
+- publish npm-shrinkwrap.json ([#742](https://github.com/oclif/plugin-update/issues/742)) ([f807417](https://github.com/oclif/plugin-update/commit/f8074172bc309c4637f4f6513208de8e987b994d))
+
 ## [4.1.16](https://github.com/oclif/plugin-update/compare/4.1.15...4.1.16) (2024-03-04)
 
 ### Bug Fixes
