@@ -4242,13 +4242,13 @@ eslint-config-oclif-typescript@^3.1.0:
     eslint-plugin-n "^15"
     eslint-plugin-perfectionist "^2.5.0"
 
-eslint-config-oclif@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-oclif/-/eslint-config-oclif-5.1.0.tgz#c70b63a68f5a897f71ab277ecd99c79e0d60d692"
-  integrity sha512-T4pFAFV9g1hy797f817bzkBeQB0R9j3AShrI0ohfVecHU54GrzzOTFufh0Ex8bwb89un/NlF8TE5RTiy8SKURQ==
+eslint-config-oclif@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/eslint-config-oclif/-/eslint-config-oclif-5.1.1.tgz#012e9db4091336ede08b1d8c58540a8627887a7b"
+  integrity sha512-cyvKKwNnNkrYmumgrd72I8WxXJBL2DDI8fX2/wX5v4O0kl7Poj2ceR4ylP6DWXpCbD48+qXGwjIjiz2cVVVrzQ==
   dependencies:
     eslint-config-xo-space "^0.35.0"
-    eslint-plugin-mocha "^10.3.0"
+    eslint-plugin-mocha "^10.4.1"
     eslint-plugin-n "^15.1.0"
     eslint-plugin-unicorn "^48.0.1"
 
@@ -4331,12 +4331,13 @@ eslint-plugin-import@^2.29.1:
     semver "^6.3.1"
     tsconfig-paths "^3.15.0"
 
-eslint-plugin-mocha@^10.3.0:
-  version "10.3.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-mocha/-/eslint-plugin-mocha-10.3.0.tgz#a1cd40737c230f4dc7477a3bef3bbaad7f8d8282"
-  integrity sha512-IWzbg2K6B1Q7h37Ih4zMyW+nhmw1JvUlHlbCUUUu6PfOOAUGCB0gxmvv7/U+TQQ6e8yHUv+q7KMdIIum4bx+PA==
+eslint-plugin-mocha@^10.3.0, eslint-plugin-mocha@^10.4.1:
+  version "10.4.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-mocha/-/eslint-plugin-mocha-10.4.1.tgz#7975a3dbb0de80a5f3ea69c30f6f1f1c931f8800"
+  integrity sha512-G85ALUgKaLzuEuHhoW3HVRgPTmia6njQC3qCG6CEvA8/Ja9PDZnRZOuzekMki+HaViEQXINuYsmhp5WR5/4MfA==
   dependencies:
     eslint-utils "^3.0.0"
+    globals "^13.24.0"
     rambda "^7.4.0"
 
 eslint-plugin-n@^15, eslint-plugin-n@^15.1.0:
@@ -4994,6 +4995,13 @@ globals@^13.19.0:
   version "13.21.0"
   resolved "https://registry.yarnpkg.com/globals/-/globals-13.21.0.tgz#163aae12f34ef502f5153cfbdd3600f36c63c571"
   integrity sha512-ybyme3s4yy/t/3s35bewwXKOf7cvzfreG2lH0lZl0JB7I4GxRP2ghxOK/Nb9EkRXdbBXZLfq/p/0W2JUONB/Gg==
+  dependencies:
+    type-fest "^0.20.2"
+
+globals@^13.24.0:
+  version "13.24.0"
+  resolved "https://registry.yarnpkg.com/globals/-/globals-13.24.0.tgz#8432a19d78ce0c1e833949c36adb345400bb1171"
+  integrity sha512-AhO5QUcj8llrbG09iWhPU2B204J1xnPeL8kQmVorSsy+Sjj1sk8gIyh6cUocGmH4L0UuhAJy+hJMRA4mgA4mFQ==
   dependencies:
     type-fest "^0.20.2"
 
