@@ -9,6 +9,8 @@
 - [@oclif/plugin-update](#oclifplugin-update)
 - [Usage](#usage)
 - [Commands](#commands)
+  - [`oclif-example update [CHANNEL]`](#oclif-example-update-channel)
+- [Contributing](#contributing)
 <!-- tocstop -->
 
 # Usage
@@ -19,7 +21,11 @@ See https://oclif.io/docs/releasing.html#autoupdater
 
 <!-- commands -->
 
-- [`oclif-example update [CHANNEL]`](#oclif-example-update-channel)
+- [@oclif/plugin-update](#oclifplugin-update)
+- [Usage](#usage)
+- [Commands](#commands)
+  - [`oclif-example update [CHANNEL]`](#oclif-example-update-channel)
+- [Contributing](#contributing)
 
 ## `oclif-example update [CHANNEL]`
 
@@ -59,3 +65,7 @@ EXAMPLES
 _See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/4.2.0/src/commands/update.ts)_
 
 <!-- commandsstop -->
+
+# Contributing
+
+See [contributing guide](./CONRTIBUTING.md)
