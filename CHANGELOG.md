@@ -1,3 +1,9 @@
+## [4.2.3](https://github.com/oclif/plugin-update/compare/4.2.2...4.2.3) (2024-03-31)
+
+### Bug Fixes
+
+- **deps:** bump inquirer from 9.2.16 to 9.2.17 ([#774](https://github.com/oclif/plugin-update/issues/774)) ([b39b54c](https://github.com/oclif/plugin-update/commit/b39b54cd80e12e8dff739864c469930a6b6b91d6))
+
 ## [4.2.2](https://github.com/oclif/plugin-update/compare/4.2.1...4.2.2) (2024-03-25)
 
 ### Bug Fixes
