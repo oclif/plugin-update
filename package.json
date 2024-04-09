@@ -55,8 +55,7 @@
   "files": [
     "oclif.manifest.json",
     "/dist",
-    "npm-shrinkwrap.json",
-    "oclif.lock"
+    "npm-shrinkwrap.json"
   ],
   "homepage": "https://github.com/oclif/plugin-update",
   "keywords": [
@@ -78,12 +77,12 @@
   "repository": "oclif/plugin-update",
   "scripts": {
     "build": "shx rm -rf lib && tsc",
-    "clean": "shx rm -f oclif.manifest.json npm-shrinkwrap.json oclif.lock",
+    "clean": "shx rm -f oclif.manifest.json npm-shrinkwrap.json",
     "compile": "tsc",
     "lint": "eslint . --ext .ts",
     "postpack": "yarn run clean",
     "posttest": "yarn lint",
-    "prepack": "yarn build && oclif manifest && oclif readme && npm shrinkwrap && oclif lock",
+    "prepack": "yarn build && oclif manifest && oclif readme && npm shrinkwrap",
     "prepare": "husky && yarn build",
     "pretest": "yarn build --noEmit && tsc -p test --noEmit",
     "test:integration:sf": "mocha --forbid-only \"test/integration/sf.integration.ts\" --timeout 900000",
