@@ -1,5 +1,5 @@
+import select from '@inquirer/select'
 import {Args, Command, Flags, ux} from '@oclif/core'
-import inquirer from 'inquirer'
 import {basename} from 'node:path'
 import {sort} from 'semver'
 
@@ -56,9 +56,8 @@ export default class UpdateCommand extends Command {
     const {args, flags} = await this.parse(UpdateCommand)
     const updater = new Updater(this.config)
     if (flags.available) {
-      const index = await updater.fetchVersionIndex()
+      const [index, localVersions] = await Promise.all([updater.fetchVersionIndex(), updater.findLocalVersions()])
       const allVersions = sort(Object.keys(index)).reverse()
-      const localVersions = await updater.findLocalVersions()
 
       const table = allVersions.map((version) => {
         const location = localVersions.find((l) => basename(l).startsWith(version)) || index[version]
@@ -77,18 +76,16 @@ export default class UpdateCommand extends Command {
       autoUpdate: flags.autoupdate,
       channel: args.channel,
       force: flags.force,
-      version: flags.interactive ? await this.promptForVersion(updater) : flags.version,
+      version: flags.interactive ? await promptForVersion(updater) : flags.version,
     })
-  }
-
-  private async promptForVersion(updater: Updater): Promise<string> {
-    const choices = sort(Object.keys(await updater.fetchVersionIndex())).reverse()
-    const {version} = await inquirer.prompt<{version: string}>({
-      choices: [...choices, new inquirer.Separator()],
-      message: 'Select a version to update to',
-      name: 'version',
-      type: 'list',
-    })
-    return version
   }
 }
+
+const promptForVersion = async (updater: Updater): Promise<string> =>
+  select({
+    choices: sort(Object.keys(await updater.fetchVersionIndex()))
+      .reverse()
+      .map((v) => ({value: v})),
+    loop: false,
+    message: 'Select a version to update to',
+  })
