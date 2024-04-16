@@ -1,3 +1,9 @@
+## [4.2.6](https://github.com/oclif/plugin-update/compare/4.2.5...4.2.6) (2024-04-16)
+
+### Bug Fixes
+
+- use native spawn, new inquirer ([#788](https://github.com/oclif/plugin-update/issues/788)) ([a53ff7a](https://github.com/oclif/plugin-update/commit/a53ff7a952e0ab09fc987ac028085326f1d93de7))
+
 ## [4.2.5](https://github.com/oclif/plugin-update/compare/4.2.4...4.2.5) (2024-04-14)
 
 ### Bug Fixes
