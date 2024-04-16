@@ -1,6 +1,6 @@
 import {Interfaces} from '@oclif/core'
-import {spawn} from 'cross-spawn'
 import makeDebug from 'debug'
+import {spawn} from 'node:child_process'
 import {existsSync} from 'node:fs'
 import {open, stat, writeFile} from 'node:fs/promises'
 import {join} from 'node:path'
@@ -70,6 +70,7 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
     detached: !config.windows,
     env: autoupdateEnv,
     stdio: ['ignore', stream, stream],
+    ...(config.windows ? {shell: true} : {}),
   })
     .on('error', (e: Error) => process.emitWarning(e))
     .unref()
