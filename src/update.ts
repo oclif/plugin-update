@@ -445,8 +445,12 @@ const determineCurrentVersion = async (clientBin: string, version: string): Prom
     const currentVersion = await readFile(clientBin, 'utf8')
     const matches = currentVersion.match(/\.\.[/\\|](.+)[/\\|]bin/)
     return matches ? matches[1] : version
-  } catch (error: unknown) {
-    ux.warn(error as Error | string)
+  } catch (error) {
+    if (error instanceof Error) {
+      ux.debug(error.name, error.message)
+    } else if (typeof error === 'string') {
+      ux.debug(error)
+    }
   }
 
   return version
