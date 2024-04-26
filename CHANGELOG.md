@@ -1,3 +1,9 @@
+## [4.2.8](https://github.com/oclif/plugin-update/compare/4.2.7...4.2.8) (2024-04-26)
+
+### Bug Fixes
+
+- debug error instead of warn ([#799](https://github.com/oclif/plugin-update/issues/799)) ([12794f4](https://github.com/oclif/plugin-update/commit/12794f4405a8285b448aef6fac13c3f487ddb4db))
+
 ## [4.2.7](https://github.com/oclif/plugin-update/compare/4.2.6...4.2.7) (2024-04-21)
 
 ### Bug Fixes
