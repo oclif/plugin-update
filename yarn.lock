@@ -4769,16 +4769,16 @@ object.values@^1.1.7:
     es-abstract "^1.22.1"
 
 oclif@^4:
-  version "4.8.7"
-  resolved "https://registry.yarnpkg.com/oclif/-/oclif-4.8.7.tgz#af39fc02c2b09a23866241b3a377a8ce05c25c01"
-  integrity sha512-AR6nnhoc+HpoyD/2clcc8gMiB4v+y5qN2jy2L8DCM6ZLj33WyB7XWaB2ijhN3oD2zMEBr+eXiNb27YRXrjfpeg==
+  version "4.9.0"
+  resolved "https://registry.yarnpkg.com/oclif/-/oclif-4.9.0.tgz#6519161de69b58559c2483b9ff81dd16ecffdb4e"
+  integrity sha512-35wI+Rqu7iDix6iLToYyqTw7aHDxzUsymt2JZ5HMzrZWlaebDwkYMJTyOT08e9IQY8U8k4+zZPie1hLTxdEOFg==
   dependencies:
     "@aws-sdk/client-cloudfront" "^3.535.0"
     "@aws-sdk/client-s3" "^3.554.0"
     "@inquirer/confirm" "^3.1.5"
     "@inquirer/input" "^2.1.1"
     "@inquirer/select" "^2.2.1"
-    "@oclif/core" "^3.26.0"
+    "@oclif/core" "^3.26.4"
     "@oclif/plugin-help" "^6.0.21"
     "@oclif/plugin-not-found" "^3.0.14"
     "@oclif/plugin-warn-if-update-available" "^3.0.14"
