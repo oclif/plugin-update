@@ -425,6 +425,10 @@ const determineChannel = async ({config, version}: {config: Config; version?: st
   // eslint-disable-next-line unicorn/no-await-expression-member
   const channel = existsSync(channelPath) ? (await readFile(channelPath, 'utf8')).trim() : 'stable'
 
+  if (config.pjson.oclif.update?.disableNpmLookup ?? false) {
+    return channel
+  }
+
   try {
     const {body} = await HTTP.get<{'dist-tags': Record<string, string>}>(
       `${config.npmRegistry ?? 'https://registry.npmjs.org'}/${config.pjson.name}`,
