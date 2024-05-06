@@ -1,3 +1,9 @@
+## [4.2.11](https://github.com/oclif/plugin-update/compare/4.2.10...4.2.11) (2024-05-06)
+
+### Bug Fixes
+
+- dont check npm option - [#797](https://github.com/oclif/plugin-update/issues/797) ([#807](https://github.com/oclif/plugin-update/issues/807)) ([#812](https://github.com/oclif/plugin-update/issues/812)) ([973666b](https://github.com/oclif/plugin-update/commit/973666bc0a2217d6ac8ffbada1990419fcb0e0bf))
+
 ## [4.2.10](https://github.com/oclif/plugin-update/compare/4.2.9...4.2.10) (2024-05-05)
 
 ### Bug Fixes
