@@ -1,8 +1,7 @@
 import {Config, Interfaces, ux} from '@oclif/core'
 import chalk from 'chalk'
 import fileSize from 'filesize'
-import {HTTP} from 'http-call'
-import throttle from 'lodash.throttle'
+import {got} from 'got'
 import {Stats, existsSync} from 'node:fs'
 import {mkdir, readFile, readdir, rm, stat, symlink, utimes, writeFile} from 'node:fs/promises'
 import {basename, dirname, join} from 'node:path'
@@ -37,7 +36,7 @@ export class Updater {
     ux.action.status = 'fetching version index'
     const newIndexUrl = this.config.s3Url(s3VersionIndexKey(this.config))
     try {
-      const {body} = await HTTP.get<VersionIndex>(newIndexUrl)
+      const {body} = await got.get<VersionIndex>(newIndexUrl)
       return typeof body === 'string' ? JSON.parse(body) : body
     } catch {
       throw new Error(`No version indices exist for ${this.config.name}.`)
@@ -265,7 +264,6 @@ const ensureClientDir = async (clientRoot: string): Promise<void> => {
   }
 }
 
-// eslint-disable-next-line unicorn/no-await-expression-member
 const mtime = async (f: string): Promise<Date> => (await stat(f)).mtime
 
 const notUpdatable = (config: Config): boolean => {
@@ -294,7 +292,7 @@ const fetchManifest = async (s3Key: string, config: Config): Promise<Interfaces.
   ux.action.status = 'fetching manifest'
 
   const url = config.s3Url(s3Key)
-  const {body} = await HTTP.get<Interfaces.S3Manifest | string>(url)
+  const {body} = await got.get<Interfaces.S3Manifest | string>(url)
   if (typeof body === 'string') {
     return JSON.parse(body)
   }
@@ -385,7 +383,8 @@ const downloadAndExtract = async (
         version,
       }),
     )
-  const {response: stream} = await HTTP.stream(gzUrl)
+  const stream = got.stream(gzUrl)
+
   stream.pause()
 
   const baseDir =
@@ -400,18 +399,11 @@ const downloadAndExtract = async (
   const extraction = Extractor.extract(stream, baseDir, output, sha256gz)
 
   if (ux.action.type === 'spinner') {
-    const total = Number.parseInt(stream.headers['content-length']!, 10)
-    let current = 0
-    const updateStatus = throttle(
-      (newStatus: string) => {
-        ux.action.status = newStatus
-      },
-      250,
-      {leading: true, trailing: false},
-    )
-    stream.on('data', (data) => {
-      current += data.length
-      updateStatus(`${filesize(current)}/${filesize(total)}`)
+    stream.on('downloadProgress', (progress) => {
+      ux.action.status =
+        progress.percent === 1
+          ? `${filesize(progress.transferred)}/${filesize(progress.total)} - Extracting`
+          : `${filesize(progress.transferred)}/${filesize(progress.total)}`
     })
   }
 
@@ -422,7 +414,6 @@ const downloadAndExtract = async (
 const determineChannel = async ({config, version}: {config: Config; version?: string}): Promise<string> => {
   const channelPath = join(config.dataDir, 'channel')
 
-  // eslint-disable-next-line unicorn/no-await-expression-member
   const channel = existsSync(channelPath) ? (await readFile(channelPath, 'utf8')).trim() : 'stable'
 
   if (config.pjson.oclif.update?.disableNpmLookup ?? false) {
@@ -430,7 +421,7 @@ const determineChannel = async ({config, version}: {config: Config; version?: st
   }
 
   try {
-    const {body} = await HTTP.get<{'dist-tags': Record<string, string>}>(
+    const {body} = await got.get<{'dist-tags': Record<string, string>}>(
       `${config.npmRegistry ?? 'https://registry.npmjs.org'}/${config.pjson.name}`,
     )
     const tags = body['dist-tags']

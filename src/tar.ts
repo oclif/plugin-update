@@ -1,6 +1,6 @@
 import makeDebug from 'debug'
 import {existsSync} from 'node:fs'
-import {cp, rename, rm} from 'node:fs/promises'
+import {rename, rm} from 'node:fs/promises'
 import {join} from 'node:path'
 
 import {touch} from './util.js'
@@ -68,9 +68,7 @@ async function extract(stream: NodeJS.ReadableStream, basename: string, output: 
 
     if (existsSync(output)) {
       try {
-        const tmp = getTmp()
-        await cp(output, tmp)
-        await rm(tmp, {force: true, recursive: true}).catch(debug)
+        await rm(output, {force: true, recursive: true}).catch(debug)
       } catch (error: unknown) {
         debug(error)
         await rm(tmp, {force: true, recursive: true}).catch(debug)
