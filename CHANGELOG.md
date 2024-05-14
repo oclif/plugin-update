@@ -1,3 +1,9 @@
+## [4.2.12](https://github.com/oclif/plugin-update/compare/4.2.11...4.2.12) (2024-05-14)
+
+### Bug Fixes
+
+- no error when using --force ([#820](https://github.com/oclif/plugin-update/issues/820)) ([8415299](https://github.com/oclif/plugin-update/commit/84152991723e483fe40a687a7928a091468a054c))
+
 ## [4.2.11](https://github.com/oclif/plugin-update/compare/4.2.10...4.2.11) (2024-05-06)
 
 ### Bug Fixes
