@@ -4,7 +4,7 @@
   "author": "Salesforce",
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
-    "@inquirer/select": "^2.3.2",
+    "@inquirer/select": "^2.3.4",
     "@oclif/core": "^3.26.6",
     "chalk": "^5",
     "debug": "^4.3.1",
