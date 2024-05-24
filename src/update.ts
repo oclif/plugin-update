@@ -1,5 +1,6 @@
 import {Config, Interfaces, ux} from '@oclif/core'
 import chalk from 'chalk'
+import makeDebug from 'debug'
 import fileSize from 'filesize'
 import {got} from 'got'
 import {Stats, existsSync} from 'node:fs'
@@ -8,6 +9,8 @@ import {basename, dirname, join} from 'node:path'
 
 import {Extractor} from './tar.js'
 import {ls, wait} from './util.js'
+
+const debug = makeDebug('oclif:update')
 
 const filesize = (n: number): string => {
   const [num, suffix] = fileSize(n, {output: 'array'})
@@ -93,8 +96,8 @@ export class Updater {
 
       await this.config.runHook('update', {channel, version})
       ux.action.stop()
-      ux.log()
-      ux.log(
+      ux.stdout()
+      ux.stdout(
         `Updating to a specific version will not update the channel. If autoupdate is enabled, the CLI will eventually be updated back to ${channel}.`,
       )
     } else {
@@ -114,7 +117,7 @@ export class Updater {
 
     await this.touch()
     await this.tidy()
-    ux.debug('done')
+    debug('done')
   }
 
   private async createBin(version: string): Promise<void> {
@@ -177,7 +180,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
 
   // removes any unused CLIs
   private async tidy(): Promise<void> {
-    ux.debug('tidy')
+    debug('tidy')
     try {
       const root = this.clientRoot
       if (!existsSync(root)) return
@@ -206,7 +209,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
     // touch the client so it won't be tidied up right away
     try {
       const p = join(this.clientRoot, this.config.version)
-      ux.debug('touching client at', p)
+      debug('touching client at', p)
       if (!existsSync(p)) return
       return utimes(p, new Date(), new Date())
     } catch (error: unknown) {
@@ -273,7 +276,7 @@ const notUpdatable = (config: Config): boolean => {
       ux.warn(instructions)
       // once the spinner stops, it'll eat this blank line
       // https://github.com/oclif/core/issues/799
-      ux.log()
+      ux.stdout()
     }
 
     return true
@@ -283,7 +286,7 @@ const notUpdatable = (config: Config): boolean => {
 }
 
 const composeS3SubDir = (config: Config): string => {
-  let s3SubDir = config.pjson.oclif.update.s3.folder || ''
+  let s3SubDir = config.pjson.oclif.update?.s3?.folder || ''
   if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
   return s3SubDir
 }
@@ -336,9 +339,9 @@ const debounce = async (cacheDir: string): Promise<void> => {
   if (m > new Date()) {
     const msg = `waiting until ${m.toISOString()} to update`
     if (output) {
-      ux.debug(msg)
+      debug(msg)
     } else {
-      ux.log(msg)
+      ux.stdout(msg)
       output = true
     }
 
@@ -346,7 +349,7 @@ const debounce = async (cacheDir: string): Promise<void> => {
     return debounce(cacheDir)
   }
 
-  ux.log('time to update')
+  ux.stdout('time to update')
 }
 
 const setChannel = async (channel: string, dataDir: string): Promise<void> =>
@@ -442,9 +445,9 @@ const determineCurrentVersion = async (clientBin: string, version: string): Prom
     return matches ? matches[1] : version
   } catch (error) {
     if (error instanceof Error) {
-      ux.debug(error.name, error.message)
+      debug(error.name, error.message)
     } else if (typeof error === 'string') {
-      ux.debug(error)
+      debug(error)
     }
   }
 
