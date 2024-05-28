@@ -1,3 +1,9 @@
+## [4.2.14](https://github.com/oclif/plugin-update/compare/4.2.13...4.2.14) (2024-05-28)
+
+### Reverts
+
+- Revert "chore: remove outdated example [skip ci]" ([8abd256](https://github.com/oclif/plugin-update/commit/8abd2561abc47e1f766381fb189003ac4544ccb6))
+
 ## [4.2.13](https://github.com/oclif/plugin-update/compare/4.2.12...4.2.13) (2024-05-19)
 
 ### Bug Fixes
