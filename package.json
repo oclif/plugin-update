@@ -23,6 +23,7 @@
     "@types/mocha": "^10",
     "@types/node": "^18",
     "@types/semver": "^7.5.8",
+    "@types/sinon": "^17.0.3",
     "@types/tar-fs": "^2.0.2",
     "chai": "^4.4.1",
     "commitlint": "^19",
