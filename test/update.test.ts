@@ -4,9 +4,9 @@ import {got} from 'got'
 import nock from 'nock'
 import {existsSync} from 'node:fs'
 import {mkdir, rm, symlink, writeFile} from 'node:fs/promises'
-import * as path from 'node:path'
+import path from 'node:path'
 import zlib from 'node:zlib'
-import {createSandbox} from 'sinon'
+import sinon from 'sinon'
 import stripAnsi from 'strip-ansi'
 
 import {Extractor} from '../src/tar.js'
@@ -48,18 +48,19 @@ describe('update plugin', () => {
   let collector: OutputCollectors
   let clientRoot: string
 
-  const sandbox = createSandbox()
-
   beforeEach(async () => {
     config = await loadConfig({root: path.join(process.cwd(), 'examples', 's3-update-example-cli')})
     config.binPath = config.binPath || config.bin
     collector = {stderr: [], stdout: []}
-    sandbox.stub(ux, 'log').callsFake((line) => collector.stdout.push(line || ''))
-    sandbox.stub(ux, 'warn').callsFake((line) => collector.stderr.push(line ? `${line}` : ''))
-    sandbox.stub(ux.action, 'start').callsFake((line) => collector.stdout.push(line || ''))
-    sandbox.stub(ux.action, 'stop').callsFake((line) => collector.stdout.push(line || ''))
+    sinon.stub(ux, 'stdout').callsFake((lines) => {
+      const arr = Array.isArray(lines) ? lines : [lines ?? '']
+      collector.stdout.push(...arr)
+    })
+    sinon.stub(ux, 'warn').callsFake((line) => collector.stderr.push(line ? `${line}` : ''))
+    sinon.stub(ux.action, 'start').callsFake((line) => collector.stdout.push(line || ''))
+    sinon.stub(ux.action, 'stop').callsFake((line) => collector.stdout.push(line || ''))
     // @ts-expect-error because private method
-    sandbox.stub(Updater.prototype, 'refreshConfig').resolves()
+    sinon.stub(Updater.prototype, 'refreshConfig').resolves()
   })
 
   afterEach(async () => {
@@ -69,7 +70,7 @@ describe('update plugin', () => {
       await rm(clientRoot, {force: true, recursive: true})
     }
 
-    sandbox.restore()
+    sinon.restore()
   })
 
   it('should not update - already on same version', async () => {
@@ -99,7 +100,7 @@ describe('update plugin', () => {
     await mkdir(path.join(`${newVersionPath}.partial.11111`, 'bin'), {recursive: true})
     await writeFile(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
 
-    sandbox.stub(Extractor, 'extract').resolves()
+    sinon.stub(Extractor, 'extract').resolves()
 
     const gzContents = zlib.gzipSync(' ')
 
@@ -134,7 +135,7 @@ describe('update plugin', () => {
     )
     const indexRegex = new RegExp(`example-cli-${config.platform}-${config.arch}-tar-gz.json`)
 
-    sandbox.stub(Extractor, 'extract').resolves()
+    sinon.stub(Extractor, 'extract').resolves()
 
     const gzContents = zlib.gzipSync(' ')
 
@@ -163,7 +164,7 @@ describe('update plugin', () => {
   })
 
   it('will get the correct channel and use default registry', async () => {
-    const request = sandbox.spy(got, 'get')
+    const request = sinon.spy(got, 'get')
     const hash = 'f289627'
     config.pjson.name = '@oclif/plugin-update'
     clientRoot = await setupClientRoot({config})
@@ -177,7 +178,7 @@ describe('update plugin', () => {
     )
     const indexRegex = new RegExp(`example-cli-${config.platform}-${config.arch}-tar-gz.json`)
 
-    sandbox.stub(Extractor, 'extract').resolves()
+    sinon.stub(Extractor, 'extract').resolves()
 
     const gzContents = zlib.gzipSync(' ')
 
@@ -205,7 +206,7 @@ describe('update plugin', () => {
     expect(request.firstCall.args[0]).to.include('https://registry.npmjs.org/@oclif/plugin-update')
   })
   it('will get the correct channel and use a custom registry', async () => {
-    const request = sandbox.spy(got, 'get')
+    const request = sinon.spy(got, 'get')
     const hash = 'f289627'
     config.pjson.name = '@oclif/plugin-update'
     config.npmRegistry = 'https://myCustomRegistry.com'
@@ -220,7 +221,7 @@ describe('update plugin', () => {
     )
     const indexRegex = new RegExp(`example-cli-${config.platform}-${config.arch}-tar-gz.json`)
 
-    sandbox.stub(Extractor, 'extract').resolves()
+    sinon.stub(Extractor, 'extract').resolves()
 
     const gzContents = zlib.gzipSync(' ')
 
@@ -276,7 +277,7 @@ describe('update plugin', () => {
     await mkdir(path.join(`${newVersionPath}.partial.11111`, 'bin'), {recursive: true})
     await writeFile(path.join(`${newVersionPath}.partial.11111`, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
     await writeFile(path.join(newVersionPath, 'bin', 'example-cli'), '../2.0.1/bin', 'utf8')
-    sandbox.stub(Extractor, 'extract').resolves()
+    sinon.stub(Extractor, 'extract').resolves()
 
     const gzContents = zlib.gzipSync(' ')
 

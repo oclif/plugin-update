@@ -5,13 +5,14 @@
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
     "@inquirer/select": "^2.3.4",
-    "@oclif/core": "^3.26.6",
+    "@oclif/core": "^4.0.0-beta.13",
     "chalk": "^5",
     "debug": "^4.3.1",
     "filesize": "^6.1.0",
     "got": "^13",
     "semver": "^7.6.0",
-    "tar-fs": "^2.1.1"
+    "tar-fs": "^2.1.1",
+    "tty-table": "^4.2.3"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^19",
@@ -38,7 +39,7 @@
     "oclif": "^4",
     "prettier": "^3.2.5",
     "shx": "^0.3.4",
-    "sinon": "^17",
+    "sinon": "^18.0.0",
     "strip-ansi": "^7.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"

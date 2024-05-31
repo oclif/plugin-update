@@ -2,6 +2,7 @@ import select from '@inquirer/select'
 import {Args, Command, Flags, ux} from '@oclif/core'
 import {basename} from 'node:path'
 import {sort} from 'semver'
+import TtyTable from 'tty-table'
 
 import {Updater} from '../update.js'
 
@@ -57,14 +58,23 @@ export default class UpdateCommand extends Command {
     const updater = new Updater(this.config)
     if (flags.available) {
       const [index, localVersions] = await Promise.all([updater.fetchVersionIndex(), updater.findLocalVersions()])
-      const allVersions = sort(Object.keys(index)).reverse()
 
-      const table = allVersions.map((version) => {
-        const location = localVersions.find((l) => basename(l).startsWith(version)) || index[version]
-        return {location, version}
-      })
+      // eslint-disable-next-line new-cap
+      const t = TtyTable(
+        [
+          {align: 'left', value: 'Location'},
+          {align: 'left', value: 'Version'},
+        ],
+        sort(Object.keys(index))
+          .reverse()
+          .map((version) => {
+            const location = localVersions.find((l) => basename(l).startsWith(version)) || index[version]
+            return [location, version]
+          }),
+        {compact: true},
+      )
 
-      ux.table(table, {location: {}, version: {}})
+      ux.stdout(t.render())
       return
     }
 
