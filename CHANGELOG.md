@@ -1,3 +1,9 @@
+# [4.3.0](https://github.com/oclif/plugin-update/compare/4.2.14...4.3.0) (2024-05-31)
+
+### Features
+
+- use @oclif/core v4 ([#824](https://github.com/oclif/plugin-update/issues/824)) ([d0d8c4b](https://github.com/oclif/plugin-update/commit/d0d8c4b9825776bd6170c74738b2f6e07fa3e2ee))
+
 ## [4.2.14](https://github.com/oclif/plugin-update/compare/4.2.13...4.2.14) (2024-05-28)
 
 ### Reverts
