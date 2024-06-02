@@ -1,3 +1,9 @@
+## [4.3.1](https://github.com/oclif/plugin-update/compare/4.3.0...4.3.1) (2024-06-02)
+
+### Bug Fixes
+
+- **deps:** bump debug from 4.3.4 to 4.3.5 ([#831](https://github.com/oclif/plugin-update/issues/831)) ([ae5ad05](https://github.com/oclif/plugin-update/commit/ae5ad05e08afc5868bb726eef0c0a4df01f906ec))
+
 # [4.3.0](https://github.com/oclif/plugin-update/compare/4.2.14...4.3.0) (2024-05-31)
 
 ### Features
