@@ -1,3 +1,9 @@
+## [4.3.3](https://github.com/oclif/plugin-update/compare/4.3.2...4.3.3) (2024-06-04)
+
+### Bug Fixes
+
+- core v4 ([9f74abd](https://github.com/oclif/plugin-update/commit/9f74abd6f5b4c0f64b9caf9696c5e2206ce275e9))
+
 ## [4.3.2](https://github.com/oclif/plugin-update/compare/4.3.1...4.3.2) (2024-06-02)
 
 ### Bug Fixes
