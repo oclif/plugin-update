@@ -7,6 +7,7 @@ import {mkdir, readFile, readdir, rm} from 'node:fs/promises'
 import {tmpdir} from 'node:os'
 import {join} from 'node:path'
 import {rsort} from 'semver'
+import stripAnsi from 'strip-ansi'
 
 const makeTestDir = async (): Promise<string> => {
   const tmpDir = join(tmpdir(), 'sf-update-test')
@@ -53,7 +54,7 @@ const exec = async (
         console.log('Error!', error)
         reject(error)
       } else {
-        resolve({code: 0, stderr, stdout})
+        resolve({code: 0, stderr: stripAnsi(stderr), stdout: stripAnsi(stdout)})
       }
     })
   })
