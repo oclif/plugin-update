@@ -1,5 +1,6 @@
 import select from '@inquirer/select'
 import {Args, Command, Flags, ux} from '@oclif/core'
+import {got} from 'got'
 import {basename} from 'node:path'
 import {sort} from 'semver'
 import TtyTable from 'tty-table'
@@ -57,18 +58,41 @@ export default class UpdateCommand extends Command {
     const {args, flags} = await this.parse(UpdateCommand)
     const updater = new Updater(this.config)
     if (flags.available) {
-      const [index, localVersions] = await Promise.all([updater.fetchVersionIndex(), updater.findLocalVersions()])
+      const [index, localVersions, distTags] = await Promise.all([
+        updater.fetchVersionIndex(),
+        updater.findLocalVersions(),
+        this.config.pjson.oclif.update?.disableNpmLookup
+          ? Promise.resolve()
+          : got
+              .get(`${this.config.npmRegistry ?? 'https://registry.npmjs.org'}/${this.config.pjson.name}`)
+              .json<{
+                'dist-tags': Record<string, string>
+              }>()
+              .then((r) => r['dist-tags']),
+      ])
+
+      const headers = [
+        {align: 'left', value: 'Location'},
+        {align: 'left', value: 'Version'},
+      ]
+
+      if (distTags) {
+        headers.push({align: 'left', value: 'Channel'})
+      }
+
+      const invertedDistTags = Object.fromEntries(Object.entries(distTags ?? {}).map(([k, v]) => [v, k]))
 
       // eslint-disable-next-line new-cap
       const t = TtyTable(
-        [
-          {align: 'left', value: 'Location'},
-          {align: 'left', value: 'Version'},
-        ],
+        headers,
         sort(Object.keys(index))
           .reverse()
           .map((version) => {
             const location = localVersions.find((l) => basename(l).startsWith(version)) || index[version]
+            if (invertedDistTags) {
+              return [location, version, invertedDistTags[version] ?? '']
+            }
+
             return [location, version]
           }),
         {compact: true},
