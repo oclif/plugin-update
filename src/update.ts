@@ -1,5 +1,5 @@
 import {Config, Interfaces, ux} from '@oclif/core'
-import chalk from 'chalk'
+import {green, yellow} from 'ansis'
 import makeDebug from 'debug'
 import fileSize from 'filesize'
 import {got} from 'got'
@@ -226,8 +226,8 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
     channel: string,
   ) {
     ux.action.start(
-      `${this.config.name}: Updating CLI from ${chalk.green(current)} to ${chalk.green(updated)}${
-        channel === 'stable' ? '' : ' (' + chalk.yellow(channel) + ')'
+      `${this.config.name}: Updating CLI from ${green(current)} to ${green(updated)}${
+        channel === 'stable' ? '' : ' (' + yellow(channel) + ')'
       }`,
     )
 
@@ -242,7 +242,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
   }
 
   private async updateToExistingVersion(current: string, updated: string): Promise<void> {
-    ux.action.start(`${this.config.name}: Updating CLI from ${chalk.green(current)} to ${chalk.green(updated)}`)
+    ux.action.start(`${this.config.name}: Updating CLI from ${green(current)} to ${green(updated)}`)
     await ensureClientDir(this.clientRoot)
     await this.refreshConfig(updated)
     await this.createBin(updated)
