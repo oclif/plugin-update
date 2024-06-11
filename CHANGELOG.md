@@ -1,3 +1,9 @@
+## [4.3.5](https://github.com/oclif/plugin-update/compare/4.3.4...4.3.5) (2024-06-11)
+
+### Bug Fixes
+
+- **deps:** chalk to ansis ([#841](https://github.com/oclif/plugin-update/issues/841)) ([e51e7a8](https://github.com/oclif/plugin-update/commit/e51e7a8df1f6c15a3fd6ac6c0c044c24fb47e927))
+
 ## [4.3.4](https://github.com/oclif/plugin-update/compare/4.3.3...4.3.4) (2024-06-10)
 
 ### Bug Fixes
