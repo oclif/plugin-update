@@ -1,3 +1,9 @@
+## [4.3.6](https://github.com/oclif/plugin-update/compare/4.3.5...4.3.6) (2024-06-12)
+
+### Bug Fixes
+
+- **deps:** bump braces from 3.0.2 to 3.0.3 ([#842](https://github.com/oclif/plugin-update/issues/842)) ([c663f92](https://github.com/oclif/plugin-update/commit/c663f92e4232f0bfea5fc86f6e43d9f6099e1045))
+
 ## [4.3.5](https://github.com/oclif/plugin-update/compare/4.3.4...4.3.5) (2024-06-11)
 
 ### Bug Fixes
