@@ -38,9 +38,11 @@ export default class UpdateCommand extends Command {
     available: Flags.boolean({
       char: 'a',
       description: 'See available versions.',
+      exclusive: ['version', 'interactive'],
     }),
     force: Flags.boolean({
       description: 'Force a re-download of the requested version.',
+      exclusive: ['interactive', 'available'],
     }),
     interactive: Flags.boolean({
       char: 'i',
@@ -50,7 +52,7 @@ export default class UpdateCommand extends Command {
     version: Flags.string({
       char: 'v',
       description: 'Install a specific version.',
-      exclusive: ['interactive'],
+      exclusive: ['interactive', 'force'],
     }),
   }
 
