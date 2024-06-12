@@ -1,5 +1,5 @@
 import select from '@inquirer/select'
-import {Args, Command, Flags, ux} from '@oclif/core'
+import {Args, Command, Flags, Interfaces, ux} from '@oclif/core'
 import {got} from 'got'
 import {basename} from 'node:path'
 import {sort} from 'semver'
@@ -58,18 +58,7 @@ export default class UpdateCommand extends Command {
     const {args, flags} = await this.parse(UpdateCommand)
     const updater = new Updater(this.config)
     if (flags.available) {
-      const [index, localVersions, distTags] = await Promise.all([
-        updater.fetchVersionIndex(),
-        updater.findLocalVersions(),
-        this.config.pjson.oclif.update?.disableNpmLookup
-          ? Promise.resolve()
-          : got
-              .get(`${this.config.npmRegistry ?? 'https://registry.npmjs.org'}/${this.config.pjson.name}`)
-              .json<{
-                'dist-tags': Record<string, string>
-              }>()
-              .then((r) => r['dist-tags']),
-      ])
+      const {distTags, index, localVersions} = await lookupVersions(updater, this.config)
 
       const headers = [
         {align: 'left', value: 'Location'},
@@ -80,8 +69,6 @@ export default class UpdateCommand extends Command {
         headers.push({align: 'left', value: 'Channel'})
       }
 
-      const invertedDistTags = Object.fromEntries(Object.entries(distTags ?? {}).map(([k, v]) => [v, k]))
-
       // eslint-disable-next-line new-cap
       const t = TtyTable(
         headers,
@@ -89,8 +76,8 @@ export default class UpdateCommand extends Command {
           .reverse()
           .map((version) => {
             const location = localVersions.find((l) => basename(l).startsWith(version)) || index[version]
-            if (invertedDistTags) {
-              return [location, version, invertedDistTags[version] ?? '']
+            if (distTags) {
+              return [location, version, distTags[version] ?? '']
             }
 
             return [location, version]
@@ -110,16 +97,52 @@ export default class UpdateCommand extends Command {
       autoUpdate: flags.autoupdate,
       channel: args.channel,
       force: flags.force,
-      version: flags.interactive ? await promptForVersion(updater) : flags.version,
+      version: flags.interactive ? await promptForVersion(updater, this.config) : flags.version,
     })
   }
 }
 
-const promptForVersion = async (updater: Updater): Promise<string> =>
-  select({
-    choices: sort(Object.keys(await updater.fetchVersionIndex()))
+const lookupVersions = async (updater: Updater, config: Interfaces.Config) => {
+  ux.action.start('Looking up versions')
+  const [index, localVersions, distTags] = await Promise.all([
+    updater.fetchVersionIndex(),
+    updater.findLocalVersions(),
+    fetchDistTags(config),
+  ])
+
+  ux.action.stop(`Found ${Object.keys(index).length} versions`)
+  return {
+    distTags,
+    index,
+    localVersions,
+  }
+}
+
+const fetchDistTags = async (config: Interfaces.Config) => {
+  const distTags = config.pjson.oclif.update?.disableNpmLookup
+    ? {}
+    : await got
+        .get(`${config.npmRegistry ?? 'https://registry.npmjs.org'}/${config.pjson.name}`)
+        .json<{
+          'dist-tags': Record<string, string>
+        }>()
+        .then((r) => r['dist-tags'])
+
+  // Invert the distTags object so we can look up the channel by version
+  return Object.fromEntries(Object.entries(distTags ?? {}).map(([k, v]) => [v, k]))
+}
+
+const displayName = (value: string, distTags: Record<string, string>) =>
+  `${value} ${distTags[value] ? `(${distTags[value]})` : ''}`
+
+const promptForVersion = async (updater: Updater, config: Interfaces.Config): Promise<string> => {
+  const {distTags, index} = await lookupVersions(updater, config)
+  return select({
+    choices: sort(Object.keys(index))
       .reverse()
-      .map((v) => ({value: v})),
+      .map((v) => ({name: displayName(v, distTags), value: v})),
     loop: false,
     message: 'Select a version to update to',
+    pageSize: 10,
   })
+}

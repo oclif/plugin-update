@@ -36,7 +36,6 @@ export class Updater {
   }
 
   public async fetchVersionIndex(): Promise<VersionIndex> {
-    ux.action.status = 'fetching version index'
     const newIndexUrl = this.config.s3Url(s3VersionIndexKey(this.config))
     try {
       const {body} = await got.get<VersionIndex>(newIndexUrl)
@@ -83,6 +82,7 @@ export class Updater {
       if (localVersion) {
         await this.updateToExistingVersion(current, localVersion)
       } else {
+        ux.action.status = 'fetching version index'
         const index = await this.fetchVersionIndex()
         const url = index[version]
         if (!url) {
