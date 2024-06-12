@@ -1,3 +1,9 @@
+# [4.4.0](https://github.com/oclif/plugin-update/compare/4.3.6...4.4.0) (2024-06-12)
+
+### Features
+
+- show channel in --available table ([#840](https://github.com/oclif/plugin-update/issues/840)) ([26946dd](https://github.com/oclif/plugin-update/commit/26946dd9c229ec884cc4373b0154bc16769d5edf))
+
 ## [4.3.6](https://github.com/oclif/plugin-update/compare/4.3.5...4.3.6) (2024-06-12)
 
 ### Bug Fixes
