@@ -360,8 +360,9 @@ const fetchChannelManifest = async (channel: string, config: Config): Promise<In
   try {
     return await fetchManifest(s3Key, config)
   } catch (error: unknown) {
-    const {statusCode} = error as {statusCode: number}
-    if (statusCode === 403) throw new Error(`HTTP 403: Invalid channel ${channel}`)
+    const {code, statusCode} = error as {code?: string; statusCode?: number}
+    if (statusCode === 403 || code === 'ERR_NON_2XX_3XX_RESPONSE')
+      throw new Error(`HTTP 403: Invalid channel ${channel}`)
     throw error
   }
 }
@@ -405,7 +406,7 @@ const downloadAndExtract = async (
     stream.on('downloadProgress', (progress) => {
       ux.action.status =
         progress.percent === 1
-          ? `${filesize(progress.transferred)}/${filesize(progress.total)} - Extracting`
+          ? `${filesize(progress.transferred)}/${filesize(progress.total)} - Finishing up...`
           : `${filesize(progress.transferred)}/${filesize(progress.total)}`
     })
   }
@@ -415,6 +416,7 @@ const downloadAndExtract = async (
 }
 
 const determineChannel = async ({config, version}: {config: Config; version?: string}): Promise<string> => {
+  ux.action.status = `Determining channel for ${version}`
   const channelPath = join(config.dataDir, 'channel')
 
   const channel = existsSync(channelPath) ? (await readFile(channelPath, 'utf8')).trim() : 'stable'
