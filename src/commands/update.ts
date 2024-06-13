@@ -52,7 +52,7 @@ export default class UpdateCommand extends Command {
     version: Flags.string({
       char: 'v',
       description: 'Install a specific version.',
-      exclusive: ['interactive', 'force'],
+      exclusive: ['interactive'],
     }),
   }
 

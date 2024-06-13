@@ -1,13 +1,14 @@
 import makeDebug from 'debug'
+import crypto from 'node:crypto'
 import {existsSync} from 'node:fs'
 import {rename, rm} from 'node:fs/promises'
 import {join} from 'node:path'
-
-import {touch} from './util.js'
-const debug = makeDebug('oclif-update')
-import crypto from 'node:crypto'
 import zlib from 'node:zlib'
 import {Headers, extract as tarExtract} from 'tar-fs'
+
+import {touch} from './util.js'
+
+const debug = makeDebug('oclif-update')
 
 const ignore = (_name: string, header?: Headers) => {
   switch (header?.type) {
