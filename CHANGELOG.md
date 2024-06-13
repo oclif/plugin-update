@@ -1,3 +1,9 @@
+## [4.4.1](https://github.com/oclif/plugin-update/compare/4.4.0...4.4.1) (2024-06-13)
+
+### Bug Fixes
+
+- ux improvements to update command ([#844](https://github.com/oclif/plugin-update/issues/844)) ([902949b](https://github.com/oclif/plugin-update/commit/902949b107d6fd6e1321738f4f1c655e2bde89c3))
+
 # [4.4.0](https://github.com/oclif/plugin-update/compare/4.3.6...4.4.0) (2024-06-12)
 
 ### Features
