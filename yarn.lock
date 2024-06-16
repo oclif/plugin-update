@@ -5007,9 +5007,9 @@ object.values@^1.1.7:
     es-object-atoms "^1.0.0"
 
 oclif@^4:
-  version "4.13.5"
-  resolved "https://registry.yarnpkg.com/oclif/-/oclif-4.13.5.tgz#21af577d8bf6a83f962a9b6b51baaa14b7638349"
-  integrity sha512-7HIXQC0ID+N2mrzVILe4ou1IMwq+i8eg6IeGI8HjcE7Csqt7hYMgfXC9R8+Yezn12zqtzyaZzReV07C3t4cqFA==
+  version "4.13.6"
+  resolved "https://registry.yarnpkg.com/oclif/-/oclif-4.13.6.tgz#804f991ef7f77c5d1d3592c0c16c45499ec6bfd4"
+  integrity sha512-PnBwhHp+9DiMsUbED0nv13mBGy4PDeDF0blcWfAkS8Uy9+SYgjA3rWxOk5edSdVSv2k2VdSCwitqmGWmOrfBNw==
   dependencies:
     "@aws-sdk/client-cloudfront" "^3.592.0"
     "@aws-sdk/client-s3" "^3.583.0"
