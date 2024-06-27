@@ -416,7 +416,8 @@ const downloadAndExtract = async (
 }
 
 const determineChannel = async ({config, version}: {config: Config; version?: string}): Promise<string> => {
-  ux.action.status = `Determining channel for ${version}`
+  ux.action.status = version ? `Determining channel for ${version}` : 'Determining channel'
+
   const channelPath = join(config.dataDir, 'channel')
 
   const channel = existsSync(channelPath) ? (await readFile(channelPath, 'utf8')).trim() : 'stable'
