@@ -1,3 +1,9 @@
+## [4.4.4](https://github.com/oclif/plugin-update/compare/4.4.3...4.4.4) (2024-06-27)
+
+### Bug Fixes
+
+- determine channel status message when no version is provided ([#855](https://github.com/oclif/plugin-update/issues/855)) ([3022b94](https://github.com/oclif/plugin-update/commit/3022b9429c690ddf295eca9e0ec903e218302e35))
+
 ## [4.4.3](https://github.com/oclif/plugin-update/compare/4.4.2...4.4.3) (2024-06-23)
 
 ### Bug Fixes
