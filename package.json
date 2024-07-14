@@ -6,7 +6,7 @@
   "dependencies": {
     "@inquirer/select": "^2.3.7",
     "@oclif/core": "^4",
-    "ansis": "^3.2.0",
+    "ansis": "^3.2.1",
     "debug": "^4.3.5",
     "filesize": "^6.1.0",
     "got": "^13",
