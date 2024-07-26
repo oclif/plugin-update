@@ -447,7 +447,7 @@ const determineChannel = async ({config, version}: {config: Config; version?: st
 
   try {
     const {body} = await httpGet<{'dist-tags': Record<string, string>}>(
-      `${config.npmRegistry ?? 'https://registry.npmjs.org'}/${config.pjson.name}1`,
+      `${config.npmRegistry ?? 'https://registry.npmjs.org'}/${config.pjson.name}`,
     )
     const tags = body['dist-tags']
     const tag = Object.keys(tags).find((v) => tags[v] === version) ?? channel
