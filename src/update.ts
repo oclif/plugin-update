@@ -406,7 +406,11 @@ const downloadAndExtract = async (
         version,
       }),
     )
-  const stream = got.stream(gzUrl)
+
+  debug(`Streaming ${gzUrl} to ${output}`)
+  const stream = got.stream(gzUrl, {
+    agent: {https: new ProxyAgent()},
+  })
 
   stream.pause()
 
