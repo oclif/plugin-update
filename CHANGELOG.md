@@ -1,3 +1,9 @@
+## [4.4.15](https://github.com/oclif/plugin-update/compare/4.4.14...4.4.15) (2024-07-28)
+
+### Bug Fixes
+
+- **deps:** bump @inquirer/select from 2.4.1 to 2.4.2 ([#882](https://github.com/oclif/plugin-update/issues/882)) ([b5a1ba6](https://github.com/oclif/plugin-update/commit/b5a1ba66424c7cda4ca6306b06b45f9bed1fd23b))
+
 ## [4.4.14](https://github.com/oclif/plugin-update/compare/4.4.13...4.4.14) (2024-07-28)
 
 ### Bug Fixes
