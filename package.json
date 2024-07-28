@@ -7,7 +7,7 @@
     "@inquirer/select": "^2.4.1",
     "@oclif/core": "^4",
     "ansis": "^3.3.2",
-    "debug": "^4.3.5",
+    "debug": "^4.3.6",
     "filesize": "^6.1.0",
     "got": "^13",
     "semver": "^7.6.3",
