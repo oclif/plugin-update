@@ -1,13 +1,13 @@
 {
   "name": "@oclif/plugin-update",
-  "version": "4.4.13-dev.2",
+  "version": "4.4.15",
   "author": "Salesforce",
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
-    "@inquirer/select": "^2.4.1",
+    "@inquirer/select": "^2.4.2",
     "@oclif/core": "^4",
-    "ansis": "^3.2.1",
-    "debug": "^4.3.5",
+    "ansis": "^3.3.2",
+    "debug": "^4.3.6",
     "filesize": "^6.1.0",
     "got": "^13",
     "proxy-agent": "^6.4.0",
