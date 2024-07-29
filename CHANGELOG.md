@@ -1,3 +1,9 @@
+## [4.4.16](https://github.com/oclif/plugin-update/compare/4.4.15...4.4.16) (2024-07-29)
+
+### Bug Fixes
+
+- support proxies ([#880](https://github.com/oclif/plugin-update/issues/880)) ([5b7dace](https://github.com/oclif/plugin-update/commit/5b7dace7958c6243c74f02d33f5deea0ac6f01c3))
+
 ## [4.4.15](https://github.com/oclif/plugin-update/compare/4.4.14...4.4.15) (2024-07-28)
 
 ### Bug Fixes
