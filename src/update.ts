@@ -2,10 +2,11 @@ import {Config, Interfaces, ux} from '@oclif/core'
 import {green, yellow} from 'ansis'
 import makeDebug from 'debug'
 import fileSize from 'filesize'
-import {got} from 'got'
+import {HTTPError, got} from 'got'
 import {Stats, existsSync} from 'node:fs'
 import {mkdir, readFile, readdir, rm, stat, symlink, utimes, writeFile} from 'node:fs/promises'
 import {basename, dirname, join} from 'node:path'
+import {ProxyAgent} from 'proxy-agent'
 
 import {Extractor} from './tar.js'
 import {ls, wait} from './util.js'
@@ -15,6 +16,24 @@ const debug = makeDebug('oclif:update')
 const filesize = (n: number): string => {
   const [num, suffix] = fileSize(n, {output: 'array'})
   return Number.parseFloat(num).toFixed(1) + ` ${suffix}`
+}
+
+async function httpGet<T>(url: string) {
+  debug(`[${url}] GET`)
+  return got
+    .get<T>(url, {
+      agent: {https: new ProxyAgent()},
+    })
+    .then((res) => {
+      debug(`[${url}] ${res.statusCode}`)
+      return res
+    })
+    .catch((error) => {
+      debug(`[${url}] ${error.response?.statusCode ?? error.code}`)
+      // constructing a new HTTPError here will produce a more actionable stack trace
+      debug(new HTTPError(error.response))
+      throw error
+    })
 }
 
 type Options = {
@@ -38,7 +57,7 @@ export class Updater {
   public async fetchVersionIndex(): Promise<VersionIndex> {
     const newIndexUrl = this.config.s3Url(s3VersionIndexKey(this.config))
     try {
-      const {body} = await got.get<VersionIndex>(newIndexUrl)
+      const {body} = await httpGet<VersionIndex>(newIndexUrl)
       return typeof body === 'string' ? JSON.parse(body) : body
     } catch {
       throw new Error(`No version indices exist for ${this.config.name}.`)
@@ -295,7 +314,7 @@ const fetchManifest = async (s3Key: string, config: Config): Promise<Interfaces.
   ux.action.status = 'fetching manifest'
 
   const url = config.s3Url(s3Key)
-  const {body} = await got.get<Interfaces.S3Manifest | string>(url)
+  const {body} = await httpGet<Interfaces.S3Manifest | string>(url)
   if (typeof body === 'string') {
     return JSON.parse(body)
   }
@@ -387,7 +406,11 @@ const downloadAndExtract = async (
         version,
       }),
     )
-  const stream = got.stream(gzUrl)
+
+  debug(`Streaming ${gzUrl} to ${output}`)
+  const stream = got.stream(gzUrl, {
+    agent: {https: new ProxyAgent()},
+  })
 
   stream.pause()
 
@@ -427,7 +450,7 @@ const determineChannel = async ({config, version}: {config: Config; version?: st
   }
 
   try {
-    const {body} = await got.get<{'dist-tags': Record<string, string>}>(
+    const {body} = await httpGet<{'dist-tags': Record<string, string>}>(
       `${config.npmRegistry ?? 'https://registry.npmjs.org'}/${config.pjson.name}`,
     )
     const tags = body['dist-tags']
