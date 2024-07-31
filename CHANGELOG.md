@@ -1,3 +1,9 @@
+# [4.5.0](https://github.com/oclif/plugin-update/compare/4.4.16...4.5.0) (2024-07-31)
+
+### Features
+
+- add missing `index.ts` ([#886](https://github.com/oclif/plugin-update/issues/886)) ([2a43c81](https://github.com/oclif/plugin-update/commit/2a43c81ebda2b1c94930a392c4f131af34aeb0fc))
+
 ## [4.4.16](https://github.com/oclif/plugin-update/compare/4.4.15...4.4.16) (2024-07-29)
 
 ### Bug Fixes
