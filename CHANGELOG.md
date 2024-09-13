@@ -1,3 +1,9 @@
+## [4.5.7](https://github.com/oclif/plugin-update/compare/4.5.6...4.5.7) (2024-09-13)
+
+### Bug Fixes
+
+- **deps:** bump path-to-regexp from 6.2.2 to 6.3.0 ([#922](https://github.com/oclif/plugin-update/issues/922)) ([5840884](https://github.com/oclif/plugin-update/commit/5840884a42406a54db0ed423cddd3e3cc72ad62c))
+
 ## [4.5.6](https://github.com/oclif/plugin-update/compare/4.5.5...4.5.6) (2024-09-08)
 
 ### Bug Fixes
