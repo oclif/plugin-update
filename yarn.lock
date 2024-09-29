@@ -926,7 +926,7 @@
     "@inquirer/core" "^9.0.8"
     "@inquirer/type" "^1.5.1"
 
-"@inquirer/select@^2.3.10", "@inquirer/select@^2.5.0":
+"@inquirer/select@^2.5.0":
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/@inquirer/select/-/select-2.5.0.tgz#345c6908ecfaeef3d84ddd2f9feb2f487c558efb"
   integrity sha512-YmDobTItPP3WcEI86GvPo+T2sRHkxxOq/kXmsBjHS5BVXUgvgZ5AfJjkvQvZr03T81NnI3KrrRuMzeuYUQRFOA==
@@ -4600,15 +4600,15 @@ object.values@^1.2.0:
     es-object-atoms "^1.0.0"
 
 oclif@^4:
-  version "4.14.34"
-  resolved "https://registry.yarnpkg.com/oclif/-/oclif-4.14.34.tgz#45ddd207ab648a0996ec845e975087ac2fe10479"
-  integrity sha512-NA604h6cPhiDQTLjjwaJ2yGq3gv6OyHIMIdwt9xTiOqMjFOrKXpoqXiwmKN6bGoeWC1SuaSJqlfoXThlAKn+Ag==
+  version "4.14.36"
+  resolved "https://registry.yarnpkg.com/oclif/-/oclif-4.14.36.tgz#3535f2de7665f223610e321be46b210f0a6dc3c4"
+  integrity sha512-aVNdf3Jgu3HZEos83q7YE+/SQ9uGwLpldLSJ0eRBaapRnX7Pw/q9kT9A06THnG3OmX2qFcmwX8Rsus47Su11hQ==
   dependencies:
     "@aws-sdk/client-cloudfront" "^3.645.0"
     "@aws-sdk/client-s3" "^3.651.1"
     "@inquirer/confirm" "^3.1.22"
     "@inquirer/input" "^2.2.4"
-    "@inquirer/select" "^2.3.10"
+    "@inquirer/select" "^2.5.0"
     "@oclif/core" "^4"
     "@oclif/plugin-help" "^6.2.10"
     "@oclif/plugin-not-found" "^3.2.21"
