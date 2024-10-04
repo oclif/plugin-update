@@ -6,14 +6,14 @@
   "dependencies": {
     "@inquirer/select": "^2.5.0",
     "@oclif/core": "^4",
+    "@oclif/table": "^0.1.12",
     "ansis": "^3.3.2",
     "debug": "^4.3.7",
     "filesize": "^6.1.0",
     "got": "^13",
     "proxy-agent": "^6.4.0",
     "semver": "^7.6.3",
-    "tar-fs": "^2.1.1",
-    "tty-table": "^4.2.3"
+    "tar-fs": "^2.1.1"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^19",

@@ -1,9 +1,9 @@
 import select from '@inquirer/select'
 import {Args, Command, Flags, Interfaces, ux} from '@oclif/core'
+import {printTable} from '@oclif/table'
 import {got} from 'got'
 import {basename} from 'node:path'
 import {sort} from 'semver'
-import TtyTable from 'tty-table'
 
 import {Updater} from '../update.js'
 
@@ -49,6 +49,11 @@ export default class UpdateCommand extends Command {
       description: 'Interactively select version to install. This is ignored if a channel is provided.',
       exclusive: ['version'],
     }),
+    verbose: Flags.boolean({
+      char: 'b',
+      dependsOn: ['available'],
+      description: 'Show more details about the available versions.',
+    }),
     version: Flags.string({
       char: 'v',
       description: 'Install a specific version.',
@@ -62,32 +67,34 @@ export default class UpdateCommand extends Command {
     if (flags.available) {
       const {distTags, index, localVersions} = await lookupVersions(updater, this.config)
 
-      const headers = [
-        {align: 'left', value: 'Location'},
-        {align: 'left', value: 'Version'},
-      ]
+      const data = Object.keys(index).map((version) => {
+        const location = localVersions.find((l) => basename(l).startsWith(version)) || index[version]
+        const channel =
+          distTags[version] === 'latest'
+            ? 'stable'
+            : distTags[version] === 'latest-rc'
+              ? 'stable-rc'
+              : distTags[version]
+        return {
+          channel,
+          downloaded: location.includes('http') ? '' : 'true',
+          location,
+          version: this.config.version === version ? `${ux.colorize('yellowBright', version)} (current)` : version,
+        }
+      })
 
-      if (distTags) {
-        headers.push({align: 'left', value: 'Channel'})
-      }
+      printTable({
+        borderStyle: 'vertical-with-outline',
+        columns: flags.verbose
+          ? ['version', 'channel', 'downloaded', 'location']
+          : ['version', 'channel', 'downloaded'],
+        data,
+        headerOptions: {
+          formatter: 'capitalCase',
+        },
+        overflow: 'wrap',
+      })
 
-      // eslint-disable-next-line new-cap
-      const t = TtyTable(
-        headers,
-        sort(Object.keys(index))
-          .reverse()
-          .map((version) => {
-            const location = localVersions.find((l) => basename(l).startsWith(version)) || index[version]
-            if (distTags) {
-              return [location, version, distTags[version] ?? '']
-            }
-
-            return [location, version]
-          }),
-        {compact: true},
-      )
-
-      ux.stdout(t.render())
       return
     }
 

@@ -194,7 +194,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
   }
 
   private async refreshConfig(version: string): Promise<void> {
-    this.config = (await Config.load({root: join(this.clientRoot, version)})) as Config
+    this.config = await Config.load({root: join(this.clientRoot, version)})
   }
 
   // removes any unused CLIs
