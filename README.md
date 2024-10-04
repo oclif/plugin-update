@@ -28,10 +28,11 @@ update the oclif-example CLI
 
 ```
 USAGE
-  $ oclif-example update [CHANNEL] [--force |  | [-a | -v <value> | -i]]
+  $ oclif-example update [CHANNEL] [--force |  | [-a | -v <value> | -i]] [-b ]
 
 FLAGS
   -a, --available        See available versions.
+  -b, --verbose          Show more details about the available versions.
   -i, --interactive      Interactively select version to install. This is ignored if a channel is provided.
   -v, --version=<value>  Install a specific version.
       --force            Force a re-download of the requested version.
@@ -57,7 +58,7 @@ EXAMPLES
     $ oclif-example update --available
 ```
 
-_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/4.5.10/src/commands/update.ts)_
+_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/4.6.0/src/commands/update.ts)_
 
 <!-- commandsstop -->
 

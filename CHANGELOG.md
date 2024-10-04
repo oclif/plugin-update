@@ -1,3 +1,9 @@
+# [4.6.0](https://github.com/oclif/plugin-update/compare/4.5.10...4.6.0) (2024-10-04)
+
+### Features
+
+- use oclif/table ([#932](https://github.com/oclif/plugin-update/issues/932)) ([280b6ed](https://github.com/oclif/plugin-update/commit/280b6ed955ca92b4e37f1c3d151c39bb267facda))
+
 ## [4.5.10](https://github.com/oclif/plugin-update/compare/4.5.9...4.5.10) (2024-09-29)
 
 ### Bug Fixes
