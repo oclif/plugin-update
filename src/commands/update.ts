@@ -84,7 +84,7 @@ export default class UpdateCommand extends Command {
       })
 
       printTable({
-        borderStyle: 'headers-only-with-underline',
+        borderStyle: 'vertical-with-outline',
         columns: flags.verbose
           ? ['version', 'channel', 'downloaded', 'location']
           : ['version', 'channel', 'downloaded'],
