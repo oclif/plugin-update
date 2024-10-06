@@ -1,3 +1,9 @@
+## [4.6.1](https://github.com/oclif/plugin-update/compare/4.6.0...4.6.1) (2024-10-06)
+
+### Bug Fixes
+
+- **deps:** bump @oclif/table from 0.1.12 to 0.1.13 ([#942](https://github.com/oclif/plugin-update/issues/942)) ([4fd3703](https://github.com/oclif/plugin-update/commit/4fd37032e67798f532882e341aba722ae3863e1f))
+
 # [4.6.0](https://github.com/oclif/plugin-update/compare/4.5.10...4.6.0) (2024-10-04)
 
 ### Features
