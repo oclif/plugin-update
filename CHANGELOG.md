@@ -1,3 +1,9 @@
+## [4.6.3](https://github.com/oclif/plugin-update/compare/4.6.2...4.6.3) (2024-10-08)
+
+### Bug Fixes
+
+- bump @oclif/table ([#948](https://github.com/oclif/plugin-update/issues/948)) ([869ca46](https://github.com/oclif/plugin-update/commit/869ca46ab9755e47ea1ec7be24479a4adb4cce6a))
+
 ## [4.6.2](https://github.com/oclif/plugin-update/compare/4.6.1...4.6.2) (2024-10-08)
 
 ### Bug Fixes
