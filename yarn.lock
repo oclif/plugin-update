@@ -1412,13 +1412,13 @@
   resolved "https://registry.yarnpkg.com/@oclif/prettier-config/-/prettier-config-0.2.1.tgz#1def9f38134f9bfb229257f48a35f7d0d183dc78"
   integrity sha512-XB8kwQj8zynXjIIWRm+6gO/r8Qft2xKtwBMSmq1JRqtA6TpwpqECqiu8LosBCyg2JBXuUy2lU23/L98KIR7FrQ==
 
-"@oclif/table@^0.1.21":
-  version "0.1.21"
-  resolved "https://registry.yarnpkg.com/@oclif/table/-/table-0.1.21.tgz#2a164c45450f78a681b04c1e6723faf54356f8a2"
-  integrity sha512-ZeFGSJLAQ6jkBdkR8Lf+uzlWIturNAc1TsoVxN2nTMa8cnEiQmrEqabbcV2RE6b+Vt9qx4yrx7Zq9ihcPsidTA==
+"@oclif/table@^0.2.4":
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/@oclif/table/-/table-0.2.4.tgz#89349c4fe3a3af0bfc285bfc920b35dd70d7f626"
+  integrity sha512-qbkBEkpvIXdiZ844stwX6vH+RaRkOH7k0X3U2zJqRGMJl3Uqr9d78vWpuUX7gmsuspCDavsgi/Gbnx2MXH5GQw==
   dependencies:
     "@oclif/core" "^4"
-    "@types/react" "^18.3.11"
+    "@types/react" "^18.3.12"
     change-case "^5.4.4"
     cli-truncate "^4.0.0"
     ink "^5.0.1"
@@ -2084,10 +2084,10 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.13.tgz#2af91918ee12d9d32914feb13f5326658461b451"
   integrity sha512-hCZTSvwbzWGvhqxp/RqVqwU999pBf2vp7hzIjiYOsl8wqOmUxkQ6ddw1cV3l8811+kdUFus/q4d1Y3E3SyEifA==
 
-"@types/react@^18.3.11":
-  version "18.3.11"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.3.11.tgz#9d530601ff843ee0d7030d4227ea4360236bd537"
-  integrity sha512-r6QZ069rFTjrEYgFdOck1gK7FLVsgJE7tTz0pQBczlBNUhBNk0MQH4UbnFSwjpQLMkLzgqvBBa+qGpLje16eTQ==
+"@types/react@^18.3.12":
+  version "18.3.12"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.3.12.tgz#99419f182ccd69151813b7ee24b792fe08774f60"
+  integrity sha512-D2wOSq/d6Agt28q7rSI3jhU7G6aiuzljDGZ2hTZHIkrTLUI+AF3WMeKkEZ9nN2fkBAlcktT6vcZjDFiIhMYEQw==
   dependencies:
     "@types/prop-types" "*"
     csstype "^3.0.2"
