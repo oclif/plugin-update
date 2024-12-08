@@ -11,7 +11,7 @@
     "debug": "^4.4.0",
     "filesize": "^6.1.0",
     "got": "^13",
-    "proxy-agent": "^6.4.0",
+    "proxy-agent": "^6.5.0",
     "semver": "^7.6.3",
     "tar-fs": "^2.1.1"
   },
