@@ -1,3 +1,9 @@
+## [4.6.17](https://github.com/oclif/plugin-update/compare/4.6.16...4.6.17) (2024-12-08)
+
+### Bug Fixes
+
+- **deps:** bump proxy-agent from 6.4.0 to 6.5.0 ([#993](https://github.com/oclif/plugin-update/issues/993)) ([2e0cb81](https://github.com/oclif/plugin-update/commit/2e0cb814db00c069b2c96b086dc5597424005fb5))
+
 ## [4.6.16](https://github.com/oclif/plugin-update/compare/4.6.15...4.6.16) (2024-12-08)
 
 ### Bug Fixes
