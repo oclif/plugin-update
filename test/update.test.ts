@@ -64,7 +64,6 @@ describe('update plugin', () => {
   })
 
   afterEach(async () => {
-    // eslint-disable-next-line import/no-named-as-default-member
     nock.cleanAll()
     if (existsSync(clientRoot)) {
       await rm(clientRoot, {force: true, recursive: true})
@@ -112,8 +111,8 @@ describe('update plugin', () => {
       .get(tarballRegex)
       .reply(200, gzContents, {
         'Content-Encoding': 'gzip',
-        'X-Transfer-Length': String(gzContents.length),
         'content-length': String(gzContents.length),
+        'X-Transfer-Length': String(gzContents.length),
       })
 
     updater = initUpdater(config)
@@ -149,8 +148,8 @@ describe('update plugin', () => {
       .get(tarballRegex)
       .reply(200, gzContents, {
         'Content-Encoding': 'gzip',
-        'X-Transfer-Length': String(gzContents.length),
         'content-length': String(gzContents.length),
+        'X-Transfer-Length': String(gzContents.length),
       })
       .get(indexRegex)
       .reply(200, {
@@ -192,8 +191,8 @@ describe('update plugin', () => {
       .get(tarballRegex)
       .reply(200, gzContents, {
         'Content-Encoding': 'gzip',
-        'X-Transfer-Length': String(gzContents.length),
         'content-length': String(gzContents.length),
+        'X-Transfer-Length': String(gzContents.length),
       })
       .get(indexRegex)
       .reply(200, {
@@ -205,6 +204,7 @@ describe('update plugin', () => {
     expect(request.callCount).to.equal(3)
     expect(request.firstCall.args[0]).to.include('https://registry.npmjs.org/@oclif/plugin-update')
   })
+
   it('will get the correct channel and use a custom registry', async () => {
     const request = sinon.spy(got, 'get')
     const hash = 'f289627'
@@ -235,8 +235,8 @@ describe('update plugin', () => {
       .get(tarballRegex)
       .reply(200, gzContents, {
         'Content-Encoding': 'gzip',
-        'X-Transfer-Length': String(gzContents.length),
         'content-length': String(gzContents.length),
+        'X-Transfer-Length': String(gzContents.length),
       })
       .get(indexRegex)
       .reply(200, {
@@ -289,8 +289,8 @@ describe('update plugin', () => {
       .get(tarballRegex)
       .reply(200, gzContents, {
         'Content-Encoding': 'gzip',
-        'X-Transfer-Length': String(gzContents.length),
         'content-length': String(gzContents.length),
+        'X-Transfer-Length': String(gzContents.length),
       })
 
     updater = initUpdater(config)

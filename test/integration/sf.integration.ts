@@ -1,9 +1,9 @@
 import {Interfaces} from '@oclif/core'
 import {expect} from 'chai'
 import {default as got} from 'got'
-import {ExecOptions, exec as cpExec} from 'node:child_process'
+import {exec as cpExec, ExecOptions} from 'node:child_process'
 import {createWriteStream} from 'node:fs'
-import {mkdir, readFile, readdir, rm} from 'node:fs/promises'
+import {mkdir, readdir, readFile, rm} from 'node:fs/promises'
 import {tmpdir} from 'node:os'
 import {join} from 'node:path'
 import {rsort} from 'semver'
@@ -47,7 +47,7 @@ const exec = async (
   command: string,
   options?: ExecOptions,
 ): Promise<{code: number; stderr: string; stdout: string}> => {
-  const opts = process.platform === 'win32' ? {...options, shell: 'powershell.exe'} : options ?? {}
+  const opts = process.platform === 'win32' ? {...options, shell: 'powershell.exe'} : (options ?? {})
   return new Promise((resolve, reject) => {
     cpExec(command, opts, (error, stdout, stderr) => {
       if (error) {
@@ -175,7 +175,9 @@ describe('sf integration', () => {
     if (platform === 'win32') {
       const {stdout} = await exec(`${join(clientDir, 'bin', 'sf.cmd')} version --json`)
       const version = JSON.parse(stdout).cliVersion.replace('@salesforce/cli/', '')
-      expect(version, 'version in SF_DATA_DIR\\bin\\sf.cmd to be the updated version').to.equal(versionToUpdateTo)
+      expect(version, String.raw`version in SF_DATA_DIR\bin\sf.cmd to be the updated version`).to.equal(
+        versionToUpdateTo,
+      )
       expect(version).to.not.equal(initialVersion)
     } else {
       const {version} = await readJSON<Interfaces.PJSON>(join(dataDir, 'client', 'current', 'package.json'))
@@ -198,7 +200,7 @@ describe('sf integration', () => {
     if (platform === 'win32') {
       const {stdout} = await exec(`${join(clientDir, 'bin', 'sf.cmd')} version --json`)
       const version = JSON.parse(stdout).cliVersion.replace('@salesforce/cli/', '')
-      expect(version, 'version in SF_DATA_DIR\\bin\\sf.cmd to be the updated version').to.equal(stableVersion)
+      expect(version, String.raw`version in SF_DATA_DIR\bin\sf.cmd to be the updated version`).to.equal(stableVersion)
       expect(version).to.not.equal(initialVersion)
     } else {
       const {version} = await readJSON<Interfaces.PJSON>(join(dataDir, 'client', 'current', 'package.json'))

@@ -11,9 +11,7 @@ export default class UpdateCommand extends Command {
   static args = {
     channel: Args.string({optional: true}),
   }
-
   static description = 'update the <%= config.bin %> CLI'
-
   static examples = [
     {
       command: '<%= config.bin %> <%= command.id %> stable',
@@ -32,7 +30,6 @@ export default class UpdateCommand extends Command {
       description: 'See available versions:',
     },
   ]
-
   static flags = {
     autoupdate: Flags.boolean({hidden: true}),
     available: Flags.boolean({
