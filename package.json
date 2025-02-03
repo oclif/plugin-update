@@ -13,7 +13,7 @@
     "got": "^13",
     "proxy-agent": "^6.5.0",
     "semver": "^7.6.3",
-    "tar-fs": "^2.1.1"
+    "tar-fs": "^2.1.2"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^19",
