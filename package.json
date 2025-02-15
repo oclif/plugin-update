@@ -30,7 +30,7 @@
     "@types/tar-fs": "^2.0.2",
     "chai": "^4.5.0",
     "commitlint": "^19",
-    "eslint": "^9.19.0",
+    "eslint": "^9.20.1",
     "eslint-config-oclif": "^6.0.5",
     "eslint-config-prettier": "^10.0.1",
     "husky": "^9.1.7",
