@@ -1,3 +1,9 @@
+## [4.6.34](https://github.com/oclif/plugin-update/compare/4.6.33...4.6.34) (2025-03-09)
+
+### Bug Fixes
+
+- **deps:** bump ansis from 3.16.0 to 3.17.0 ([#1059](https://github.com/oclif/plugin-update/issues/1059)) ([2c90688](https://github.com/oclif/plugin-update/commit/2c906880c44114fb96f3c81b2964c642eed26e6e))
+
 ## [4.6.33](https://github.com/oclif/plugin-update/compare/4.6.32...4.6.33) (2025-02-24)
 
 ### Bug Fixes
