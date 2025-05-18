@@ -8,7 +8,7 @@
     "@oclif/core": "^4",
     "@oclif/table": "^0.4.8",
     "ansis": "^3.17.0",
-    "debug": "^4.4.0",
+    "debug": "^4.4.1",
     "filesize": "^6.1.0",
     "got": "^13",
     "proxy-agent": "^6.5.0",
