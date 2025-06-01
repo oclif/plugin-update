@@ -1,3 +1,9 @@
+## [4.6.42](https://github.com/oclif/plugin-update/compare/4.6.41...4.6.42) (2025-06-01)
+
+### Bug Fixes
+
+- **deps:** bump tar-fs from 2.1.2 to 2.1.3 ([#1111](https://github.com/oclif/plugin-update/issues/1111)) ([727c06b](https://github.com/oclif/plugin-update/commit/727c06b0a15839701ec91a6c0e8fe61803fe080e))
+
 ## [4.6.41](https://github.com/oclif/plugin-update/compare/4.6.40...4.6.41) (2025-05-18)
 
 ### Bug Fixes
