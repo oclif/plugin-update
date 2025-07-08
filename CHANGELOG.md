@@ -1,3 +1,9 @@
+## [4.6.47](https://github.com/oclif/plugin-update/compare/4.6.46...4.6.47) (2025-07-08)
+
+### Bug Fixes
+
+- ensure cacheDir exists before trying to create files ([#1143](https://github.com/oclif/plugin-update/issues/1143)) ([#1144](https://github.com/oclif/plugin-update/issues/1144)) ([20e2d83](https://github.com/oclif/plugin-update/commit/20e2d838c2f2198b78e728204b15b068000f7470))
+
 ## [4.6.46](https://github.com/oclif/plugin-update/compare/4.6.45...4.6.46) (2025-07-07)
 
 ### Bug Fixes
