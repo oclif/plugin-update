@@ -1,3 +1,9 @@
+# [4.7.0](https://github.com/oclif/plugin-update/compare/4.6.47...4.7.0) (2025-07-08)
+
+### Features
+
+- configure autoupdate frequency ([#1142](https://github.com/oclif/plugin-update/issues/1142)) ([#1145](https://github.com/oclif/plugin-update/issues/1145)) ([8e3c552](https://github.com/oclif/plugin-update/commit/8e3c5527eee16be24bf06fde1efedde13233a959))
+
 ## [4.6.47](https://github.com/oclif/plugin-update/compare/4.6.46...4.6.47) (2025-07-08)
 
 ### Bug Fixes
