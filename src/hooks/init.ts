@@ -39,6 +39,13 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
       const m = await mtime(autoupdatefile)
       let days = 1
       if (opts.config.channel === 'stable') days = 14
+
+      // Check for custom update check interval in configuration
+      const debounce = config.pjson.oclif?.update?.autoupdate?.debounce
+      if (debounce !== undefined && debounce > 0) {
+        days = debounce
+      }
+
       m.setHours(m.getHours() + days * 24)
       return m < new Date()
     } catch (error: unknown) {
