@@ -16,6 +16,31 @@
 
 See https://oclif.io/docs/releasing.html#autoupdater
 
+## Configuration
+
+### Update Check Interval
+
+You can customize how often the plugin checks for updates by adding the `autoupdate.debounce` configuration to your `package.json`:
+
+```json
+{
+  "oclif": {
+    "update": {
+      "autoupdate": {
+        "debounce": 7
+      }
+    }
+  }
+}
+```
+
+The `debounce` value is the number of days between update checks for all channels. When set, it overrides the default behavior for all channels.
+
+If not configured, the plugin defaults to:
+
+- Stable channel: 14 days
+- Other channels: 1 day
+
 # Commands
 
 <!-- commands -->
