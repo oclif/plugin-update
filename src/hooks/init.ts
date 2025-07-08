@@ -2,7 +2,7 @@ import {Interfaces} from '@oclif/core'
 import makeDebug from 'debug'
 import {spawn} from 'node:child_process'
 import {existsSync} from 'node:fs'
-import {open, stat, writeFile} from 'node:fs/promises'
+import {mkdir, open, stat, writeFile} from 'node:fs/promises'
 import {join} from 'node:path'
 
 import {touch} from '../util.js'
@@ -33,6 +33,9 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
     [config.scopedEnvVarKey('SKIP_ANALYTICS')]: '1',
     [config.scopedEnvVarKey('TIMESTAMPS')]: '1',
   }
+
+  // Ensure the cache directory exists
+  await mkdir(config.cacheDir, {recursive: true})
 
   async function autoupdateNeeded(): Promise<boolean> {
     try {
