@@ -1641,10 +1641,10 @@
   resolved "https://registry.yarnpkg.com/@oclif/prettier-config/-/prettier-config-0.2.1.tgz#1def9f38134f9bfb229257f48a35f7d0d183dc78"
   integrity sha512-XB8kwQj8zynXjIIWRm+6gO/r8Qft2xKtwBMSmq1JRqtA6TpwpqECqiu8LosBCyg2JBXuUy2lU23/L98KIR7FrQ==
 
-"@oclif/table@^0.4.11":
-  version "0.4.11"
-  resolved "https://registry.yarnpkg.com/@oclif/table/-/table-0.4.11.tgz#5c6ebcc85554678924099e659ade5b60c0a59bd9"
-  integrity sha512-HKvX4YqabHYrt3juFOldmMedLiHRLBoxO3JnhVQxOCdq7Jr5HP7GM6nrHww4mNSA+Jrc7WhbmSu2GenrHnTOvQ==
+"@oclif/table@^0.4.12":
+  version "0.4.12"
+  resolved "https://registry.yarnpkg.com/@oclif/table/-/table-0.4.12.tgz#070c6fc474d3f6b5cb6924c55931fe51ab79c69b"
+  integrity sha512-CrdJBBmil38o6K5QY+vuOovfG3A6q9nFIAISpNOoOnSSiA81s/xfZ/T4E0z7coDvYnz6wJCTMc2ObqaxBZfbHg==
   dependencies:
     "@types/react" "^18.3.12"
     change-case "^5.4.4"
