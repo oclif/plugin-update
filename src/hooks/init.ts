@@ -76,7 +76,7 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
   )
 
   const stream = fd.createWriteStream()
-  spawn(binPath, ['update', '--autoupdate'], {
+  spawn(`${binPath} update --autoupdate`, {
     detached: !config.windows,
     env: autoupdateEnv,
     stdio: ['ignore', stream, stream],
