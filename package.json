@@ -41,7 +41,7 @@
     "prettier": "^3.8.1",
     "shx": "^0.4.0",
     "sinon": "^18.0.1",
-    "strip-ansi": "^7.1.2",
+    "strip-ansi": "^7.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   },
