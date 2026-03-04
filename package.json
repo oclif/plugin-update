@@ -58,6 +58,7 @@
   ],
   "license": "MIT",
   "oclif": {
+    "repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>",
     "autoupdate": "github",
     "commands": "./dist/commands",
     "bin": "oclif-example",
