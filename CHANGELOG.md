@@ -1,3 +1,9 @@
+## [4.7.20](https://github.com/oclif/plugin-update/compare/4.7.19...4.7.20) (2026-03-05)
+
+### Bug Fixes
+
+- repository prefix devcenter links ([#1275](https://github.com/oclif/plugin-update/issues/1275)) ([96d8b68](https://github.com/oclif/plugin-update/commit/96d8b68dede9dfc6f48bf2d6df780843fddc5ee4))
+
 ## [4.7.19](https://github.com/oclif/plugin-update/compare/4.7.18...4.7.19) (2026-02-08)
 
 ### Bug Fixes
