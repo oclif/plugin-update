@@ -74,11 +74,8 @@ describe('update plugin', () => {
 
   it('should not update - already on same version', async () => {
     clientRoot = await setupClientRoot({config}, '2.0.0')
-    const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
-    const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
+    const manifestRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     nock(/oclif-staging.s3.amazonaws.com/)
-      .get(platformRegex)
-      .reply(200, {version: '2.0.0'})
       .get(manifestRegex)
       .reply(200, {version: '2.0.0'})
 
@@ -90,8 +87,7 @@ describe('update plugin', () => {
 
   it('should update to channel', async () => {
     clientRoot = await setupClientRoot({config})
-    const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
-    const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
+    const manifestRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
     const tarballRegex = new RegExp(
       `tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
     )
@@ -104,8 +100,6 @@ describe('update plugin', () => {
     const gzContents = zlib.gzipSync(' ')
 
     nock(/oclif-staging.s3.amazonaws.com/)
-      .get(platformRegex)
-      .reply(200, {version: '2.0.1'})
       .get(manifestRegex)
       .reply(200, {version: '2.0.1'})
       .get(tarballRegex)
@@ -267,8 +261,6 @@ describe('update plugin', () => {
 
   it('should update from local file', async () => {
     clientRoot = await setupClientRoot({config})
-    const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
-    const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
     const tarballRegex = new RegExp(
       `tarballs\\/example-cli\\/example-cli-v2.0.0\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
     )
@@ -282,10 +274,6 @@ describe('update plugin', () => {
     const gzContents = zlib.gzipSync(' ')
 
     nock(/oclif-staging.s3.amazonaws.com/)
-      .get(platformRegex)
-      .reply(200, {version: '2.0.1'})
-      .get(manifestRegex)
-      .reply(200, {version: '2.0.1'})
       .get(tarballRegex)
       .reply(200, gzContents, {
         'Content-Encoding': 'gzip',
@@ -297,5 +285,84 @@ describe('update plugin', () => {
     await updater.runUpdate({autoUpdate: false, version: '2.0.1'})
     const stdout = stripAnsi(collector.stdout.join(' '))
     expect(stdout).to.matches(/Updating to a specific version will not update the channel/)
+  })
+
+  describe('custom S3 templates', () => {
+    it('should use config.s3Key() for manifest URL when custom templates are configured', async () => {
+      clientRoot = await setupClientRoot({config}, '2.0.0')
+      // The example config has custom S3 templates with target.manifest:
+      //   "tarballs/<%- bin %>/<%- channel === 'stable' ? '' : 'channels/' + channel + '/' %><%- platform %>-<%- arch %>"
+      // For channel=stable, this produces: tarballs/example-cli/{platform}-{arch}
+      const customManifestRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}$`)
+      // Verify the hardcoded format is NOT used
+      const hardcodedManifestRegex = new RegExp(
+        `channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+      )
+      const interceptedPaths: string[] = []
+
+      nock(/oclif-staging.s3.amazonaws.com/)
+        .get(customManifestRegex)
+        .reply(function () {
+          interceptedPaths.push(this.req.path)
+          return [200, {version: '2.0.0'}]
+        })
+
+      updater = initUpdater(config)
+      await updater.runUpdate({autoUpdate: false})
+
+      expect(interceptedPaths).to.have.lengthOf(1)
+      expect(interceptedPaths[0]).to.match(customManifestRegex)
+      expect(interceptedPaths[0]).to.not.match(hardcodedManifestRegex)
+    })
+
+    it('should use hardcoded manifest key when no custom templates are configured', async () => {
+      // Remove custom templates from the config
+      const originalTemplates = config.pjson.oclif.update!.s3!.templates
+      delete (config.pjson.oclif.update!.s3 as Record<string, unknown>).templates
+
+      clientRoot = await setupClientRoot({config}, '2.0.0')
+      const hardcodedManifestRegex = new RegExp(
+        `channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+      )
+      const interceptedPaths: string[] = []
+
+      nock(/oclif-staging.s3.amazonaws.com/)
+        .get(hardcodedManifestRegex)
+        .reply(function () {
+          interceptedPaths.push(this.req.path)
+          return [200, {version: '2.0.0'}]
+        })
+
+      updater = initUpdater(config)
+      await updater.runUpdate({autoUpdate: false})
+
+      expect(interceptedPaths).to.have.lengthOf(1)
+      expect(interceptedPaths[0]).to.match(hardcodedManifestRegex)
+
+      // Restore templates
+      config.pjson.oclif.update!.s3!.templates = originalTemplates
+    })
+
+    it('should use custom template manifest URL for non-stable channels', async () => {
+      clientRoot = await setupClientRoot({config}, '2.0.0')
+      // For channel=beta, the template produces: tarballs/example-cli/channels/beta/{platform}-{arch}
+      const betaManifestRegex = new RegExp(
+        `tarballs\\/example-cli\\/channels\\/beta\\/${config.platform}-${config.arch}`,
+      )
+      const interceptedPaths: string[] = []
+
+      nock(/oclif-staging.s3.amazonaws.com/)
+        .get(betaManifestRegex)
+        .reply(function () {
+          interceptedPaths.push(this.req.path)
+          return [200, {version: '2.0.0'}]
+        })
+
+      updater = initUpdater(config)
+      await updater.runUpdate({autoUpdate: false, channel: 'beta'})
+
+      expect(interceptedPaths).to.have.lengthOf(1)
+      expect(interceptedPaths[0]).to.match(betaManifestRegex)
+    })
   })
 })

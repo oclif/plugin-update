@@ -375,7 +375,14 @@ const setChannel = async (channel: string, dataDir: string): Promise<void> =>
   writeFile(join(dataDir, 'channel'), channel, 'utf8')
 
 const fetchChannelManifest = async (channel: string, config: Config): Promise<Interfaces.S3Manifest> => {
-  const s3Key = s3ChannelManifestKey(channel, config)
+  const hasCustomTemplates = Boolean(config.pjson.oclif?.update?.s3?.templates)
+  const s3Key = hasCustomTemplates
+    ? config.s3Key('manifest', {
+        arch: config.arch,
+        channel,
+        platform: determinePlatform(config),
+      })
+    : s3ChannelManifestKey(channel, config)
   try {
     return await fetchManifest(s3Key, config)
   } catch (error: unknown) {
