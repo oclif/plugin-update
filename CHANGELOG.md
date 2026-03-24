@@ -1,3 +1,9 @@
+## [4.7.27](https://github.com/oclif/plugin-update/compare/4.7.26...4.7.27) (2026-03-24)
+
+### Bug Fixes
+
+- swap arguments to isNotSpecial in tidy() to correctly preserve bin/ and current ([#1290](https://github.com/oclif/plugin-update/issues/1290)) ([97bec25](https://github.com/oclif/plugin-update/commit/97bec253336148fbd12532a479d87738d7dbef64)), closes [#1289](https://github.com/oclif/plugin-update/issues/1289)
+
 ## [4.7.26](https://github.com/oclif/plugin-update/compare/4.7.25...4.7.26) (2026-03-22)
 
 ### Bug Fixes
