@@ -3,7 +3,7 @@ import {expect} from 'chai'
 import {got} from 'got'
 import nock from 'nock'
 import {existsSync} from 'node:fs'
-import {mkdir, rm, symlink, writeFile} from 'node:fs/promises'
+import {mkdir, rm, symlink, utimes, writeFile} from 'node:fs/promises'
 import path from 'node:path'
 import zlib from 'node:zlib'
 import sinon from 'sinon'
@@ -40,6 +40,33 @@ function initUpdater(config: Config): Updater {
   const updater = new Updater(config)
   expect(updater).to.be.ok
   return updater
+}
+
+const setOldMtime = async (filePath: string): Promise<void> => {
+  const oldDate = new Date()
+  oldDate.setDate(oldDate.getDate() - 43)
+  await utimes(filePath, oldDate, oldDate)
+}
+
+const setupTidyClientRoot = async (config: Interfaces.Config): Promise<string> => {
+  const root = config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(config.dataDir, 'client')
+  await mkdir(root, {recursive: true})
+
+  // Create current version directory (matches config.version = '2.0.0')
+  const versionDir = path.join(root, '2.0.0')
+  await mkdir(path.join(versionDir, 'bin'), {recursive: true})
+  await writeFile(path.join(versionDir, 'bin', config.bin), 'binary', 'utf8')
+
+  // Create bin/ directory with launcher script
+  await mkdir(path.join(root, 'bin'), {recursive: true})
+  await writeFile(path.join(root, 'bin', config.bin), '../2.0.0/bin', 'utf8')
+
+  // Create current symlink
+  if (!existsSync(path.join(root, 'current'))) {
+    await symlink(path.join(root, '2.0.0'), path.join(root, 'current'))
+  }
+
+  return root
 }
 
 describe('update plugin', () => {
@@ -297,5 +324,69 @@ describe('update plugin', () => {
     await updater.runUpdate({autoUpdate: false, version: '2.0.1'})
     const stdout = stripAnsi(collector.stdout.join(' '))
     expect(stdout).to.matches(/Updating to a specific version will not update the channel/)
+  })
+
+  describe('tidy', () => {
+    it('should preserve bin, current, and active version directories during tidy', async () => {
+      clientRoot = await setupTidyClientRoot(config)
+
+      // Create old version directory that should be cleaned up
+      const oldVersionDir = path.join(clientRoot, '1.0.0-abc1234')
+      await mkdir(path.join(oldVersionDir, 'bin'), {recursive: true})
+      await writeFile(path.join(oldVersionDir, 'bin', 'example-cli'), 'old version', 'utf8')
+
+      // Backdate the old version directory to be older than 42 days
+      await setOldMtime(oldVersionDir)
+
+      // Also backdate bin/ and current to verify they are preserved even when old
+      await setOldMtime(path.join(clientRoot, 'bin'))
+      await setOldMtime(path.join(clientRoot, 'current'))
+
+      // Backdate the active version directory too - it should still be preserved
+      await setOldMtime(path.join(clientRoot, '2.0.0'))
+
+      // Trigger tidy via runUpdate (already on same version, but tidy still runs)
+      const manifestRegex = new RegExp(
+        `channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+      )
+      nock(/oclif-staging.s3.amazonaws.com/)
+        .get(manifestRegex)
+        .reply(200, {version: '2.0.0'})
+
+      updater = initUpdater(config)
+      await updater.runUpdate({autoUpdate: false})
+
+      // Verify bin/ and current survived even though they are old
+      expect(existsSync(path.join(clientRoot, 'bin'))).to.be.true
+      expect(existsSync(path.join(clientRoot, 'current'))).to.be.true
+
+      // Verify active version directory survived even though it is old
+      expect(existsSync(path.join(clientRoot, '2.0.0'))).to.be.true
+
+      // Verify old version was cleaned up
+      expect(existsSync(oldVersionDir)).to.be.false
+    })
+
+    it('should not delete entries newer than 42 days', async () => {
+      clientRoot = await setupTidyClientRoot(config)
+
+      // Create a recent version directory (should survive)
+      const recentVersionDir = path.join(clientRoot, '1.9.0-def5678')
+      await mkdir(path.join(recentVersionDir, 'bin'), {recursive: true})
+      await writeFile(path.join(recentVersionDir, 'bin', 'example-cli'), 'recent version', 'utf8')
+
+      const manifestRegex = new RegExp(
+        `channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+      )
+      nock(/oclif-staging.s3.amazonaws.com/)
+        .get(manifestRegex)
+        .reply(200, {version: '2.0.0'})
+
+      updater = initUpdater(config)
+      await updater.runUpdate({autoUpdate: false})
+
+      // Recent version should survive
+      expect(existsSync(recentVersionDir)).to.be.true
+    })
   })
 })

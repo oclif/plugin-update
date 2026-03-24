@@ -216,7 +216,7 @@ ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${
 
       await Promise.all(
         files
-          .filter((f) => isNotSpecial(this.config.version, f.path) && isOld(f.stat))
+          .filter((f) => isNotSpecial(f.path, this.config.version) && isOld(f.stat))
           .map((f) => rm(f.path, {force: true, recursive: true})),
       )
     } catch (error: unknown) {
