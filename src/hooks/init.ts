@@ -83,5 +83,6 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
     ...(config.windows ? {shell: true} : {}),
   })
     .on('error', (e: Error) => process.emitWarning(e))
+    .on('close', () => fd.close())
     .unref()
 }
