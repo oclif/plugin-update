@@ -1,3 +1,9 @@
+## [4.7.32](https://github.com/oclif/plugin-update/compare/4.7.31...4.7.32) (2026-04-14)
+
+### Bug Fixes
+
+- closed file handler @W-21915680@ ([#1307](https://github.com/oclif/plugin-update/issues/1307)) ([93cf5cb](https://github.com/oclif/plugin-update/commit/93cf5cb8b0eb29350b585fbdc82332f0c43e0fbf))
+
 ## [4.7.31](https://github.com/oclif/plugin-update/compare/4.7.30...4.7.31) (2026-04-09)
 
 ### Bug Fixes
