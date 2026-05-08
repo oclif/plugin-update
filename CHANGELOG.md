@@ -1,3 +1,9 @@
+## [4.7.36](https://github.com/oclif/plugin-update/compare/4.7.35...4.7.36) (2026-05-08)
+
+### Bug Fixes
+
+- **deps:** bump basic-ftp from 5.2.1 to 5.3.1 ([#1317](https://github.com/oclif/plugin-update/issues/1317)) ([526a035](https://github.com/oclif/plugin-update/commit/526a0353966a78b43e12faeb9f1bbbca9117e947))
+
 ## [4.7.35](https://github.com/oclif/plugin-update/compare/4.7.34...4.7.35) (2026-05-04)
 
 ### Bug Fixes
