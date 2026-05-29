@@ -1,3 +1,9 @@
+## [4.7.44](https://github.com/oclif/plugin-update/compare/4.7.43...4.7.44) (2026-05-29)
+
+### Bug Fixes
+
+- close autoupdate marker race in init hook ([#1336](https://github.com/oclif/plugin-update/issues/1336)) ([1af6351](https://github.com/oclif/plugin-update/commit/1af635153cff45b6db7a10d440920df5f212df5b))
+
 ## [4.7.43](https://github.com/oclif/plugin-update/compare/4.7.42...4.7.43) (2026-05-25)
 
 ### Bug Fixes
