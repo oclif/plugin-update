@@ -170,8 +170,12 @@ get_script_dir () {
   DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
   echo "$DIR"
 }
-DIR=$(get_script_dir)
-${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${bin}" "$@"
+
+# Ensure everything is read at once before execution to avoid race conditions when updating versions
+{
+  DIR=$(get_script_dir)
+  ${binPathEnvVar}="\$DIR/${bin}" ${redirectedEnvVar}=1 "$DIR/../${version}/bin/${bin}" "$@"
+}; exit
 `
       /* eslint-enable no-useless-escape */
       await writeFile(dst, body, {mode: 0o755})
