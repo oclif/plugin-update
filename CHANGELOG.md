@@ -1,3 +1,9 @@
+## [4.7.46](https://github.com/oclif/plugin-update/compare/4.7.45...4.7.46) (2026-06-01)
+
+### Bug Fixes
+
+- bound debounce() recursion in autoupdate flow ([#1337](https://github.com/oclif/plugin-update/issues/1337)) ([53d22f4](https://github.com/oclif/plugin-update/commit/53d22f4e43c7dd1fe362af017567ade06eb50cb0)), closes [#1277](https://github.com/oclif/plugin-update/issues/1277)
+
 ## [4.7.45](https://github.com/oclif/plugin-update/compare/4.7.44...4.7.45) (2026-06-01)
 
 ### Bug Fixes
