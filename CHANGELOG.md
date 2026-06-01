@@ -1,3 +1,9 @@
+## [4.7.45](https://github.com/oclif/plugin-update/compare/4.7.44...4.7.45) (2026-06-01)
+
+### Bug Fixes
+
+- update bin script to load at once before execution ([#1338](https://github.com/oclif/plugin-update/issues/1338)) ([588ced7](https://github.com/oclif/plugin-update/commit/588ced7ffccbbd43b975078c845907b987b9c649))
+
 ## [4.7.44](https://github.com/oclif/plugin-update/compare/4.7.43...4.7.44) (2026-05-29)
 
 ### Bug Fixes
