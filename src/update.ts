@@ -9,7 +9,7 @@ import {basename, dirname, join} from 'node:path'
 import {ProxyAgent} from 'proxy-agent'
 
 import {Extractor} from './tar.js'
-import {ls, wait} from './util.js'
+import {ls} from './util.js'
 
 const debug = makeDebug('oclif:update')
 
@@ -353,26 +353,58 @@ const s3VersionManifestKey = ({config, hash, version}: {config: Config; hash: st
   )
 }
 
-// when autoupdating, wait until the CLI isn't active
-const debounce = async (cacheDir: string): Promise<void> => {
-  let output = false
+// When autoupdating, wait until the CLI isn't active (lastrun mtime > 1 hour old).
+//
+// IMPORTANT: every CLI invocation touches lastrun before this function runs, so
+// while the user is actively using the CLI, `lastrun + 1hr` keeps shifting
+// forward and this wait never naturally resolves. The previous implementation
+// recursed forever in that scenario, leaving each spawned autoupdate child
+// pinned in memory as a full node process for the entire active session. When
+// combined with the race documented in hooks/init.ts (which could spawn
+// multiple such children per debounce window), the leaked children compounded
+// until OOM on machines doing heavy CLI setup.
+//
+// Fix: cap the wait at a sensible wall-clock max. If the user is still active
+// after that, abandon this autoupdate run — the next CLI invocation will fire
+// a new one when it's again "needed".
+const MAX_DEBOUNCE_WAIT_MS = 6 * 60 * 60 * 1000 // 6 hours
+const DEBOUNCE_POLL_INTERVAL_MS = 60 * 1000 // 1 minute
+
+const debounce = (cacheDir: string): Promise<void> => {
   const lastrunfile = join(cacheDir, 'lastrun')
-  const m = await mtime(lastrunfile)
-  m.setHours(m.getHours() + 1)
-  if (m > new Date()) {
-    const msg = `waiting until ${m.toISOString()} to update`
-    if (output) {
-      debug(msg)
-    } else {
-      ux.stdout(msg)
-      output = true
+  const startedAt = Date.now()
+  let announced = false
+
+  return new Promise((resolve) => {
+    const check = async (): Promise<void> => {
+      const m = await mtime(lastrunfile)
+      m.setHours(m.getHours() + 1)
+
+      if (m <= new Date()) {
+        ux.stdout('time to update')
+        resolve()
+        return
+      }
+
+      if (Date.now() - startedAt >= MAX_DEBOUNCE_WAIT_MS) {
+        ux.stdout('autoupdate: debounce wait exceeded; abandoning this run')
+        resolve()
+        return
+      }
+
+      const msg = `waiting until ${m.toISOString()} to update`
+      if (announced) {
+        debug(msg)
+      } else {
+        ux.stdout(msg)
+        announced = true
+      }
+
+      setTimeout(check, DEBOUNCE_POLL_INTERVAL_MS)
     }
 
-    await wait(60 * 1000) // wait 1 minute
-    return debounce(cacheDir)
-  }
-
-  ux.stdout('time to update')
+    check()
+  })
 }
 
 const setChannel = async (channel: string, dataDir: string): Promise<void> =>
