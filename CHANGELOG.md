@@ -1,3 +1,9 @@
+## [4.7.49](https://github.com/oclif/plugin-update/compare/4.7.48...4.7.49) (2026-06-18)
+
+### Bug Fixes
+
+- got downloadProgress undefined total ([#1349](https://github.com/oclif/plugin-update/issues/1349)) ([62a75ea](https://github.com/oclif/plugin-update/commit/62a75ea107f68f2ec7e85c09ccff25dcb0bb98e5))
+
 ## [4.7.48](https://github.com/oclif/plugin-update/compare/4.7.47...4.7.48) (2026-06-14)
 
 ### Bug Fixes
