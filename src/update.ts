@@ -465,8 +465,8 @@ const downloadAndExtract = async (
     stream.on('downloadProgress', (progress) => {
       ux.action.status =
         progress.percent === 1
-          ? `${filesize(progress.transferred)}/${filesize(progress.total)} - Finishing up...`
-          : `${filesize(progress.transferred)}/${filesize(progress.total)}`
+          ? `${filesize(progress.transferred)}/${filesize(progress?.total || 0)} - Finishing up...`
+          : `${filesize(progress.transferred)}/${filesize(progress?.total || 0)}`
     })
   }
 
