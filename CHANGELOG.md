@@ -1,3 +1,9 @@
+## [4.7.52](https://github.com/oclif/plugin-update/compare/4.7.51...4.7.52) (2026-06-22)
+
+### Bug Fixes
+
+- **deps:** bump semver from 7.8.4 to 7.8.5 ([#1350](https://github.com/oclif/plugin-update/issues/1350)) ([d59390a](https://github.com/oclif/plugin-update/commit/d59390afbb1e71f1ccec0e7d7115d34257f38581))
+
 ## [4.7.51](https://github.com/oclif/plugin-update/compare/4.7.50...4.7.51) (2026-06-21)
 
 ### Bug Fixes
