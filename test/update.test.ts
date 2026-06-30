@@ -3,7 +3,7 @@ import {expect} from 'chai'
 import {got} from 'got'
 import nock from 'nock'
 import {existsSync} from 'node:fs'
-import {mkdir, rm, symlink, utimes, writeFile} from 'node:fs/promises'
+import {mkdir, rm, stat, symlink, utimes, writeFile} from 'node:fs/promises'
 import path from 'node:path'
 import zlib from 'node:zlib'
 import sinon from 'sinon'
@@ -64,6 +64,29 @@ const setupTidyClientRoot = async (config: Interfaces.Config): Promise<string> =
   // Create current symlink
   if (!existsSync(path.join(root, 'current'))) {
     await symlink(path.join(root, '2.0.0'), path.join(root, 'current'))
+  }
+
+  return root
+}
+
+// Mirrors a real install where the active directory is named "<version>-<sha>"
+// (e.g. "2.0.0-a2559bd") while config.version remains plain semver ("2.0.0").
+const setupShaSuffixedTidyClientRoot = async (config: Interfaces.Config, activeDirName: string): Promise<string> => {
+  const root = config.scopedEnvVar('OCLIF_CLIENT_HOME') || path.join(config.dataDir, 'client')
+  await mkdir(root, {recursive: true})
+
+  // Active version directory, named "<version>-<sha>"
+  const versionDir = path.join(root, activeDirName)
+  await mkdir(path.join(versionDir, 'bin'), {recursive: true})
+  await writeFile(path.join(versionDir, 'bin', config.bin), 'binary', 'utf8')
+
+  // bin/ directory with launcher script pointing at the sha-suffixed dir
+  await mkdir(path.join(root, 'bin'), {recursive: true})
+  await writeFile(path.join(root, 'bin', config.bin), `../${activeDirName}/bin`, 'utf8')
+
+  // current symlink -> sha-suffixed dir
+  if (!existsSync(path.join(root, 'current'))) {
+    await symlink(path.join(root, activeDirName), path.join(root, 'current'))
   }
 
   return root
@@ -387,6 +410,81 @@ describe('update plugin', () => {
 
       // Recent version should survive
       expect(existsSync(recentVersionDir)).to.be.true
+    })
+
+    // Regression test for #1361: installs are named "<version>-<sha>" but
+    // config.version is plain semver, so the exact-match guard never matched the
+    // active dir. Once it aged past 42 days, tidy() deleted the running CLI,
+    // leaving `current` dangling. The active dir must be preserved by name even
+    // when it is sha-suffixed and old.
+    it('should preserve a sha-suffixed active version directory even when old', async () => {
+      const activeDirName = '2.0.0-a2559bd'
+      clientRoot = await setupShaSuffixedTidyClientRoot(config, activeDirName)
+
+      // Create an old, non-active version that should be cleaned up
+      const oldVersionDir = path.join(clientRoot, '1.0.0-abc1234')
+      await mkdir(path.join(oldVersionDir, 'bin'), {recursive: true})
+      await writeFile(path.join(oldVersionDir, 'bin', 'example-cli'), 'old version', 'utf8')
+      await setOldMtime(oldVersionDir)
+
+      // Backdate bin/, current, and the active dir past the 42-day threshold to
+      // exercise the exact scenario from the report: staying on latest 42+ days.
+      await setOldMtime(path.join(clientRoot, 'bin'))
+      await setOldMtime(path.join(clientRoot, 'current'))
+      await setOldMtime(path.join(clientRoot, activeDirName))
+
+      // Manifest carries a sha so `updated` becomes "2.0.0-a2559bd", matching
+      // the current install and short-circuiting before any download, while
+      // touch() and tidy() still run.
+      const manifestRegex = new RegExp(
+        `channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+      )
+      nock(/oclif-staging.s3.amazonaws.com/)
+        .get(manifestRegex)
+        .reply(200, {sha: 'a2559bd', version: '2.0.0'})
+
+      updater = initUpdater(config)
+      await updater.runUpdate({autoUpdate: false})
+
+      // Active sha-suffixed dir must survive, along with bin/ and current.
+      expect(existsSync(path.join(clientRoot, activeDirName))).to.be.true
+      expect(existsSync(path.join(clientRoot, 'bin'))).to.be.true
+      expect(existsSync(path.join(clientRoot, 'current'))).to.be.true
+
+      // The `current` symlink must still resolve to the active dir (not dangling).
+      expect(existsSync(path.join(clientRoot, 'current', 'bin', config.bin))).to.be.true
+
+      // Genuinely old, non-active version is still cleaned up.
+      expect(existsSync(oldVersionDir)).to.be.false
+    })
+
+    // touch() must refresh the sha-suffixed active dir's mtime so it is never
+    // considered "old" in the first place. Previously it joined the bare
+    // config.version ("2.0.0"), which does not exist on disk, making it a no-op.
+    it('touch() refreshes the sha-suffixed active version directory mtime', async () => {
+      const activeDirName = '2.0.0-a2559bd'
+      clientRoot = await setupShaSuffixedTidyClientRoot(config, activeDirName)
+
+      const activeDir = path.join(clientRoot, activeDirName)
+
+      // Backdate the active dir well past the threshold.
+      await setOldMtime(activeDir)
+      const beforeMtime = (await stat(activeDir)).mtime.getTime()
+
+      const manifestRegex = new RegExp(
+        `channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+      )
+      nock(/oclif-staging.s3.amazonaws.com/)
+        .get(manifestRegex)
+        .reply(200, {sha: 'a2559bd', version: '2.0.0'})
+
+      updater = initUpdater(config)
+      await updater.runUpdate({autoUpdate: false})
+
+      // mtime should have been bumped to ~now, proving touch() found the dir.
+      const afterMtime = (await stat(activeDir)).mtime.getTime()
+      expect(afterMtime).to.be.greaterThan(beforeMtime)
+      expect(Date.now() - afterMtime).to.be.lessThan(60_000)
     })
   })
 })
