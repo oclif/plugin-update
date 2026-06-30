@@ -1,3 +1,9 @@
+## [4.7.54](https://github.com/oclif/plugin-update/compare/4.7.53...4.7.54) (2026-06-30)
+
+### Bug Fixes
+
+- preserve sha-suffixed active version dir in tidy() ([#1361](https://github.com/oclif/plugin-update/issues/1361)) ([#1362](https://github.com/oclif/plugin-update/issues/1362)) ([4630b19](https://github.com/oclif/plugin-update/commit/4630b19321053302de023a700118194e46c6c8ed)), closes [#621](https://github.com/oclif/plugin-update/issues/621) [#643](https://github.com/oclif/plugin-update/issues/643) [#1290](https://github.com/oclif/plugin-update/issues/1290)
+
 ## [4.7.53](https://github.com/oclif/plugin-update/compare/4.7.52...4.7.53) (2026-06-28)
 
 ### Bug Fixes
