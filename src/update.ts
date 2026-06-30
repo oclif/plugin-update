@@ -201,6 +201,23 @@ get_script_dir () {
     this.config = await Config.load({root: join(this.clientRoot, version)})
   }
 
+  // Resolves the absolute path of the active install directory. Installed
+  // directories are named "<version>-<sha>", but `this.config.version` is plain
+  // semver, so match by exact name or "<version>-" prefix. Falls back to the
+  // bare version path when no match exists.
+  private async resolveActiveDir(): Promise<string> {
+    const {version} = this.config
+    try {
+      const entries = await readdir(this.clientRoot)
+      const match = entries.find((entry) => entry === version || entry.startsWith(`${version}-`))
+      if (match) return join(this.clientRoot, match)
+    } catch {
+      // fall through to bare version path
+    }
+
+    return join(this.clientRoot, version)
+  }
+
   // removes any unused CLIs
   private async tidy(): Promise<void> {
     debug('tidy')
@@ -209,8 +226,15 @@ get_script_dir () {
       if (!existsSync(root)) return
       const files = await ls(root)
 
-      const isNotSpecial = (fPath: string, version: string): boolean =>
-        !['bin', 'current', version].includes(basename(fPath))
+      // `version` is plain semver (e.g. "1.2.3") but installed directories are
+      // named "<version>-<sha>" (e.g. "1.2.3-abc1234"). Protect both forms so
+      // the active CLI never deletes itself. See #1361.
+      const isNotSpecial = (fPath: string, version: string): boolean => {
+        const name = basename(fPath)
+        if (name === 'bin' || name === 'current') return false
+        // "1.2.3" or "1.2.3-abc1234" both start from `version`
+        return !(name === version || name.startsWith(`${version}-`))
+      }
 
       const isOld = (fStat: Stats): boolean => {
         const {mtime} = fStat
@@ -231,7 +255,12 @@ get_script_dir () {
   private async touch(): Promise<void> {
     // touch the client so it won't be tidied up right away
     try {
-      const p = join(this.clientRoot, this.config.version)
+      // `this.config.version` is plain semver, but the installed directory is
+      // named "<version>-<sha>", so joining the bare version would point at a
+      // non-existent path and silently no-op. Resolve the real directory the
+      // same way tidy()'s guard does so the active install's mtime is refreshed
+      // and it isn't considered "old". See #1361.
+      const p = await this.resolveActiveDir()
       debug('touching client at', p)
       if (!existsSync(p)) return
       return utimes(p, new Date(), new Date())
