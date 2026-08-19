@@ -1,3 +1,9 @@
+# [4.8.0](https://github.com/oclif/plugin-update/compare/4.7.59...4.8.0) (2026-08-19)
+
+### Features
+
+- bumping eslint to v10 (W-23473845) ([#1387](https://github.com/oclif/plugin-update/issues/1387)) ([a043c1d](https://github.com/oclif/plugin-update/commit/a043c1dbbe264043df50a9badcb2fe554abe0f04))
+
 ## [4.7.59](https://github.com/oclif/plugin-update/compare/4.7.58...4.7.59) (2026-08-09)
 
 ### Bug Fixes
