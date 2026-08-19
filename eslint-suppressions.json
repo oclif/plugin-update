@@ -1,0 +1,259 @@
+{
+  "eslint.config.js": {
+    "import-x/no-anonymous-default-export": {
+      "count": 1
+    }
+  },
+  "examples/s3-update-example-cli/src/commands/hello.ts": {
+    "@stylistic/lines-between-class-members": {
+      "count": 1
+    },
+    "@typescript-eslint/no-shadow": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 5
+    },
+    "@typescript-eslint/no-unsafe-call": {
+      "count": 6
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 7
+    },
+    "@typescript-eslint/prefer-nullish-coalescing": {
+      "count": 1
+    },
+    "import-x/no-unresolved": {
+      "count": 1
+    }
+  },
+  "examples/s3-update-example-cli/src/index.ts": {
+    "import-x/no-unresolved": {
+      "count": 1
+    }
+  },
+  "src/commands/update.ts": {
+    "@stylistic/lines-between-class-members": {
+      "count": 2
+    },
+    "@typescript-eslint/consistent-type-imports": {
+      "count": 1
+    },
+    "@typescript-eslint/prefer-nullish-coalescing": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-array-reverse": {
+      "count": 1
+    },
+    "unicorn/no-computed-property-existence-check": {
+      "count": 1
+    },
+    "unicorn/prefer-object-iterable-methods": {
+      "count": 1
+    }
+  },
+  "src/hooks/init.ts": {
+    "@typescript-eslint/consistent-type-imports": {
+      "count": 1
+    },
+    "@typescript-eslint/no-confusing-void-expression": {
+      "count": 1
+    },
+    "@typescript-eslint/no-shadow": {
+      "count": 3
+    },
+    "@typescript-eslint/promise-function-async": {
+      "count": 1
+    },
+    "@typescript-eslint/strict-void-return": {
+      "count": 1
+    },
+    "import-x/newline-after-import": {
+      "count": 1
+    },
+    "unicorn/consistent-conditional-object-spread": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/prefer-ternary": {
+      "count": 1
+    }
+  },
+  "src/tar.ts": {
+    "@typescript-eslint/consistent-type-imports": {
+      "count": 1
+    },
+    "@typescript-eslint/no-confusing-void-expression": {
+      "count": 1
+    },
+    "@typescript-eslint/no-shadow": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 1
+    },
+    "@typescript-eslint/strict-void-return": {
+      "count": 1
+    },
+    "@typescript-eslint/switch-exhaustiveness-check": {
+      "count": 1
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 2
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/prefer-split-limit": {
+      "count": 1
+    }
+  },
+  "src/update.ts": {
+    "@eslint-community/eslint-comments/require-description": {
+      "count": 1
+    },
+    "@typescript-eslint/consistent-type-imports": {
+      "count": 2
+    },
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    },
+    "@typescript-eslint/no-restricted-types": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 5
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 8
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 2
+    },
+    "@typescript-eslint/prefer-nullish-coalescing": {
+      "count": 4
+    },
+    "@typescript-eslint/prefer-regexp-exec": {
+      "count": 1
+    },
+    "@typescript-eslint/prefer-string-starts-ends-with": {
+      "count": 1
+    },
+    "@typescript-eslint/promise-function-async": {
+      "count": 2
+    },
+    "@typescript-eslint/return-await": {
+      "count": 1
+    },
+    "@typescript-eslint/strict-void-return": {
+      "count": 1
+    },
+    "@typescript-eslint/use-unknown-in-catch-callback-variable": {
+      "count": 1
+    },
+    "preserve-caught-error": {
+      "count": 1
+    },
+    "require-unicode-regexp": {
+      "count": 1
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 4
+    },
+    "unicorn/consistent-class-member-order": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/operator-assignment": {
+      "count": 1
+    },
+    "unicorn/prefer-number-coercion": {
+      "count": 1
+    },
+    "unicorn/prefer-string-starts-ends-with": {
+      "count": 1
+    }
+  },
+  "src/util.ts": {
+    "@typescript-eslint/consistent-type-imports": {
+      "count": 1
+    },
+    "@typescript-eslint/no-confusing-void-expression": {
+      "count": 1
+    },
+    "@typescript-eslint/promise-function-async": {
+      "count": 2
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    }
+  },
+  "test/integration/sf.integration.ts": {
+    "@typescript-eslint/consistent-type-imports": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 6
+    },
+    "@typescript-eslint/no-unsafe-call": {
+      "count": 3
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 8
+    },
+    "import-x/no-named-default": {
+      "count": 1
+    },
+    "require-unicode-regexp": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-named-default": {
+      "count": 1
+    },
+    "unicorn/prefer-hoisting-branch-code": {
+      "count": 1
+    }
+  },
+  "test/update.test.ts": {
+    "@typescript-eslint/consistent-type-imports": {
+      "count": 1
+    },
+    "@typescript-eslint/prefer-nullish-coalescing": {
+      "count": 5
+    },
+    "@typescript-eslint/strict-void-return": {
+      "count": 3
+    },
+    "require-unicode-regexp": {
+      "count": 43
+    },
+    "unicorn/logical-assignment-operators": {
+      "count": 1
+    },
+    "unicorn/no-non-function-verb-prefix": {
+      "count": 1
+    },
+    "unicorn/no-return-array-push": {
+      "count": 3
+    },
+    "unicorn/prefer-string-raw": {
+      "count": 21
+    }
+  }
+}
