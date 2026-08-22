@@ -2490,10 +2490,10 @@ eslint-compat-utils@^0.5.1:
   dependencies:
     semver "^7.5.4"
 
-eslint-config-oclif@^7.1.5:
-  version "7.1.5"
-  resolved "https://registry.yarnpkg.com/eslint-config-oclif/-/eslint-config-oclif-7.1.5.tgz#65755cf4be62bb29c2836b4469550fa26dd99514"
-  integrity sha512-Gs+5M6DZ/Fhv5ejm6Xy6qUApU6kUYfjkNeDvjbgxCftzABPVyqs8zk0ZPQFd0LjJxa8gbU5Z4f84hY9+DkmRWQ==
+eslint-config-oclif@^7.1.7:
+  version "7.1.7"
+  resolved "https://registry.yarnpkg.com/eslint-config-oclif/-/eslint-config-oclif-7.1.7.tgz#3eaee259e933735abe14512940accd9f6e0634e5"
+  integrity sha512-ByozqpcFAcWLTBCKJMGs9V8+GVDTOfv3CE5dTww3nn+ykPLk5a7nfPqM4vOZDT0idLTUsbUAVL0lW7inYsKcbw==
   dependencies:
     "@eslint/js" "^10.0.1"
     "@stylistic/eslint-plugin" "^5.10.0"
@@ -2502,10 +2502,10 @@ eslint-config-oclif@^7.1.5:
     eslint-plugin-import-x "^4.17.1"
     eslint-plugin-jsdoc "^63.3.3"
     eslint-plugin-mocha "^11.3.0"
-    eslint-plugin-n "^18.2.2"
+    eslint-plugin-n "^18.3.0"
     eslint-plugin-perfectionist "^5.10.1"
     eslint-plugin-unicorn "^72.0.0"
-    typescript-eslint "^8.66.0"
+    typescript-eslint "^8.67.0"
 
 eslint-config-prettier@^10.1.8:
   version "10.1.8"
@@ -2645,7 +2645,7 @@ eslint-plugin-mocha@^11.3.0:
     "@eslint-community/eslint-utils" "^4.4.1"
     globals "^15.14.0"
 
-eslint-plugin-n@^18.2.2:
+eslint-plugin-n@^18.2.2, eslint-plugin-n@^18.3.0:
   version "18.3.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-n/-/eslint-plugin-n-18.3.0.tgz#c6dbf33e930eb7fef6b0d715a3938114dd0930f6"
   integrity sha512-cPVguuDe6DrIPb/qUXHf8P89MaVTUmiYWwpt5gX5AILsvRIiZAxMFXcFR6QHYBksqKJpjfUBlL/RleCJUWcD7w==
@@ -5671,7 +5671,7 @@ type-fest@^4.8.3:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-4.32.0.tgz#55bacdd6f2cf1392b7e9cde894e9b1d726807e97"
   integrity sha512-rfgpoi08xagF3JSdtJlCwMq9DGNDE0IMh3Mkpc1wUypg9vPi786AiqeBBKcqvIkq42azsBM85N490fyZjeUftw==
 
-typescript-eslint@^8.64.0, typescript-eslint@^8.66.0:
+typescript-eslint@^8.64.0, typescript-eslint@^8.67.0:
   version "8.67.0"
   resolved "https://registry.yarnpkg.com/typescript-eslint/-/typescript-eslint-8.67.0.tgz#1e92de09ee0ff2d96cc0848f5e9f345ea930d963"
   integrity sha512-S2udFs8tCKEKffuJ4TB1idGUZiXdCPGi3IPBGWXarbLQ5UPXORV8QEVzJ4gCRduURMb5EkpNCdjbk0eDIuI8Yg==
