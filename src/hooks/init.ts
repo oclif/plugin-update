@@ -1,4 +1,4 @@
-import {Interfaces} from '@oclif/core'
+import {type Interfaces} from '@oclif/core'
 import makeDebug from 'debug'
 import {spawn} from 'node:child_process'
 import {existsSync} from 'node:fs'
@@ -6,6 +6,7 @@ import {mkdir, open, stat, unlink, writeFile} from 'node:fs/promises'
 import {join} from 'node:path'
 
 import {touch} from '../util.js'
+
 const debug = makeDebug('cli:updater')
 
 function timestamp(msg: string): string {
@@ -94,10 +95,12 @@ export const init: Interfaces.Hook<'init'> = async function (opts) {
     detached: !config.windows,
     env: autoupdateEnv,
     stdio: ['ignore', stream, stream],
-    ...(config.windows ? {shell: true} : {}),
+    ...(config.windows && {shell: true}),
   })
-    .on('error', (e: Error) => process.emitWarning(e))
-    .on('close', () => fd.close())
+    .on('error', (e: Error) => {
+      process.emitWarning(e)
+    })
+    .on('close', async () => fd.close())
     .unref()
 
   async function claimAutoupdate(markerPath: string): Promise<boolean> {

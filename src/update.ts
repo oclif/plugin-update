@@ -1,9 +1,9 @@
-import {Config, Interfaces, ux} from '@oclif/core'
+import {Config, type Interfaces, ux} from '@oclif/core'
 import {green, yellow} from 'ansis'
 import makeDebug from 'debug'
 import fileSize from 'filesize'
 import {got, HTTPError} from 'got'
-import {existsSync, Stats} from 'node:fs'
+import {existsSync, type Stats} from 'node:fs'
 import {mkdir, readdir, readFile, rm, stat, symlink, utimes, writeFile} from 'node:fs/promises'
 import {basename, dirname, join} from 'node:path'
 import {ProxyAgent} from 'proxy-agent'
@@ -245,7 +245,7 @@ get_script_dir () {
       await Promise.all(
         files
           .filter((f) => isNotSpecial(f.path, this.config.version) && isOld(f.stat))
-          .map((f) => rm(f.path, {force: true, recursive: true})),
+          .map(async (f) => rm(f.path, {force: true, recursive: true})),
       )
     } catch (error: unknown) {
       ux.warn(error as Error | string)
@@ -301,7 +301,7 @@ get_script_dir () {
   }
 }
 
-const alreadyOnVersion = (current: string, updated: null | string): boolean => current === updated
+const alreadyOnVersion = (current: string, updated: string | undefined): boolean => current === updated
 
 const ensureClientDir = async (clientRoot: string): Promise<void> => {
   try {
@@ -339,7 +339,7 @@ const notUpdatable = (config: Config): boolean => {
 
 const composeS3SubDir = (config: Config): string => {
   let s3SubDir = config.pjson.oclif.update?.s3?.folder || ''
-  if (s3SubDir !== '' && s3SubDir.slice(-1) !== '/') s3SubDir = `${s3SubDir}/`
+  if (s3SubDir !== '' && !s3SubDir.endsWith('/')) s3SubDir = `${s3SubDir}/`
   return s3SubDir
 }
 
@@ -399,10 +399,10 @@ const s3VersionManifestKey = ({config, hash, version}: {config: Config; hash: st
 const MAX_DEBOUNCE_WAIT_MS = 6 * 60 * 60 * 1000 // 6 hours
 const DEBOUNCE_POLL_INTERVAL_MS = 60 * 1000 // 1 minute
 
-const debounce = (cacheDir: string): Promise<void> => {
+const debounce = async (cacheDir: string): Promise<void> => {
   const lastrunfile = join(cacheDir, 'lastrun')
   const startedAt = Date.now()
-  let announced = false
+  let isAnnounced = false
 
   return new Promise((resolve) => {
     const check = async (): Promise<void> => {
@@ -422,11 +422,11 @@ const debounce = (cacheDir: string): Promise<void> => {
       }
 
       const msg = `waiting until ${m.toISOString()} to update`
-      if (announced) {
+      if (isAnnounced) {
         debug(msg)
       } else {
         ux.stdout(msg)
-        announced = true
+        isAnnounced = true
       }
 
       setTimeout(check, DEBOUNCE_POLL_INTERVAL_MS)
@@ -532,7 +532,7 @@ const determineChannel = async ({config, version}: {config: Config; version?: st
 const determineCurrentVersion = async (clientBin: string, version: string): Promise<string> => {
   try {
     const currentVersion = await readFile(clientBin, 'utf8')
-    const matches = currentVersion.match(/\.\.[/\\|](.+)[/\\|]bin/)
+    const matches = /\.\.[/\\|](.+)[/\\|]bin/.exec(currentVersion)
     return matches ? matches[1] : version
   } catch (error) {
     if (error instanceof Error) {

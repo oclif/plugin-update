@@ -4,7 +4,8 @@
     "forceConsistentCasingInFileNames": true,
     "module": "Node16",
     "outDir": "./dist",
-    "rootDirs": ["./src"],
+    "rootDir": "./src",
+    "types": ["node", "mocha"],
     "strict": true,
     "target": "ES2022",
     "moduleResolution": "node16"

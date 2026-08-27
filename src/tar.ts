@@ -4,7 +4,7 @@ import {existsSync} from 'node:fs'
 import {rename, rm} from 'node:fs/promises'
 import {join} from 'node:path'
 import zlib from 'node:zlib'
-import {Headers, extract as tarExtract} from 'tar-fs'
+import {type Headers, extract as tarExtract} from 'tar-fs'
 
 import {touch} from './util.js'
 
@@ -29,15 +29,15 @@ const ignore = (_name: string, header?: Headers) => {
 }
 
 async function extract(stream: NodeJS.ReadableStream, basename: string, output: string, sha?: string): Promise<void> {
-  const getTmp = () => `${output}.partial.${Math.random().toString().split('.')[1].slice(0, 5)}`
+  const getTmp = () => `${output}.partial.${Math.random().toString().split('.', 2)[1].slice(0, 5)}`
   let tmp = getTmp()
   if (existsSync(tmp)) tmp = getTmp()
   debug(`extracting to ${tmp}`)
   try {
     await new Promise((resolve, reject) => {
-      let shaValidated = false
-      let extracted = false
-      const check = () => shaValidated && extracted && resolve(null)
+      let isShaValidated = false
+      let isExtracted = false
+      const check = () => isShaValidated && isExtracted && resolve(null)
 
       if (sha) {
         const hasher = crypto.createHash('sha256')
@@ -46,18 +46,18 @@ async function extract(stream: NodeJS.ReadableStream, basename: string, output: 
         stream.on('end', () => {
           const shasum = hasher.digest('hex')
           if (sha === shasum) {
-            shaValidated = true
+            isShaValidated = true
             check()
           } else {
             reject(new Error(`SHA mismatch: expected ${shasum} to be ${sha}`))
           }
         })
-      } else shaValidated = true
+      } else isShaValidated = true
 
       const extract = tarExtract(tmp, {ignore})
       extract.on('error', reject)
       extract.on('finish', () => {
-        extracted = true
+        isExtracted = true
         check()
       })
 
