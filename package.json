@@ -5,8 +5,8 @@
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
     "@inquirer/select": "^2.5.0",
-    "@oclif/core": "^4",
-    "@oclif/table": "^0.5.9",
+    "@oclif/core": "^5.0.0",
+    "@oclif/table": "^1.0.0",
     "ansis": "^3.17.0",
     "debug": "^4.4.1",
     "filesize": "^6.1.0",
@@ -46,7 +46,7 @@
     "typescript": "^6"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "files": [
     "oclif.manifest.json",
