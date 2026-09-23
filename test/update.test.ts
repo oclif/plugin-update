@@ -1,4 +1,4 @@
-import {Config, Interfaces, ux} from '@oclif/core'
+import {Config, type Interfaces, ux} from '@oclif/core'
 import {expect} from 'chai'
 import {got} from 'got'
 import nock from 'nock'
@@ -124,8 +124,10 @@ describe('update plugin', () => {
 
   it('should not update - already on same version', async () => {
     clientRoot = await setupClientRoot({config}, '2.0.0')
-    const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
-    const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
+    const platformRegex = new RegExp(String.raw`tarballs\/example-cli\/${config.platform}-${config.arch}`)
+    const manifestRegex = new RegExp(
+      String.raw`channels\/stable\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+    )
     nock(/oclif-staging.s3.amazonaws.com/)
       .get(platformRegex)
       .reply(200, {version: '2.0.0'})
@@ -140,10 +142,12 @@ describe('update plugin', () => {
 
   it('should update to channel', async () => {
     clientRoot = await setupClientRoot({config})
-    const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
-    const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
+    const platformRegex = new RegExp(String.raw`tarballs\/example-cli\/${config.platform}-${config.arch}`)
+    const manifestRegex = new RegExp(
+      String.raw`channels\/stable\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+    )
     const tarballRegex = new RegExp(
-      `tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
+      String.raw`tarballs\/example-cli\/example-cli-v2.0.1\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
     )
     const newVersionPath = path.join(clientRoot, '2.0.1')
     await mkdir(path.join(`${newVersionPath}.partial.11111`, 'bin'), {recursive: true})
@@ -174,13 +178,15 @@ describe('update plugin', () => {
   it('should update to version', async () => {
     const hash = 'f289627'
     clientRoot = await setupClientRoot({config})
-    const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
-    const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
+    const platformRegex = new RegExp(String.raw`tarballs\/example-cli\/${config.platform}-${config.arch}`)
+    const manifestRegex = new RegExp(
+      String.raw`channels\/stable\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+    )
     const versionManifestRegex = new RegExp(
       `example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`,
     )
     const tarballRegex = new RegExp(
-      `tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
+      String.raw`tarballs\/example-cli\/example-cli-v2.0.1\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
     )
     const indexRegex = new RegExp(`example-cli-${config.platform}-${config.arch}-tar-gz.json`)
 
@@ -217,13 +223,15 @@ describe('update plugin', () => {
     const hash = 'f289627'
     config.pjson.name = '@oclif/plugin-update'
     clientRoot = await setupClientRoot({config})
-    const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
-    const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
+    const platformRegex = new RegExp(String.raw`tarballs\/example-cli\/${config.platform}-${config.arch}`)
+    const manifestRegex = new RegExp(
+      String.raw`channels\/stable\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+    )
     const versionManifestRegex = new RegExp(
       `example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`,
     )
     const tarballRegex = new RegExp(
-      `tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
+      String.raw`tarballs\/example-cli\/example-cli-v2.0.1\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
     )
     const indexRegex = new RegExp(`example-cli-${config.platform}-${config.arch}-tar-gz.json`)
 
@@ -261,13 +269,15 @@ describe('update plugin', () => {
     config.pjson.name = '@oclif/plugin-update'
     config.npmRegistry = 'https://myCustomRegistry.com'
     clientRoot = await setupClientRoot({config})
-    const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
-    const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
+    const platformRegex = new RegExp(String.raw`tarballs\/example-cli\/${config.platform}-${config.arch}`)
+    const manifestRegex = new RegExp(
+      String.raw`channels\/stable\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+    )
     const versionManifestRegex = new RegExp(
       `example-cli-v2.0.1-${hash}-${config.platform}-${config.arch}-buildmanifest`,
     )
     const tarballRegex = new RegExp(
-      `tarballs\\/example-cli\\/example-cli-v2.0.1\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
+      String.raw`tarballs\/example-cli\/example-cli-v2.0.1\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
     )
     const indexRegex = new RegExp(`example-cli-${config.platform}-${config.arch}-tar-gz.json`)
 
@@ -317,10 +327,12 @@ describe('update plugin', () => {
 
   it('should update from local file', async () => {
     clientRoot = await setupClientRoot({config})
-    const platformRegex = new RegExp(`tarballs\\/example-cli\\/${config.platform}-${config.arch}`)
-    const manifestRegex = new RegExp(`channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`)
+    const platformRegex = new RegExp(String.raw`tarballs\/example-cli\/${config.platform}-${config.arch}`)
+    const manifestRegex = new RegExp(
+      String.raw`channels\/stable\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+    )
     const tarballRegex = new RegExp(
-      `tarballs\\/example-cli\\/example-cli-v2.0.0\\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
+      String.raw`tarballs\/example-cli\/example-cli-v2.0.0\/example-cli-v2.0.1-${config.platform}-${config.arch}gz`,
     )
     const newVersionPath = path.join(clientRoot, '2.0.1')
     await mkdir(path.join(newVersionPath, 'bin'), {recursive: true})
@@ -370,7 +382,7 @@ describe('update plugin', () => {
 
       // Trigger tidy via runUpdate (already on same version, but tidy still runs)
       const manifestRegex = new RegExp(
-        `channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+        String.raw`channels\/stable\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
       )
       nock(/oclif-staging.s3.amazonaws.com/)
         .get(manifestRegex)
@@ -399,7 +411,7 @@ describe('update plugin', () => {
       await writeFile(path.join(recentVersionDir, 'bin', 'example-cli'), 'recent version', 'utf8')
 
       const manifestRegex = new RegExp(
-        `channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+        String.raw`channels\/stable\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
       )
       nock(/oclif-staging.s3.amazonaws.com/)
         .get(manifestRegex)
@@ -437,7 +449,7 @@ describe('update plugin', () => {
       // the current install and short-circuiting before any download, while
       // touch() and tidy() still run.
       const manifestRegex = new RegExp(
-        `channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+        String.raw`channels\/stable\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
       )
       nock(/oclif-staging.s3.amazonaws.com/)
         .get(manifestRegex)
@@ -472,7 +484,7 @@ describe('update plugin', () => {
       const beforeMtime = (await stat(activeDir)).mtime.getTime()
 
       const manifestRegex = new RegExp(
-        `channels\\/stable\\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
+        String.raw`channels\/stable\/example-cli-${config.platform}-${config.arch}-buildmanifest`,
       )
       nock(/oclif-staging.s3.amazonaws.com/)
         .get(manifestRegex)
