@@ -8,6 +8,7 @@ static examples = [
 hello world from ./src/hello.ts!
 `,
   ]
+
 static flags = {
     // flag with no value (-f, --force)
     force: flags.boolean({char: 'f'}),

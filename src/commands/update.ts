@@ -1,5 +1,5 @@
 import select from '@inquirer/select'
-import {Args, Command, Flags, Interfaces, ux} from '@oclif/core'
+import {Args, Command, Flags, type Interfaces, ux} from '@oclif/core'
 import {printTable} from '@oclif/table'
 import {got} from 'got'
 import {basename} from 'node:path'
@@ -11,6 +11,7 @@ export default class UpdateCommand extends Command {
   static args = {
     channel: Args.string({optional: true}),
   }
+
   static description = 'update the <%= config.bin %> CLI'
   static examples = [
     {
@@ -30,6 +31,7 @@ export default class UpdateCommand extends Command {
       description: 'See available versions:',
     },
   ]
+
   static flags = {
     autoupdate: Flags.boolean({hidden: true}),
     available: Flags.boolean({

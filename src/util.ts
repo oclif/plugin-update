@@ -1,4 +1,4 @@
-import {Stats} from 'node:fs'
+import {type Stats} from 'node:fs'
 import {readdir, stat, utimes, writeFile} from 'node:fs/promises'
 import {join} from 'node:path'
 
@@ -13,12 +13,14 @@ export async function touch(p: string): Promise<void> {
 export async function ls(dir: string): Promise<Array<{path: string; stat: Stats}>> {
   const files = await readdir(dir)
   const paths = files.map((f) => join(dir, f))
-  return Promise.all(paths.map((path) => stat(path).then((s) => ({path, stat: s}))))
+  return Promise.all(paths.map(async (path) => stat(path).then((s) => ({path, stat: s}))))
 }
 
-export function wait(ms: number, unref = false): Promise<void> {
+export async function wait(ms: number, unref = false): Promise<void> {
   return new Promise((resolve) => {
-    const t = setTimeout(() => resolve(), ms)
+    const t = setTimeout(() => {
+      resolve()
+    }, ms)
     if (unref) t.unref()
   })
 }
