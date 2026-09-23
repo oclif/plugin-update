@@ -1,3 +1,9 @@
+## [5.0.1](https://github.com/oclif/plugin-update/compare/5.0.0...5.0.1) (2026-09-23)
+
+### Bug Fixes
+
+- resolving autofixable eslint violations (W-24099831) ([#1405](https://github.com/oclif/plugin-update/issues/1405)) ([6b73d68](https://github.com/oclif/plugin-update/commit/6b73d68d405497065baf8bf5fb03737bfcd6c6b7))
+
 # [5.0.0](https://github.com/oclif/plugin-update/compare/4.8.0...5.0.0) (2026-08-31)
 
 - feat!: upgrade oclif/core to v5 @W-23512455@ (#1400) ([7d01be6](https://github.com/oclif/plugin-update/commit/7d01be678dc5a104e07dea239346611c505ec773)), closes [#1400](https://github.com/oclif/plugin-update/issues/1400)
