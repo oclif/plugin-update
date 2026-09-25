@@ -1,3 +1,9 @@
+## [5.0.2](https://github.com/oclif/plugin-update/compare/5.0.1...5.0.2) (2026-09-25)
+
+### Bug Fixes
+
+- **deps:** bump js-yaml from 4.3.1 to 4.3.2 ([#1403](https://github.com/oclif/plugin-update/issues/1403)) ([5737db4](https://github.com/oclif/plugin-update/commit/5737db49c798a94bf744272012d7379b0ee7e6cd))
+
 ## [5.0.1](https://github.com/oclif/plugin-update/compare/5.0.0...5.0.1) (2026-09-23)
 
 ### Bug Fixes

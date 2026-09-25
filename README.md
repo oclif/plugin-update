@@ -84,7 +84,7 @@ EXAMPLES
     $ oclif-example update --available
 ```
 
-_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/5.0.1/src/commands/update.ts)_
+_See code: [src/commands/update.ts](https://github.com/oclif/plugin-update/blob/5.0.2/src/commands/update.ts)_
 <!-- commandsstop -->
 
 # Contributing
