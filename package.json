@@ -5,7 +5,7 @@
   "bugs": "https://github.com/oclif/plugin-update/issues",
   "dependencies": {
     "@inquirer/select": "^2.5.0",
-    "@oclif/core": "^5.0.0",
+    "@oclif/core": "^5.1.2",
     "@oclif/table": "^1.0.0",
     "ansis": "^3.17.0",
     "debug": "^4.4.1",
