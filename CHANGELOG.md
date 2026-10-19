@@ -1,3 +1,9 @@
+## [5.0.8](https://github.com/oclif/plugin-update/compare/5.0.7...5.0.8) (2026-10-19)
+
+### Bug Fixes
+
+- **deps:** bump brace-expansion in /examples/s3-update-example-cli ([#1416](https://github.com/oclif/plugin-update/issues/1416)) ([a602a2a](https://github.com/oclif/plugin-update/commit/a602a2a693e67fa1ad79cc8ba62c62f75ebf12b0))
+
 ## [5.0.7](https://github.com/oclif/plugin-update/compare/5.0.6...5.0.7) (2026-10-19)
 
 ### Bug Fixes
