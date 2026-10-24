@@ -1066,10 +1066,10 @@
   resolved "https://registry.yarnpkg.com/@oclif/prettier-config/-/prettier-config-0.2.1.tgz#1def9f38134f9bfb229257f48a35f7d0d183dc78"
   integrity sha512-XB8kwQj8zynXjIIWRm+6gO/r8Qft2xKtwBMSmq1JRqtA6TpwpqECqiu8LosBCyg2JBXuUy2lU23/L98KIR7FrQ==
 
-"@oclif/table@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@oclif/table/-/table-1.0.5.tgz#53e60e6aa3d297414c6a9aba2a8b2df4fb3fa6c0"
-  integrity sha512-6+czHxLf6sEFob8e0h+4bXCpG3LqoMOb7u8rRxc/XM0vGNHnodp/pHPOz6kzVvzjebHevX21bnuVB0vr1JeVHQ==
+"@oclif/table@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@oclif/table/-/table-1.0.6.tgz#1ced6a69177dec8786e11aae549a152f037efcc3"
+  integrity sha512-EdCDgMfc8346oMYoMN+mKLTlTrm/eEOe1MPQLNsXFO0v+UCKq4mzavbN+8wqP5aotpt8NCMNlqR7Emz9WRsYyA==
   dependencies:
     "@types/react" "^19.3.0"
     change-case "^5.4.4"
@@ -1078,7 +1078,7 @@
     natural-orderby "^3.0.2"
     object-hash "^3.0.0"
     react "^19.3.0"
-    string-width "^8.2.1"
+    string-width "^8.3.0"
     strip-ansi "^7.2.0"
     wrap-ansi "^9.0.2"
 
@@ -5600,7 +5600,7 @@ string-width@^7.0.0:
     get-east-asian-width "^1.0.0"
     strip-ansi "^7.1.0"
 
-string-width@^8.1.0, string-width@^8.2.0, string-width@^8.2.1:
+string-width@^8.1.0, string-width@^8.2.0, string-width@^8.3.0:
   version "8.3.0"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-8.3.0.tgz#f1e85ca6d276ed9226c979c3651fb7abf548fbbe"
   integrity sha512-ZbmZM0JCihQN91dWnxoipT2KOEyHqEyfRXUyjuRhW8b/xnqPDoq4gWEVApTVa9db2wN8mmoikgFBbjh71+cGeQ==
