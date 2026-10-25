@@ -19,7 +19,7 @@
     "@commitlint/config-conventional": "^19",
     "@eslint/compat": "^1.4.1",
     "@oclif/plugin-help": "^6",
-    "@oclif/prettier-config": "^0.2.1",
+    "@oclif/prettier-config": "^0.2.2",
     "@types/chai": "^4.3.17",
     "@types/debug": "^4.1.13",
     "@types/execa": "^0.9.0",
