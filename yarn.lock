@@ -1066,10 +1066,10 @@
   resolved "https://registry.yarnpkg.com/@oclif/prettier-config/-/prettier-config-0.2.2.tgz#b6205b889163400dc7eeffb761da87158995333c"
   integrity sha512-GB+6QgBBKHjvmkSs+U4AiccDH3ijZhwhlTP7aUMqM2f0OMMZy9IAlxtTtRxhmLqzQEBQjTIrD4wmT3GOxS5pRw==
 
-"@oclif/table@^1.0.6":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@oclif/table/-/table-1.0.6.tgz#1ced6a69177dec8786e11aae549a152f037efcc3"
-  integrity sha512-EdCDgMfc8346oMYoMN+mKLTlTrm/eEOe1MPQLNsXFO0v+UCKq4mzavbN+8wqP5aotpt8NCMNlqR7Emz9WRsYyA==
+"@oclif/table@^1.0.8":
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@oclif/table/-/table-1.0.8.tgz#0e272644903525f99beb69a4dc333e705fb0455c"
+  integrity sha512-oiH9bmDv5g8plI7cSpyN2c5MSgxbwgy9Wjoml4nRyfCub1rkW/0xDmqx+EqF2JF01yAnNFNWU794xqYepM1sEw==
   dependencies:
     "@types/react" "^19.3.0"
     change-case "^5.4.4"
@@ -1077,7 +1077,7 @@
     ink "^7.1.1"
     natural-orderby "^3.0.2"
     object-hash "^3.0.0"
-    react "^19.3.0"
+    react "^19.3.1"
     string-width "^8.3.0"
     strip-ansi "^7.2.0"
     wrap-ansi "^9.0.2"
@@ -5173,7 +5173,7 @@ react-reconciler@^0.33.0:
   dependencies:
     scheduler "^0.27.0"
 
-react@^19.3.0:
+react@^19.3.1:
   version "19.3.1"
   resolved "https://registry.yarnpkg.com/react/-/react-19.3.1.tgz#26e9523fc36ea06be5050ebb780249a133260ad7"
   integrity sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw==
